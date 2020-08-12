@@ -21,11 +21,6 @@ class SignInController(BaseController):
 		'msg': 'Username or password not valid.',
 	}
 
-	cookies = {
-		'username': None,
-		'token': None,
-	}
-
 	def get(self):
 		try:
 			self.render('auth/login.html')
@@ -63,4 +58,4 @@ class SignInController(BaseController):
 		if respon.status_code == 200:
 			self.cookies['username'] = respon.json()['result']['username']
 			self.cookies['token'] = validation['token']
-			self.set_secure_cookie(options.cookies, tornado.escape.json_encode(self.cookies))
+			self.set_secure_cookie(options.cookies, tornado.escape.json_encode(self.cookies_data))
