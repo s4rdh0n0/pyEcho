@@ -29,11 +29,16 @@ class BaseController(tornado.web.RequestHandler):
 		respon = requests.get('{}/{}{}'.format(options.apis, 'offices/users/find?username=', cookies['username']), headers=dheader)
 
 		return respon
-
-	def refresh_cookies(self, token=""):
-		dheader = {'Authorization': 'Bearer {}'.format(token)}
+	
+	def refresh_cookies(self):
+		cookies = self.get_cookies_user()
+		dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}
 		respon = requests.get('{}/{}/{}'.format(options.apis, 'auth', 'refresh_token'), headers=dheader)
+		
 		if respon.status_code == 200:
-			cookies = self.get_cookies_user()
 			cookies['token'] = respon.json()['token']
 			self.set_secure_cookie(options.cookies, tornado.escape.json_encode(cookies))
+
+			return True
+		else:
+			return False
