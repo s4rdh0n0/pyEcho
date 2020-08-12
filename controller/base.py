@@ -23,6 +23,13 @@ class BaseController(tornado.web.RequestHandler):
 	def get_current_user(self):
 		return self.get_secure_cookie(options.cookies)
 
+	def get_user_actived(self):
+		cookies = self.get_cookies_user()
+		dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}
+		respon = requests.get('{}/{}{}'.format(options.apis, 'offices/users/find?username=', cookies['username']), headers=dheader)
+
+		return respon
+
 	def refresh_cookies(self, token=""):
 		dheader = {'Authorization': 'Bearer {}'.format(token)}
 		respon = requests.get('{}/{}/{}'.format(options.apis, 'auth', 'refresh_token'), headers=dheader)
