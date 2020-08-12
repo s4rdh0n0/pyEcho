@@ -1,21 +1,62 @@
 # Python Default
 import os
-
-import app
+import logging
 
 import tornado
+import tornado.gen
+import tornado.ioloop
+import tornado.locks
 from tornado.options import define, options
+from tornado.log import app_log, gen_log, access_log, LogFormatter
+
+from controller.auth import SignInController
 
 
-define("api", default="http://localhost:8000", help="web service")
 define("dir", default=os.path.dirname(__file__), help="root path")
-define("cookies", default="echo_web", help="web")
+
+
+class Application(tornado.web.Application):
+
+   handlers = [(r"/login", SignInController)]
+
+   def __init__(self):
+
+      settings = dict(
+          title='pyEcho',
+          version='1.0.0',
+          template_path=os.path.join(options.dir, 'view'),
+          static_path=os.path.join(options.dir, 'assets'),
+          xsrf_cookies=True,
+          cookie_secret='16b56537-b94e-49bc-9f98-9be58f0b2d28',
+          login_url=r"/login",
+          debug=True,
+      )
+
+      super(Application, self).__init__(self.handlers, **settings)
+
+
+def logger():
+    # define your new format, for instance :
+    my_log_format = '%(color)s::%(levelname)s %(asctime)s::%(end_color)s - %(message)s'
+
+    # create an instance of tornado formatter, just overriding the 'fmt' arg
+    my_log_formatter = LogFormatter(fmt=my_log_format, color=True)
+
+    # get the parent logger of all tornado loggers :
+    root_logger = logging.getLogger()
+
+    # set your format to root_logger
+    root_streamhandler = root_logger.handlers[0]
+    root_streamhandler.setFormatter(my_log_formatter)
+
 
 @tornado.gen.coroutine
 def main():
+    # logger format
+    logger()
     tornado.options.parse_command_line()
 
-    server = app.Application()
+    server = Application()
     server.listen('4231')
 
     # In this demo the server will simply run until interrupted

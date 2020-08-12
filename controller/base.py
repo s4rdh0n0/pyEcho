@@ -1,6 +1,11 @@
 import tornado.escape
+
+
 from tornado.web import RequestHandler
-from tornado.options import options
+from tornado.options import options, define
+
+define("apis", default="http://localhost:8000", help="web service")
+define("cookies", default="echo_web", help="web")
 
 class BaseController(RequestHandler):
    
