@@ -8,7 +8,6 @@ from tornado.options import options
 
 
 # Controller
-import controller
 from controller.base import BaseController
 
 
@@ -36,14 +35,14 @@ class SignInController(BaseController):
 			respon = requests.post('{}/{}/{}'.format(options.apis, 'auth', 'login'), json=djson)
 			if respon.status_code == 200:
 				self.result_validation['status'] = True
-				self.result_validation['url'] = None
+				self.result_validation['url'] = options.apis
 				self.result_validation['type'] = 'success'
 				self.result_validation['msg'] = None
 
 				self.save_cookies(body["username"],respon.json())
 			elif respon.status_code == 401:
 				self.result_validation['status'] = False
-				self.result_validation['url'] = options.apis + "/login"
+				self.result_validation['url'] = None
 				self.result_validation['type'] = 'warning'
 				self.result_validation['msg'] = 'Username or password not valid.'
 		except Exception as e:
