@@ -14,11 +14,16 @@ from controller.base import BaseController
 
 class SignInController(BaseController):
 
-	result = {
+	result_validation = {
 		'status': False,
 		'url': options.apis + "/login",
 		'type': None,
 		'msg': 'Username or password not valid.',
+	}
+
+	cookies = {
+		'username': None,
+		'token': None,
 	}
 
 	def get(self):
@@ -26,30 +31,36 @@ class SignInController(BaseController):
 			self.render('auth/login.html')
 		except Exception as e:
 			self.write(e)
-			# print("Error: {}".format(e))
+
 
 	def post(self):
 		body = tornado.escape.json_decode(self.request.body)
 		djson = {"username": body["username"],
 		         "password": body["password"]}
 		try:
-			validation = requests.post('{}/{}/{}'.format(options.apis, 'auth', 'login'), json=djson)
-			if validation.status_code == 200:
-				self.result['status'] = True
-				self.result['url'] = None
-				self.result['type'] = 'success'
-				self.result['msg'] = None
+			respon = requests.post('{}/{}/{}'.format(options.apis, 'auth', 'login'), json=djson)
+			if respon.status_code == 200:
+				self.result_validation['status'] = True
+				self.result_validation['url'] = None
+				self.result_validation['type'] = 'success'
+				self.result_validation['msg'] = None
 
-				self.save_cookies(validation.json())
-			elif validation.status_code == 401:
-				self.result['status'] = False
-				self.result['url'] = options.apis + "/login"
-				self.result['type'] = 'warning'
-				self.result['msg'] = 'Username or password not valid.'
+				self.save_cookies(body["username"],respon.json())
+			elif respon.status_code == 401:
+				self.result_validation['status'] = False
+				self.result_validation['url'] = options.apis + "/login"
+				self.result_validation['type'] = 'warning'
+				self.result_validation['msg'] = 'Username or password not valid.'
 		except Exception as e:
 			self.write(e)
 		finally:
-			self.write(self.result)
+			self.write(self.result_validation)
 
-	def save_cookies(self, validation = {}):
-		print(validation)
+
+	def save_cookies(self, username = "",validation = {}):
+		dheader = {'Authorization': 'Bearer {}'.format(validation['token'])}
+		respon = requests.get('{}/{}{}'.format(options.apis, 'offices/users/find?username=', username), headers=dheader)
+		if respon.status_code == 200:
+			self.cookies['username'] = respon.json()['result']['username']
+			self.cookies['token'] = validation['token']
+			self.set_secure_cookie(options.cookies, tornado.escape.json_encode(self.cookies))
