@@ -11,6 +11,7 @@ define("cookies", default="pyEchoCookies", help="web")
 class BaseController(tornado.web.RequestHandler):
    
 	"""  """
+	
 	cookies_data = {
 		'username': None,
 		'token': None,
