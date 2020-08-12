@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+    <!-- Page title -->
+    <title>{% block title %}{% end %}</title>
+
+    <!-- CSS -->
+    {% block css %}{% end %}
+</head>
+
+<body {% block bodyClass %}{% end %}>
+
+    <!-- Pages -->
+    {% block pages %}{% end %}
+
+    <!-- JS -->
+    {% block js %}{% end %}
+</body>
+
+</html>
