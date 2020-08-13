@@ -10,12 +10,12 @@
             required: true
          },
       }, messages: {
-         username: {
-            required: 'Username tidak boleh kosong.'
-         },
-         password: {
-            required: 'Password tidak boleh kosong.'
-         },
+            username: {
+               required: 'Username tidak boleh kosong.'
+            },
+            password: {
+               required: 'Password tidak boleh kosong.'
+            },
       },
       errorElement: "small",
       highlight: function (element, errorClass, validClass) {

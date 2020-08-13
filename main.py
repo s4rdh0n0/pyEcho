@@ -16,7 +16,6 @@ from controller.dashboard import DashboardController
 
 define("dir", default=os.path.dirname(__file__), help="root path")
 
-
 class Application(tornado.web.Application):
 
    handlers = [(r"/login", SignInController),

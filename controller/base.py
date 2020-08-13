@@ -4,6 +4,7 @@ import tornado.escape
 import tornado.web
 from tornado.options import options, define
 
+
 define("apis", default="http://localhost:8000", help="web service")
 define("cookies", default="pyEchoCookies", help="web")
 
@@ -13,7 +14,7 @@ class BaseController(tornado.web.RequestHandler):
 	"""  """
 	
 	cookies_data = {
-		'username': None,
+		'userid': None,
 		'token': None,
 	}
 
@@ -26,19 +27,17 @@ class BaseController(tornado.web.RequestHandler):
 	def get_user_actived(self):
 		cookies = self.get_cookies_user()
 		dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}
-		respon = requests.get('{}/{}{}'.format(options.apis, 'offices/users/find?username=', cookies['username']), headers=dheader)
-
-		return respon
+		
+		return requests.get('{}/{}{}&type=userid'.format(options.apis, 'offices/users/find?id=', cookies['userid']), headers=dheader)
 	
 	def refresh_cookies(self):
-		cookies = self.get_cookies_user()
-		dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}
-		respon = requests.get('{}/{}/{}'.format(options.apis, 'auth', 'refresh_token'), headers=dheader)
 		
-		if respon.status_code == 200:
-			cookies['token'] = respon.json()['token']
-			self.set_secure_cookie(options.cookies, tornado.escape.json_encode(cookies))
-
-			return True
-		else:
-			return False
+		try:
+			cookies = self.get_cookies_user()
+			dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}
+			respon = requests.get('{}/{}/{}'.format(options.apis, 'auth', 'refresh_token'), headers=dheader)
+			
+			if respon.status_code != 200:
+				self.redirect("/login")
+		except:
+			self.redirect("/login")

@@ -12,10 +12,10 @@ class DashboardController(BaseController):
 
     @tornado.web.authenticated
     def get(self):
+        self.refresh_cookies()
         try:
-            if self.refresh_cookies():
-                respon = self.get_user_actived()
-                if respon.status_code == 200:
-                    self.render('dashboard.html', useractived=respon.json()['result'])
+            respon = self.get_user_actived()
+            if  respon.status_code == 200:
+                self.render('dashboard.html', useractived=respon.json()['result'])
         except Exception as e:
         	self.write(e)
