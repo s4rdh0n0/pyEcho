@@ -3,6 +3,7 @@ import requests
 
 # Tornado Framework
 import tornado.gen
+import tornado.web
 import tornado.escape
 from tornado.options import options
 
@@ -62,5 +63,21 @@ class SignInController(BaseController):
 
 class SignOutController(BaseController):
 
+	@tornado.web.authenticated
 	def get(self):
 		self.clear_cookie(options.cookies)
+		self.redirect("/login")
+
+
+class NotFoundController (BaseController):
+
+	@tornado.web.authenticated
+	def get(self):
+		try:
+		    respon = self.get_user_actived()
+		    if  respon.status_code == 200:
+		        self.page_data['title'] = 'Error 404'
+		        self.page_data['description'] = 'Page not found'
+		        self.render('error/404.html', page=self.page_data, useractived=respon.json()['result'])
+		except Exception as e:
+			self.write(e)

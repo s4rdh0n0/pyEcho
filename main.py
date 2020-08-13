@@ -10,7 +10,7 @@ from tornado.options import define, options
 from tornado.log import app_log, gen_log, access_log, LogFormatter
 
 # Controller
-from controller.auth import SignInController
+from controller.auth import SignInController, SignOutController, NotFoundController
 from controller.dashboard import DashboardController
 
 
@@ -18,8 +18,10 @@ define("dir", default=os.path.dirname(__file__), help="root path")
 
 class Application(tornado.web.Application):
 
-   handlers = [(r"/login", SignInController),
-               (r"/", DashboardController)]
+   handlers = [(r"/logout", SignOutController),
+               (r"/login", SignInController),
+               (r"/", DashboardController),
+               (r"/.*", NotFoundController)]
 
    def __init__(self):
 

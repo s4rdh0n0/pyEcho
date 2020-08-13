@@ -36,7 +36,6 @@ class BaseController(tornado.web.RequestHandler):
 		return requests.get('{}/{}{}&type=userid'.format(options.apis, 'offices/users/find?id=', cookies['userid']), headers=dheader)
 	
 	def refresh_cookies(self):
-		
 		try:
 			cookies = self.get_cookies_user()
 			dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}
