@@ -18,6 +18,11 @@ class BaseController(tornado.web.RequestHandler):
 		'token': None,
 	}
 
+	page_data = {
+		'title': None,
+		'description': None,
+	}
+
 	def get_cookies_user(self):
 		return tornado.escape.json_decode(self.get_secure_cookie(options.cookies))
 

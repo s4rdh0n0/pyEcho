@@ -58,3 +58,9 @@ class SignInController(BaseController):
 			self.cookies_data['username'] = respon.json()['result']['username']
 			self.cookies_data['token'] = validation['token']
 			self.set_secure_cookie(options.cookies, tornado.escape.json_encode(self.cookies_data))
+
+
+class SignOutController(BaseController):
+
+	def get(self):
+		self.clear_cookie(options.cookies)

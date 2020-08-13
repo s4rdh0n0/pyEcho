@@ -16,6 +16,8 @@ class DashboardController(BaseController):
         try:
             respon = self.get_user_actived()
             if  respon.status_code == 200:
-                self.render('dashboard.html', useractived=respon.json()['result'])
+                self.page_data['title'] = 'Dashboard'
+                self.page_data['description'] = ''
+                self.render('dashboard.html', page=self.page_data, useractived=respon.json()['result'])
         except Exception as e:
         	self.write(e)
