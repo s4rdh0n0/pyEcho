@@ -12,6 +12,7 @@ from tornado.log import app_log, gen_log, access_log, LogFormatter
 # Controller
 from controller.auth import SignInController, SignOutController, NotFoundController
 from controller.dashboard import DashboardController
+from controller.administrator import DaftarPegawaiController
 
 
 define("dir", default=os.path.dirname(__file__), help="root path")
@@ -21,6 +22,7 @@ class Application(tornado.web.Application):
    handlers = [(r"/logout", SignOutController),
                (r"/login", SignInController),
                (r"/", DashboardController),
+               (r"/administrator/daftarpegawai", DaftarPegawaiController),
                (r"/.*", NotFoundController)]
 
    def __init__(self):

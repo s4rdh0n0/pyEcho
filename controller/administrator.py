@@ -15,7 +15,7 @@ class DaftarPegawaiController(BaseController):
             respon = self.get_user_actived()
             if  respon.status_code == 200:
                 self.page_data['title'] = 'Daftar Pegawai'
-                self.page_data['description'] = 'Rekapituasi berkas register'
+                self.page_data['description'] = 'Pegawai Actived/Non Actived by Office'
                 self.render('administrator/daftarpegawai.html', page=self.page_data, useractived=respon.json()['result'])
         except Exception as e:
         	self.write(e)
