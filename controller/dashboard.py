@@ -12,9 +12,10 @@ class DashboardController(BaseController):
 
     @tornado.web.authenticated
     def get(self):
-        self.refresh_cookies()
+        cookies = self.get_cookies_user()
+        self.refresh_cookies(cookies=cookies)
         try:
-            respon = self.get_user_actived()
+            respon = self.get_user_actived(cookies=cookies)
             if  respon.status_code == 200:
                 self.page_data['title'] = 'Dashboard'
                 self.page_data['description'] = 'Rekapitulasi berkas register'

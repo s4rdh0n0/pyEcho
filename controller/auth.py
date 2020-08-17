@@ -36,7 +36,7 @@ class SignInController(BaseController):
 			respon = requests.post('{}/{}/{}'.format(options.apis, 'auth', 'login'), json=djson)
 			if respon.status_code == 200:
 				self.result_validation['status'] = True
-				self.result_validation['url'] = self.get_query_argument('next', '/')
+				self.result_validation['url'] = self.get_query_argument('next', u'/')
 				self.result_validation['type'] = 'success'
 				self.result_validation['msg'] = None
 
@@ -51,12 +51,13 @@ class SignInController(BaseController):
 		finally:
 			self.write(self.result_validation)
 
-	def save_cookies(self, username = "",validation = {}):
+	def save_cookies(self, username="",validation={}):
 		dheader = {'Authorization': 'Bearer {}'.format(validation['token'])}
 		respon = requests.get('{}/{}{}&type=username'.format(options.apis, 'offices/users/find?id=', username), headers=dheader)
 		if respon.status_code == 200:
 			self.cookies_data['userid'] = respon.json()['result']['_id']
 			self.cookies_data['username'] = respon.json()['result']['username']
+			self.cookies_data['officeid'] = respon.json()['result']['officeid']
 			self.cookies_data['token'] = validation['token']
 			self.set_secure_cookie(options.cookies, tornado.escape.json_encode(self.cookies_data))
 
