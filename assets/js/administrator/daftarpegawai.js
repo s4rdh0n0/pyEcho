@@ -1,9 +1,47 @@
 + function ($) {
     'use strict';
 
-
+    $('#formAddPegawai').validate({
+        rules: {
+            username: {
+                required: true,
+            }
+        },
+        messages: {
+            username: {
+                required: 'Username tidak boleh kosong.',
+            }
+        },
+        errorElement: "small",
+        highlight: function (element, errorClass, validClass) {
+            var elem = $(element);
+            elem.closest('.form-group').addClass('has-error');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            var elem = $(element);
+            elem.closest('.form-group').removeClass('has-error');
+        },
+        submitHandler: function (form) {
+            $.ajax({
+                type: 'PUT',
+                url: '/administrator/daftarpegawai/kkp/username=' + $('#username').val(),
+                headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+                success: (function (data) {
+                    if (data.status) {
+                        console.log(data.data)
+                    } else {
+                        console.log('Bukan pegawai kantor ini.')
+                    }
+                }),
+                error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("Error: " + errorThrown);
+                })
+            })
+        }
+    });
 
 }(jQuery);
+
 
 /* Initial Table Pegawai */
 var tablePegawai = $('#tablePegawai').DataTable({
@@ -27,6 +65,8 @@ var tablePegawai = $('#tablePegawai').DataTable({
                 // NOTE: callback response ajax
                 if (data.status){
                     callback(data);
+                }else{
+                    alert("Error: " + data.msg)
                 }
             }),
             error: (function (XMLHttpRequest, textStatus, errorThrown) {
@@ -66,7 +106,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
             "targets": [5],
             "width": "3%",
             "render": function () {
-                return '<a id="lihat" class="btn btn-default btn-flat"><i class="fa fa-info-circle" aria-hidden="true"></i></a>';
+                return '<a id="lihat" class="btn btn-primary btn-flat"><i class="fa fa-info-circle" aria-hidden="true"></i></a>';
             }
         }
     ],
@@ -74,7 +114,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
     'paging': true,
     'pagingType': 'simple_numbers',
     'lengthChange': false,
-    'pageLength': 4,
+    'pageLength': 20,
     'ordering': false,
     'searching': false,
     'info': true

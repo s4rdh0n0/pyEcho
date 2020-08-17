@@ -8,6 +8,7 @@ from tornado.options import options
 # Controller
 from controller.base import BaseController
 
+
 class DaftarPegawaiController(BaseController):
 
     @tornado.web.authenticated
@@ -32,7 +33,7 @@ class DaftarPegawaiController(BaseController):
         cookies = self.get_cookies_user()
         self.refresh_cookies(cookies=cookies)
         try:
-            # NOTE: load users
+            # NOTE: header JWT
             dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}
 
             # NOTE: Count the number of records
@@ -47,5 +48,25 @@ class DaftarPegawaiController(BaseController):
             else:
                 pass
         except Exception as e:
-            self.write(e)
+            self.write({'status': False, 'msg': e})
+
+    @tornado.web.authenticated
+    def put(self, username=""):
+        cookies = self.get_cookies_user()
+        self.refresh_cookies(cookies=cookies)
+        try:
+            # NOTE: header JWT
+            dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}
+            param = 'officeid={}&username={}'.format(cookies['officeid'], username)
+            respon = requests.get('{}/{}{}'.format(options.apis, 'offices/users/kkp?', param), headers=dheader)
+            if respon.status_code == 200:
+                # self.write({'status': True, 'data': respon.json()})
+                if respon.json()['result']['profile']['profilepegawai'] != None:
+                    self.write({'status': True, 'data':respon.json()})
+                else:
+                    self.write({'status': False, 'data': None})
+            else:
+                pass
+        except Exception as e:
+       	    self.write(e)
         
