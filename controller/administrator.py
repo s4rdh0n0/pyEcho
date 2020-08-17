@@ -57,16 +57,25 @@ class DaftarPegawaiController(BaseController):
         try:
             # NOTE: header JWT
             dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}
-            param = 'officeid={}&username={}'.format(cookies['officeid'], username)
-            respon = requests.get('{}/{}{}'.format(options.apis, 'offices/users/kkp?', param), headers=dheader)
-            if respon.status_code == 200:
-                # self.write({'status': True, 'data': respon.json()})
-                if respon.json()['result']['profile']['profilepegawai'] != None:
-                    self.write({'status': True, 'data':respon.json()})
+
+            # NOTE: load kkp data
+            paramKKP = 'officeid={}&username={}'.format(cookies['officeid'], username)
+            responKKP = requests.get('{}/{}{}'.format(options.apis, 'offices/users/kkp?', paramKKP), headers=dheader)
+            
+            if responKKP.status_code == 200:
+                # NOTE: load db data
+                paramDB = 'id={}&type=username'.format(username)
+                responDB = requests.get('{}/{}{}'.format(options.apis, 'offices/users/find?', paramDB), headers=dheader)
+                
+                if responDB.status_code == 200:
+                    self.write({'status': False, 'data': None, 'msg': 'Username sudah terdaftar pada aplikasi ini.'})
                 else:
-                    self.write({'status': False, 'data': None})
-            else:
-                pass
+                    if responKKP.json()['result']['profile']['profilepegawai'] != None:
+                        self.write({'status': True, 'data':responKKP.json()})
+                    else:
+                        self.write({'status': False, 'data': None, 'msg': 'Username sudah tidak terdaftar database kkp.'})
+
+
         except Exception as e:
        	    self.write(e)
         

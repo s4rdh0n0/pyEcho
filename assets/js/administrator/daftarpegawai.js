@@ -26,11 +26,22 @@
                 type: 'PUT',
                 url: '/administrator/daftarpegawai/kkp/username=' + $('#username').val(),
                 headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
-                success: (function (data) {
-                    if (data.status) {
-                        console.log(data.data)
+                success: (function (json) {
+                    if (json.status) {
+                        $(".kkplog").show();
+                        $(".kkplog_finder").hide();
+                        $(".kkplog_alert").hide();
+
+                        $("#pegawaiid_kkplog").val(json.data.result.pegawaiid);
+                        $("#username_kkplog").val($("#username").val());     
+                        $("#name_kkplog").val(json.data.result.name);
+                        $("#phone_kkplog").val(json.data.result.phone);
+
+                        // console.log(json.data)
                     } else {
-                        console.log('Bukan pegawai kantor ini.')
+                        // console.log(json.msg)
+                        $(".kkplog_alert").show();
+                        $(".kkplog_alert").html('<h4><i class="icon fa fa-warning"></i> Warning!</h4>' + json.msg)
                     }
                 }),
                 error: (function (XMLHttpRequest, textStatus, errorThrown) {
@@ -38,6 +49,23 @@
                 })
             })
         }
+    });
+
+    // NOTE: Modal add hide
+    $('#modal-add').on('hide.bs.modal', function () {
+        $(".kkplog_alert").hide();
+        $(".kkplog").hide();
+        $(".kkplog_finder").show();
+        $("#username").val("");
+    });
+
+    // NOTE: Back to finder user kkp
+    $('#batalregisterpegawai').on('click', function () {
+        $(".kkplog_alert").hide();
+        $(".kkplog").hide();
+        $(".kkplog_finder").show();
+        $("#username").val("");
+        $("#username").focus();
     });
 
 }(jQuery);
