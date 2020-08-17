@@ -14,6 +14,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
             type: 'POST',
             url: '/administrator/daftarpegawai',
             data: JSON.stringify({
+                page: $('#tablePegawai').DataTable().page.info()['page'],
                 start: $('#tablePegawai').dataTable().fnSettings()._iDisplayStart,
                 limit: $('#tablePegawai').dataTable().fnSettings()._iDisplayLength,
                 draw: $('#tablePegawai').dataTable().fnSettings().iDraw,
@@ -73,7 +74,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
     'paging': true,
     'pagingType': 'simple_numbers',
     'lengthChange': false,
-    'pageLength': 20,
+    'pageLength': 4,
     'ordering': false,
     'searching': false,
     'info': true

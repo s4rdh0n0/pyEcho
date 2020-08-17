@@ -34,10 +34,16 @@ class DaftarPegawaiController(BaseController):
         try:
             # NOTE: load users
             dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}
-            param = 'officeid={}&limit={}&page={}'.format(cookies['officeid'], body['limit'], 1)
-            users = requests.get('{}/{}{}'.format(options.apis, 'offices/users?', param), headers=dheader)
-            if users.status_code == 200:
-                self.write({'status': True, 'draw': body['draw'], 'data': users.json()['result'], 'recordsTotal': body['limit'], 'recordsFiltered': body['limit']})
+
+            # NOTE: Count the number of records
+            paramRecords = 'officeid={}'.format(cookies['officeid'])
+            records = requests.get('{}/offices/users/count?{}'.format(options.apis, paramRecords), headers=dheader)
+
+            # NOTE: Load entire user data
+            paramUsers = 'officeid={}&limit={}&page={}'.format(cookies['officeid'], body['limit'], body['page'] + 1)
+            users = requests.get('{}/{}{}'.format(options.apis, 'offices/users?', paramUsers), headers=dheader)
+            if users.status_code == 200 and records.status_code == 200:
+                self.write({'status': True, 'draw': body['draw'], 'data': users.json()['result'], 'recordsTotal': records.json()['result'], 'recordsFiltered': records.json()['result']})
             else:
                 pass
         except Exception as e:
