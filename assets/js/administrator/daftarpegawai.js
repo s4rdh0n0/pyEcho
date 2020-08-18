@@ -1,6 +1,25 @@
 + function ($) {
     'use strict';
 
+
+    $('#formFilter').validate({
+        rules: {},
+        messages: {},
+        errorElement: "small",
+        highlight: function (element, errorClass, validClass) {
+            var elem = $(element);
+            elem.closest('.form-group').addClass('has-error');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            var elem = $(element);
+            elem.closest('.form-group').removeClass('has-error');
+        },
+        submitHandler: function (form) {
+            $('#tablePegawai').DataTable().ajax.reload();
+        }
+    });
+
+
     $('#formAddPegawai').validate({
         rules: {
             username: {
@@ -26,32 +45,33 @@
                 type: 'PUT',
                 url: '/administrator/daftarpegawai/kkp/username=' + $('#username').val(),
                 headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
-                success: (function (json) {
-                    if (json.status) {
+                success: (function (result) {
+                    if (result.status) {
+
+                        // NOTE : 
                         $(".kkplog").show();
                         $(".kkplog_finder").hide();
                         $(".kkplog_alert").hide();
 
-                        $("#pegawaiid_kkplog").val(json.data.result.pegawaiid);
+                        // NOTE :
+                        $("#pegawaiid_kkplog").val(result.data.result.pegawaiid);
                         $("#username_kkplog").val($("#username").val());     
-                        $("#name_kkplog").val(json.data.result.name);
-                        $("#phone_kkplog").val(json.data.result.phone);
+                        $("#name_kkplog").val(result.data.result.name);
+                        $("#phone_kkplog").val(result.data.result.phone);
 
-                        // console.log(json.data)
                     } else {
-                        // console.log(json.msg)
                         $(".kkplog_alert").show();
-                        $(".kkplog_alert").html('<h4><i class="icon fa fa-warning"></i> Warning!</h4>' + json.msg)
+                        $(".kkplog_alert").html('<h4><i class="icon fa fa-warning"></i> Warning!</h4>' + result.msg)
                     }
                 }),
                 error: (function (XMLHttpRequest, textStatus, errorThrown) {
                     alert("Error: " + errorThrown);
                 })
-            })
+            });
         }
     });
 
-    // NOTE: Modal add hide
+    // NOTE: modal-add hide
     $('#modal-add').on('hide.bs.modal', function () {
         $(".kkplog_alert").hide();
         $(".kkplog").hide();
@@ -59,7 +79,7 @@
         $("#username").val("");
     });
 
-    // NOTE: Back to finder user kkp
+    // NOTE: 
     $('#batalregisterpegawai').on('click', function () {
         $(".kkplog_alert").hide();
         $(".kkplog").hide();
@@ -68,8 +88,47 @@
         $("#username").focus();
     });
 
+    $('#registerpegawai').on('click', function(){
+        $.ajax({
+            type: 'POST',
+            url: '/administrator/daftarpegawai/add',
+            data: JSON.stringify({ username: $('#username_kkplog').val(), officeid: $('input[name=officeid]').val() }),
+            headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+            success: (function (result) {
+                $('#modal-add').modal('hide')
+
+                $.notify({
+                    title: '<strong>Info!</strong> <br>',
+                    message: result.msg,
+                }, {
+                    type: result.type,
+                    animate: {
+                        enter: 'animated fadeInRight',
+                        exit: 'animated fadeOutRight'
+                    }
+                });
+
+                if (result.status) {
+                    $('#tablePegawai').DataTable().ajax.reload();
+                }
+
+            }),
+            error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                alert("Error: " + errorThrown);
+            })
+        })
+    });
+
 }(jQuery);
 
+function run_wait(element) {
+    $(element).waitMe({
+        effect: 'bounce',
+        text: 'Harap tunggu...',
+        bg: 'rgba(255,255,255,0.6)',
+        color: '#000'
+    });
+}
 
 /* Initial Table Pegawai */
 var tablePegawai = $('#tablePegawai').DataTable({
@@ -84,6 +143,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
                 start: $('#tablePegawai').dataTable().fnSettings()._iDisplayStart,
                 limit: $('#tablePegawai').dataTable().fnSettings()._iDisplayLength,
                 draw: $('#tablePegawai').dataTable().fnSettings().iDraw,
+                pegawaiid: $('#pegawaiid').val(),
             }),
             headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
             success: (function (data) {
@@ -94,7 +154,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
                 if (data.status){
                     callback(data);
                 }else{
-                    alert("Error: " + data.msg)
+                    $('#tablePegawai').DataTable();
                 }
             }),
             error: (function (XMLHttpRequest, textStatus, errorThrown) {

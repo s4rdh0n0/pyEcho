@@ -12,7 +12,7 @@ from tornado.log import app_log, gen_log, access_log, LogFormatter
 # Controller
 from controller.auth import SignInController, SignOutController, NotFoundController
 from controller.dashboard import DashboardController
-from controller.administrator import DaftarPegawaiController
+from controller.administrator import DaftarPegawaiController, AddPegawaiController
 
 
 define("dir", default=os.path.dirname(__file__), help="root path")
@@ -23,6 +23,7 @@ class Application(tornado.web.Application):
                (r"/login", SignInController),
                (r"/", DashboardController),
                (r"/administrator/daftarpegawai", DaftarPegawaiController),
+               (r"/administrator/daftarpegawai/add", AddPegawaiController),
                (r"/administrator/daftarpegawai/kkp/username=([A-Za-z0-9]+)", DaftarPegawaiController),
                (r"/.*", NotFoundController)]
 
