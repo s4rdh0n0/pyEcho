@@ -53,7 +53,7 @@ class SignInController(BaseController):
 
 	def save_cookies(self, username="",validation={}):
 		dheader = {'Authorization': 'Bearer {}'.format(validation['token'])}
-		respon = requests.get('{}/{}{}&type=username'.format(options.apis, 'offices/users/find?id=', username), headers=dheader)
+		respon = requests.get('{}/{}{}&type=username&db=local'.format(options.apis, 'offices/users/find?id=', username), headers=dheader)
 		if respon.status_code == 200:
 			self.cookies_data['userid'] = respon.json()['result']['_id']
 			self.cookies_data['username'] = respon.json()['result']['username']

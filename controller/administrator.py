@@ -107,6 +107,5 @@ class DaftarPegawaiController(BaseController):
                     else:
                         self.write({'status': False, 'data': None, 'msg': 'Pegawai tidak terdaftar pada database kkp.'})
 
-
         except Exception as e:
        	    self.write(e)
