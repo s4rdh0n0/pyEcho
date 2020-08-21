@@ -79,7 +79,7 @@
         $("#username").val("");
     });
 
-    // NOTE: 
+    // NOTE: modal-add click button(batalregisterpegawai)
     $('#batalregisterpegawai').on('click', function () {
         $(".kkplog_alert").hide();
         $(".kkplog").hide();
@@ -89,16 +89,15 @@
     });
 
     $('#registerpegawai').on('click', function(){
+        $('#modal-add').modal('hide')
         $.ajax({
             type: 'POST',
             url: '/administrator/daftarpegawai/add',
             data: JSON.stringify({ username: $('#username_kkplog').val(), officeid: $('input[name=officeid]').val() }),
             headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
             success: (function (result) {
-                $('#modal-add').modal('hide')
-
                 $.notify({
-                    title: '<strong>Info!</strong> <br>',
+                    title: '<strong><i class="fa fa-info-circle" aria-hidden="true"></i> Info</strong> <br>',
                     message: result.msg,
                 }, {
                     type: result.type,

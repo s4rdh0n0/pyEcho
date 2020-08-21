@@ -12,30 +12,6 @@ from controller.base import BaseController
 from model.user import UserModel
 
 
-class AddPegawaiController(BaseController):
-
-    @tornado.web.authenticated
-    def post(self):
-        # NOTE: refresh cookies data
-        self.refresh_cookies(cookies=self.get_cookies_user())
-
-        # NOTE: respon body
-        body = tornado.escape.json_decode(self.request.body)
-        try:
-            # NOTE: header JWT
-            cookies = self.get_cookies_user()
-            dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}        
-            djson = {"officeid": body["officeid"],
-                     "username": body["username"]}
-            addUser = requests.post('{}/{}'.format(options.apis, 'offices/users/add'), json=djson, headers=dheader)
-            if addUser.status_code == 200:
-                self.write({'status': True, 'data': addUser.json(), 'type':'success', 'msg': 'Data pegawai berhasil tersimpan.'})
-            else:
-                self.write({'status': True, 'data': None, 'type':'warning', 'msg': addUser.json()['msg']})
-        
-        except Exception as e:
-            self.write({'status': False, 'msg': e})
-
 
 class DaftarPegawaiController(BaseController):
 
@@ -52,6 +28,7 @@ class DaftarPegawaiController(BaseController):
         except Exception as e:
         	self.write(e)
 
+
     @tornado.web.authenticated
     def post(self):
         body = tornado.escape.json_decode(self.request.body)
@@ -63,32 +40,45 @@ class DaftarPegawaiController(BaseController):
         except Exception as e:
             self.write({'status': False, 'msg': e})
 
+
     @tornado.web.authenticated
     def put(self, username=""):
         # NOTE: refresh cookies data
         self.refresh_cookies(cookies=self.get_cookies_user())
         try:
-            # NOTE: header JWT
             cookies = self.get_cookies_user()
-            dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}
+            user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
 
-            # NOTE: load kkp user
-            paramKKP = 'officeid={}&id={}&db=kkp'.format(cookies['officeid'], username)
-            responKKP = requests.get('{}/{}{}'.format(options.apis, 'offices/users/find?', paramKKP), headers=dheader)
-            
-            if responKKP.status_code == 200:
-
-                # NOTE: load db user
-                paramDB = 'id={}&type=username&db=local'.format(username)
-                responDB = requests.get('{}/{}{}'.format(options.apis, 'offices/users/find?', paramDB), headers=dheader)
-                
-                if responDB.status_code == 200:
-                    self.write({'status': False, 'data': None, 'msg': 'Pegawai sudah terdaftar pada aplikasi ini.'})
-                else:
-                    if responKKP.json()['result']['profile']['profilepegawai'] != None:
-                        self.write({'status': True, 'data':responKKP.json()})
+            user_kkp = user.get_user(db="kkp", type="username", id=username)
+            if user_kkp.status_code == 200:
+                if user_kkp.json()['result']['profile']['profilepegawai'] != None:
+                    user_db = user.get_user(db="local", type="username", id=username)
+                    if user_db.status_code == 200:
+                        self.write({'status': False, 'data': None, 'msg': 'Pegawai sudah terdaftar pada database.'})
                     else:
-                        self.write({'status': False, 'data': None, 'msg': 'Pegawai tidak terdaftar pada database kkp.'})
+                        self.write({'status': True, 'data': user_kkp.json(), 'msg': None})
+                else:
+                    self.write({'status': False, 'data': None, 'msg': 'Pegawai tidak terdaftar pada database kkp.atrbpn.go.id'})
+            else:
+                self.write({'status': False, 'data': None, 'msg': 'Server not response'})
 
         except Exception as e:
        	    self.write(e)
+
+
+    class PegawaiController(BaseController):
+
+        @tornado.web.authenticated
+        def post(self):
+            # NOTE: refresh cookies data
+            self.refresh_cookies(cookies=self.get_cookies_user())
+
+            # NOTE: respon body
+            body = tornado.escape.json_decode(self.request.body)
+            try:
+                cookies = self.get_cookies_user()
+                user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
+                self.write(user.set_user(username=body['username']))
+
+            except Exception as e:
+                self.write({'status': False, 'msg': e})
