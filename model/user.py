@@ -19,8 +19,12 @@ class UserModel(BaseModel):
 
         return response
 
-    def get_user(self):
-        pass
+    def get_user(self, db="", type="", id=""):
+        param = 'officeid={}&type={}&id={}&db={}'.format(self.officeid, type, id, db)
+        response = requests.get('{}/{}{}'.format(self.host, 'offices/users/find?', param), headers=self.get_header())
+
+        return response
+
 
     def get_all(self, pegawaiid="", draw=0, page=0, limit=0, start=0):
         record = self.count(userid="")
