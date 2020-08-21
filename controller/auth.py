@@ -12,6 +12,9 @@ from tornado.options import options
 from controller.base import BaseController
 
 
+# Model
+from model.user import UserModel
+
 class SignInController(BaseController):
 
 	result_validation = {
@@ -52,12 +55,12 @@ class SignInController(BaseController):
 			self.write(self.result_validation)
 
 	def save_cookies(self, username="",validation={}):
-		dheader = {'Authorization': 'Bearer {}'.format(validation['token'])}
-		respon = requests.get('{}/{}{}&type=username&db=local'.format(options.apis, 'offices/users/find?id=', username), headers=dheader)
-		if respon.status_code == 200:
-			self.cookies_data['userid'] = respon.json()['result']['_id']
-			self.cookies_data['username'] = respon.json()['result']['username']
-			self.cookies_data['officeid'] = respon.json()['result']['officeid']
+		user = UserModel(host=options.apis, token=validation['token'])
+		response = user.get_user(db="local",type="username",id=username)
+		if response.status_code == 200:
+			self.cookies_data['userid'] = response.json()['result']['_id']
+			self.cookies_data['username'] = response.json()['result']['username']
+			self.cookies_data['officeid'] = response.json()['result']['officeid']
 			self.cookies_data['token'] = validation['token']
 			self.set_secure_cookie(options.cookies, tornado.escape.json_encode(self.cookies_data))
 

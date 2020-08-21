@@ -5,9 +5,9 @@ from model.base import BaseModel
 
 class UserModel(BaseModel):
 
-
-    def __init__(self, officeid = ""):
+    def __init__(self, officeid="", host="", token=""):
         self.officeid = officeid
+        super().__init__(host="", token=token)
 
     def count(self, userid=""):
         if userid =="":
@@ -15,13 +15,13 @@ class UserModel(BaseModel):
         else:
             param = 'officeid={}&userid={}'.format(self.officeid, userid)
 
-        response = requests.get('{}/offices/find?{}'.format(self.host, param), headers=self.get_header())
+        response = requests.get('{}/offices/find?{}'.format(self.host, param), headers=self.header)
 
         return response
 
     def get_user(self, db="", type="", id=""):
         param = 'officeid={}&type={}&id={}&db={}'.format(self.officeid, type, id, db)
-        response = requests.get('{}/{}{}'.format(self.host, 'offices/users/find?', param), headers=self.get_header())
+        response = requests.get('{}/{}{}'.format(self.host, 'offices/users/find?', param), headers=self.header)
 
         return response
 
@@ -30,7 +30,7 @@ class UserModel(BaseModel):
         record = self.count(userid="")
         if record.status_code == 200:
             param = 'officeid={}&pegawaiid={}&limit={}&page={}'.format(self.officeid, pegawaiid, limit, page)
-            users = requests.get('{}/{}{}'.format(self.host, 'offices/users?', param), headers=self.get_header())
+            users = requests.get('{}/{}{}'.format(self.host, 'offices/users?', param), headers=self.header)
             if users.status_code == 200:
                 if users.json()['result'] != None:
                     return {'status': True, 'draw': draw, 'data': users.json()['result'], 'recordsTotal': record.json()['result'], 'recordsFiltered': record.json()['result']}
