@@ -89,13 +89,13 @@
     });
 
     $('#registerpegawai').on('click', function(){
-        $('#modal-add').modal('hide')
         $.ajax({
             type: 'POST',
             url: '/administrator/daftarpegawai/add',
             data: JSON.stringify({ username: $('#username_kkplog').val(), officeid: $('input[name=officeid]').val() }),
             headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
             success: (function (result) {
+                $('#modal-add').modal('hide')
                 $.notify({
                     title: '<strong><i class="fa fa-info-circle" aria-hidden="true"></i> Info</strong> <br>',
                     message: result.msg,
@@ -116,6 +116,20 @@
                 alert("Error: " + errorThrown);
             })
         })
+    });
+
+    // Info Pegawai
+    $('#tablePegawai tbody').on('click', '#info', function () {
+        var selected_row = $(this).parents('tr');
+        if (selected_row.hasClass('child')) {
+            selected_row = selected_row.prev();
+        }
+
+        if (tablePegawai.row(selected_row).data()[0] != "") {
+            run_wait('#detail');
+            $('#detail').load('/administrator/daftarpegawai/userid=' + tablePegawai.row(selected_row).data()['_id']);
+            $('.nav-tabs a[href="#detail"]').tab('show');
+        }
     });
 
 }(jQuery);
@@ -176,24 +190,21 @@ var tablePegawai = $('#tablePegawai').DataTable({
         },
         {
             "targets": [2],
+            "width": "20%",
             "data": 'pegawaiid',
             "className": "dt-center"
         },
         {
             "targets": [3],
-            "visible": false,
-            "data": 'username'
-        },
-        {
-            "targets": [4],
+            "width": "74%",
             "data": 'nama',
             "className": "dt-center"
         },
         {
-            "targets": [5],
+            "targets": [4],
             "width": "3%",
             "render": function () {
-                return '<a id="lihat" class="btn btn-primary btn-flat"><i class="fa fa-info-circle" aria-hidden="true"></i></a>';
+                return '<a id="info" class="btn btn-primary btn-flat"><i class="fa fa-info-circle" aria-hidden="true"></i></a>';
             }
         }
     ],

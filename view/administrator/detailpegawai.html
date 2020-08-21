@@ -1,7 +1,25 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-4">
-
+            <ul class="timeline">
+                <li>
+                    <i class="fa fa-user bg-blue" aria-hidden="true"></i>
+                    <div class="timeline-item">
+                        <div class="timeline-body">
+                            <input type="hidden" name="userid" value="{{ user['_id'] }}">
+                            <b>PegawaiID:</b> <b class="text-blue">{{ user['pegawaiid'] }} </b><br>
+                            <b>Username:</b> <b class="text-blue">{{ user['username'] }}</b> <br>
+                            <b>Nama:</b> <b class="text-blue">{{ user['nama'] }} </b><br>
+                            <b>Telp:</b> <b class="text-blue">{{ user['phone'] }} </b><br>
+                            <b>Email:</b> <b class="text-blue">{{ user['email'] }} </b><br>
+                            <b>Create:</b> <b class="text-blue">{{ user['createdate'] }} </b><br>
+                            <b>Update:</b> <b class="text-blue">{{ user['updatedate'] }} </b><br>
+                            <br>
+                            <button id="sync_kkp" class="btn btn-info btn-flat"><i class="fa fa-share-alt" aria-hidden="true"></i> kkp.atrbpn.go.id</button>
+                        </div>
+                    </div>
+                </li>
+            </ul>
         </div>
         <div class="col-sm-8">
             

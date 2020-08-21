@@ -31,8 +31,8 @@ class DaftarPegawaiController(BaseController):
 
     @tornado.web.authenticated
     def post(self):
-        body = tornado.escape.json_decode(self.request.body)
         self.refresh_cookies(cookies=self.get_cookies_user())
+        body = tornado.escape.json_decode(self.request.body)
         try:
             cookies = self.get_cookies_user()
             user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
@@ -69,11 +69,20 @@ class DaftarPegawaiController(BaseController):
     class PegawaiController(BaseController):
 
         @tornado.web.authenticated
-        def post(self):
-            # NOTE: refresh cookies data
+        def get(self, userid=""):
             self.refresh_cookies(cookies=self.get_cookies_user())
 
-            # NOTE: respon body
+            cookies = self.get_cookies_user()
+            user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
+            response = user.get_user(db="local", type="_id", id=userid)
+            if response.status_code == 200:
+                self.render('administrator/detailpegawai.html', user=response.json()['result'])
+
+
+
+        @tornado.web.authenticated
+        def post(self):
+            self.refresh_cookies(cookies=self.get_cookies_user())
             body = tornado.escape.json_decode(self.request.body)
             try:
                 cookies = self.get_cookies_user()
@@ -82,3 +91,12 @@ class DaftarPegawaiController(BaseController):
 
             except Exception as e:
                 self.write({'status': False, 'msg': e})
+
+        @tornado.web.authenticated
+        def put(self):
+            self.refresh_cookies(cookies=self.get_cookies_user())
+
+
+        @tornado.web.authenticated
+        def delete(self):
+            pass
