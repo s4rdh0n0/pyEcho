@@ -1,5 +1,6 @@
 import requests
 
+# Model
 from model.base import BaseModel
 
 
@@ -7,15 +8,15 @@ class UserModel(BaseModel):
 
     def __init__(self, officeid="", host="", token=""):
         self.officeid = officeid
-        super().__init__(host="", token=token)
+        super().__init__(host=host, token=token)
 
     def count(self, userid=""):
-        if userid =="":
+        if userid == "":
             param = 'officeid=' + self.officeid
         else:
             param = 'officeid={}&userid={}'.format(self.officeid, userid)
 
-        response = requests.get('{}/offices/find?{}'.format(self.host, param), headers=self.header)
+        response = requests.get('{}/offices/users/count?{}'.format(self.host, param), headers=self.header)
 
         return response
 

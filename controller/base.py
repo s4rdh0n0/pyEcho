@@ -4,6 +4,8 @@ import tornado.escape
 import tornado.web
 from tornado.options import options, define
 
+# Model
+from model.user import UserModel
 
 define("apis", default="http://localhost:8000", help="web service")
 define("cookies", default="pyEchoCookies", help="web")
@@ -35,10 +37,8 @@ class BaseController(tornado.web.RequestHandler):
 		return self.get_secure_cookie(options.cookies)
 
 	def get_user_actived(self, cookies={}):
-		dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}
-		param = 'id={}&type=_id&db=local'.format(cookies['userid'])
-
-		return requests.get('{}/{}{}'.format(options.apis, 'offices/users/find?', param), headers=dheader)
+		user = UserModel(officeid="", host=options.apis, token=cookies['token'])
+		return user.get_user(db="local", type="_id", id=cookies['userid'])
 
 	def get_office_actived(self, cookies={}):
 		dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}

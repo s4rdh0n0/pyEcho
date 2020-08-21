@@ -54,9 +54,9 @@ class SignInController(BaseController):
 		finally:
 			self.write(self.result_validation)
 
-	def save_cookies(self, username="",validation={}):
-		user = UserModel(host=options.apis, token=validation['token'])
-		response = user.get_user(db="local",type="username",id=username)
+	def save_cookies(self, username="", validation={}):
+		user = UserModel(officeid="none", host=options.apis, token=validation['token'])
+		response = user.get_user(db="local", type="username", id=username)
 		if response.status_code == 200:
 			self.cookies_data['userid'] = response.json()['result']['_id']
 			self.cookies_data['username'] = response.json()['result']['username']
