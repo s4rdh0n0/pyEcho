@@ -1,6 +1,7 @@
 <div class="box box-solid">
     <div class="box-body">
         <div id="formPegawai" class="form-horizontal">
+            <input type="hidden" name="userid" value="{{ user['_id'] }}">
             <div class="form-group form-group-md">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="pegawaiid">NIP/NIK:</label>
                 <div class="col-md-6 col-sm-6 col-xs-12">
@@ -22,18 +23,21 @@
         </div>
     </div>
     <div class="box-footer">
-        <form id="formRole" class="form-horizontal">
+        <form id="formAddRole" class="form-horizontal">
             <div class="form-group">
-                <label for="node" class="control-label col-md-3 col-sm-3 col-xs-12"> Role</label>
+                <label for="node" class="control-label col-md-3 col-sm-3 col-xs-12"> Role:</label>
                 <div class="col-md-6 col-sm-6 col-xs-12">
                     <select id="role" class="select2 form-control" style="width: 100%;">
+                        {% for item in typeregister %}
+                        <option value="{{ item['code'] }}">{{ item['description'] }}</option>
+                        {% end %}
                     </select>
                 </div>
             </div>
             <div class="form-group">
                 <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
                     <div class="pull-right">
-                        <a id="registerrole" class="btn btn-primary btn-flat"><i class="fa fa-save"></i> Simpan</a>
+                        <button type="submit" id="registerrole" name="registerrole" class="btn btn-primary btn-flat"><i class="fa fa-save"></i> Simpan</button>
                     </div>
                 </div>
             </div>
@@ -44,6 +48,7 @@
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>No</th>
                     <th>Role</th>
                     <th></th>
                 </tr>
@@ -59,10 +64,73 @@
                 theme: "bootstrap"
             });
 
+
+            $('#formAddRole').validate({
+                rules: {},
+                messages: {},
+                errorElement: "small",
+                highlight: function (element, errorClass, validClass) {
+                    var elem = $(element);
+                    elem.closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    var elem = $(element);
+                    elem.closest('.form-group').removeClass('has-error');
+                },
+                submitHandler: function (form) {
+                    $('#tableRole').DataTable().ajax.reload();
+                }
+            });
+
             /* Initial Table Role */
             var tableRole = $('#tableRole').DataTable({
+                'processing': true,
+                'serverSide': true,
+                'ajax': function (data, callback) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/administrator/daftarpegawai/detail/role',
+                        data: JSON.stringify({
+                            userid: $('input[name=userid]').val(),
+                        }),
+                        headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+                        success: (function (data) {
+                            // NOTE: print data
+                            console.log(data)
+
+                            // NOTE: callback response ajax
+                            callback(data);
+                        }),
+                        error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                            alert("Error: " + errorThrown);
+                        })
+                    })
+                },
+                'columns': [
+                    {
+                        "targets": [0],
+                        "visible": false,
+                        "data": '_id',
+                    },
+                    {
+                        "targets": [1],
+                        "width": "5%",
+                        "className": "dt-center"
+                    },
+                    {
+                        "targets": [2],
+                        "width": "92%",
+                        "data": 'description',
+                        "className": "dt-center"
+                    },
+                    {
+                        "targets": [3],
+                        "width": "3%",
+                        "className": "dt-center"
+                    }
+                ],
                 'responsive': true,
-                'paging': true,
+                'paging': false,
                 'pagingType': 'simple_numbers',
                 'lengthChange': false,
                 'pageLength': 20,

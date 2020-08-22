@@ -10,8 +10,8 @@ class UserModel(BaseModel):
 
     def __init__(self, officeid="", host="", token=""):
         self.officeid = officeid
+        self.role = self.RoleModel(host=host, token=token)
         super().__init__(host=host, token=token)
-
 
     def get_schema(self):
         return requests.get('{}/{}/schema'.format(self.host, self.root), headers=self.header)
@@ -31,7 +31,7 @@ class UserModel(BaseModel):
         record = self.get_count(userid="")
         if record.status_code == 200:
             param = 'officeid={}&pegawaiid={}&limit={}&page={}'.format(self.officeid, pegawaiid, limit, page)
-            users = requests.get('{}/{}{}'.format(self.host, 'offices/users?', param), headers=self.header)
+            users = requests.get('{}/{}?{}'.format(self.host, self.root, param), headers=self.header)
             if users.status_code == 200:
                 if users.json()['result'] != None:
                     return {'status': True, 'draw': draw, 'data': users.json()['result'], 'recordsTotal': record.json()['result'], 'recordsFiltered': record.json()['result']}
@@ -51,6 +51,20 @@ class UserModel(BaseModel):
         param = {'officeiid': self.officeid, 'user': data}
         return requests.put('{}/{}/update'.format(self.host, self.root), json=param, headers=self.header)
 
+    
     class RoleModel(BaseModel):
 
-        pass
+        root = 'offices/users/role'
+
+        def __init__(self, host="", token=""):
+            super().__init__(host=host, token=token)
+
+        def get_schema(self):
+            return requests.get('{}/{}/schema'.format(self.host, self.root), headers=self.header)
+
+        def get_role(self, userid=""):
+            param = 'userid={}'.format(userid)
+            return requests.get('{}/{}/find?{}'.format(self.host, self.root, param), headers=self.header)
+
+        def get_status(self, userid="", code=""):
+            pass

@@ -47,11 +47,10 @@ class BaseController(tornado.web.RequestHandler):
 		return requests.get('{}/offices/find?{}'.format(options.api, param), headers=dheader)
 	
 	def refresh_cookies(self, cookies={}):
-		try:
-			dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}
-			respon = requests.get('{}/{}/{}'.format(options.apis, 'auth', 'refresh_token'), headers=dheader)
-			
-			if respon.status_code != 200:
-				self.redirect("/login")
-		except:
+		dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}
+		response = requests.get('{}/{}/{}'.format(options.apis, 'auth', 'refresh_token'), headers=dheader)
+		if response.status_code == 200:
+			cookies['token'] = response.json()['token']
+			self.set_secure_cookie(options.cookies, tornado.escape.json_encode(cookies))
+		else:
 			self.redirect("/login")

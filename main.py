@@ -25,6 +25,7 @@ class Application(tornado.web.Application):
                (r"/administrator/daftarpegawai", DaftarPegawaiController),
                (r"/administrator/daftarpegawai/detail/userid=([A-Za-z0-9\-]+)", DaftarPegawaiController.PegawaiController),
                (r"/administrator/daftarpegawai/detail", DaftarPegawaiController.PegawaiController),
+               (r"/administrator/daftarpegawai/detail/role", DaftarPegawaiController.RoleController),
                (r"/.*", NotFoundController)]
 
    def __init__(self):

@@ -147,8 +147,8 @@ function run_wait(element) {
 /* Initial Table Pegawai */
 var tablePegawai = $('#tablePegawai').DataTable({
     'processing': true,
-    "serverSide": true,
-    "ajax": function (data, callback) {
+    'serverSide': true,
+    'ajax': function (data, callback) {
         $.ajax({
             type: 'POST',
             url: '/administrator/daftarpegawai',
