@@ -43,7 +43,8 @@
         submitHandler: function (form) {
             $.ajax({
                 type: 'PUT',
-                url: '/administrator/daftarpegawai/kkp/username=' + $('#username').val(),
+                url: '/administrator/daftarpegawai',
+                data: JSON.stringify({ username: $('#username').val() }),
                 headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                 success: (function (result) {
                     if (result.status) {
@@ -56,12 +57,12 @@
                         // NOTE :
                         $("#pegawaiid_kkplog").val(result.data.result.pegawaiid);
                         $("#username_kkplog").val($("#username").val());     
-                        $("#name_kkplog").val(result.data.result.name);
+                        $("#name_kkplog").val(result.data.result.nama);
                         $("#phone_kkplog").val(result.data.result.phone);
 
                     } else {
                         $(".kkplog_alert").show();
-                        $(".kkplog_alert").html('<h4><i class="icon fa fa-warning"></i> Warning!</h4>' + result.msg)
+                        $(".kkplog_alert").html('<h4><i class="icon fa fa-warning"></i>Warning!</h4>' + result.msg)
                     }
                 }),
                 error: (function (XMLHttpRequest, textStatus, errorThrown) {
@@ -91,8 +92,8 @@
     $('#registerpegawai').on('click', function(){
         $.ajax({
             type: 'POST',
-            url: '/administrator/daftarpegawai/add',
-            data: JSON.stringify({ username: $('#username_kkplog').val(), officeid: $('input[name=officeid]').val() }),
+            url: '/administrator/daftarpegawai/detail',
+            data: JSON.stringify({ username: $('#username_kkplog').val() }),
             headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
             success: (function (result) {
                 $('#modal-add').modal('hide')
@@ -127,7 +128,7 @@
 
         if (tablePegawai.row(selected_row).data()[0] != "") {
             run_wait('#detail');
-            $('#detail').load('/administrator/daftarpegawai/userid=' + tablePegawai.row(selected_row).data()['_id']);
+            $('#detail').load('/administrator/daftarpegawai/detail/userid=' + tablePegawai.row(selected_row).data()['_id']);
             $('.nav-tabs a[href="#detail"]').tab('show');
         }
     });
