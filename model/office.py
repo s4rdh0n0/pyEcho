@@ -1,20 +1,20 @@
 import requests
 
+# Model
 from model.base import BaseModel
 
 
 class OfficeModel(BaseModel):
 
-    def __init__(self):
-        pass
+    root = 'offices'
+
+    def __init__(self, host="", token=""):
+        super().__init__(host=host, token=token)
 
     def get_all(self):
-        response = requests.get('{}/offices'.format(self.host), headers=self.get_header())
-
+        response = requests.get('{}/{}'.format(self.host, self.root), headers=self.header)
         return response
 
     def find(self, officeid=""):
         param = 'officeid={}'.format(officeid)
-        response = requests.get('{}/offices/find?{}'.format(self.host, param), headers=self.host)
-
-        return response
+        return requests.get('{}/{}/find?{}'.format(self.host, self.root,param), headers=self.host)
