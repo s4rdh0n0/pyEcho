@@ -32,7 +32,7 @@ class SuratUkurModel(BaseModel):
         super().__init__(host=host, token=token)
 
     def pagination(self, typesu="", nomor="", tahun="", start="", limit=""):
-        param = 'officeid={};desaid={};typesu={};nomor={};tahun={};start={};limit={};count={}'.format(self.officeid, self.desaid, typesu, nomor, tahun, start, limit, "-1")
+        param = 'officeid={}&desaid={}&typesu={}&nomor={}&tahun={}&start={}&limit={}&count={}'.format(self.officeid, self.desaid, typesu, nomor, tahun, start, limit, "-1")
         return requests.get('{}/{}?{}'.format(self.host, self.root, param), headers=self.header)
 
     def find(self, suratukurid=""):
@@ -41,6 +41,17 @@ class SuratUkurModel(BaseModel):
 
 class BukuTanahModel(BaseModel):
 
-    def __init__(self, officeid="", host="", token=""):
+    root = 'document/bukutanah'
+
+    def __init__(self, officeid="",  desaid="", host="", token=""):
         self.officeid = officeid
+        self.desaid = desaid
         super().__init__(host=host, token=token)
+
+    def pagination(self, typehak="", nomor="", start="", limit=""):
+        param = 'officeid={}&desaid={}&typehak={}&nomor={}&start={}&limit={}&count={}'.format(self.officeid, self.desaid, typehak, nomor, start, limit, "-1")
+        return requests.get('{}/{}?{}'.format(self.host, self.root, param), headers=self.header)
+
+    def find(self, bukutanahid=""):
+        param = 'bukutanahid={}'.format(bukutanahid)
+        return requests.get('{}/{}/find?{}'.format(self.host, self.root, param), headers=self.header)
