@@ -18,13 +18,11 @@ class RegionModel (BaseModel):
 
     def get_kabupaten(self, parent="") -> requests.Response:
         param = 'kabupatenid={}&officeid={}&officetypeid={}'.format(parent, self.officeid, self.officetypeid)
-        return requests.get('{}/{}/kabupaten?{}'.format(self.host, self.root, param), headers=self.header)
-        
+        return requests.get('{}/{}/kabupaten?{}'.format(self.host, self.root, param), headers=self.header)    
 
     def get_kecamatan(self, parent="", ) -> requests.Response:
         param = 'kecamatanid={}&officeid={}&officetypeid={}'.format(parent, self.officeid, self.officetypeid)
-        return requests.get('{}/{}/kecamatan?{}'.format(self.host, self.root, param), headers=self.header)
-        
+        return requests.get('{}/{}/kecamatan?{}'.format(self.host, self.root, param), headers=self.header)     
 
     def get_desa(self, parent="") -> requests.Response:
         param = 'desaid={}&officeid={}&officetypeid={}'.format(parent, self.officeid, self.officetypeid)
