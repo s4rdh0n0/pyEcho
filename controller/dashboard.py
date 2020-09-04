@@ -13,11 +13,8 @@ class DashboardController(BaseController):
     @tornado.web.authenticated
     def get(self):
         self.refresh_cookies(cookies=self.get_cookies_user())
-        try:
-            response = self.get_user_actived(cookies=self.get_cookies_user())
-            if  response.status_code == 200:
-                self.page_data['title'] = 'Dashboard'
-                self.page_data['description'] = 'Rekapitulasi berkas register'
-                self.render('dashboard.html', page=self.page_data, useractived=response.json()['result'])
-        except Exception as e:
-        	self.write(e)
+        response = self.get_user_actived(cookies=self.get_cookies_user())
+        if  response.status_code == 200:
+            self.page_data['title'] = 'Dashboard'
+            self.page_data['description'] = 'Rekapitulasi berkas register'
+            self.render('dashboard.html', page=self.page_data, useractived=response.json()['result'])

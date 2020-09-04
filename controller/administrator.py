@@ -21,14 +21,11 @@ class DaftarPegawaiController(BaseController):
     def get(self):
         # NOTE: refresh cookies data
         self.refresh_cookies(cookies=self.get_cookies_user())
-        try:
-            response = self.get_user_actived(cookies=self.get_cookies_user())
-            if  response.status_code == 200:
-                self.page_data['title'] = 'Daftar Pegawai'
-                self.page_data['description'] = 'Pegawai Actived/Non Actived'
-                self.render('administrator/daftarpegawai.html', page=self.page_data, useractived=response.json()['result'])
-        except Exception as e:
-        	self.write(e)
+        response = self.get_user_actived(cookies=self.get_cookies_user())
+        if response.status_code == 200:
+            self.page_data['title'] = 'Daftar Pegawai'
+            self.page_data['description'] = 'Pegawai Actived/Non Actived'
+            self.render('administrator/daftarpegawai.html', page=self.page_data, useractived=response.json()['result'])
 
 
     @tornado.web.authenticated
@@ -36,10 +33,9 @@ class DaftarPegawaiController(BaseController):
         # NOTE: refresh cookies data
         self.refresh_cookies(cookies=self.get_cookies_user())
         cookies = self.get_cookies_user()
-
         body = tornado.escape.json_decode(self.request.body)
         user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-        self.write(user.get_all(pegawaiid=body['pegawaiid'], draw=body['draw'], page=body['page'] + 1, limit=body['limit'], start=body['start']))
+        self.write(user.pagination(pegawaiid=body['pegawaiid'], draw=body['draw'], page=body['page'] + 1, limit=body['limit'], start=body['start']))
 
 
     @tornado.web.authenticated
@@ -50,10 +46,10 @@ class DaftarPegawaiController(BaseController):
 
         body = tornado.escape.json_decode(self.request.body)
         user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-        rkkp_user = user.get_user(db="kkp", type="username", id=body["username"])
+        rkkp_user = user.kkp(username=body['username'])
         if rkkp_user.status_code == 200:
             if rkkp_user.json()['result']['profile']['profilepegawai'] != None:
-                if user.get_user(db="local", type="username", id=body["username"]).status_code == 200:
+                if user.find(typeid="username", userid=body["username"]).status_code == 200:
                     self.write({'status': False, 'data': None, 'msg': 'Pegawai sudah terdaftar pada database.'})
                 else:
                     self.write({'status': True, 'data': rkkp_user.json(), 'msg': None})
@@ -71,11 +67,9 @@ class DaftarPegawaiController(BaseController):
             # NOTE: refresh cookies data
             self.refresh_cookies(cookies=self.get_cookies_user())
             cookies = self.get_cookies_user()
-            
             user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
             master = MasterModel(type='typeregister', host=options.apis, token=cookies['token'])
-
-            ruser = user.get_user(db="local", type="_id", id=userid)
+            ruser = user.find(typeid="_id", userid=userid)
             tornado.gen.sleep(0.5)
             rmaster = master.get_master()
 
@@ -91,8 +85,8 @@ class DaftarPegawaiController(BaseController):
 
             body = tornado.escape.json_decode(self.request.body)
             user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-            rschema = user.get_schema()
-            rkkp_user = user.get_user("kkp", "username", body['username'])
+            rschema = user.schema()
+            rkkp_user = user.kkp(username=body['username'])
             if rkkp_user.status_code == 200 and rschema.status_code == 200:
                 pschema  = rschema.json()['result']
                 pkkp_user = rkkp_user.json()['result']
@@ -107,26 +101,10 @@ class DaftarPegawaiController(BaseController):
                 pschema['phone'] = pkkp_user['phone']
                 pschema['actived'] = True
 
-                if user.add_user(data=pschema).status_code == 200:
+                if user.add(data=pschema).status_code == 200:
                     self.write({'status': True, 'type': 'success','msg': 'Pegawai berhasil disimpan.'})
                 else:
                     self.write({'sttaus': False, 'type': 'warning','msg': 'Pegawai gagal disimpan.'})
 
     class RoleController(BaseController):
-
-        @tornado.web.authenticated
-        def post(self):
-            # NOTE: refresh cookies data
-            self.refresh_cookies(cookies=self.get_cookies_user())
-            cookies = self.get_cookies_user()
-
-            body = tornado.escape.json_decode(self.request.body)
-            user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-            response = user.role.get_role(userid=body['userid'])
-            if response.status_code == 200:
-                if response.json()['result'] != None:
-                    self.write({'draw': 0, 'data': response.json()['result'], 'recordsTotal': len(response.json()['result']), 'recordsFiltered': len(response.json()['result'])})
-                else:
-                    self.write({'draw': 0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0})
-            else:
-                self.write({'draw': 0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0})
+        pass

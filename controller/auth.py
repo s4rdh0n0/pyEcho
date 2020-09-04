@@ -7,10 +7,8 @@ import tornado.web
 import tornado.escape
 from tornado.options import options
 
-
 # Controller
 from controller.base import BaseController
-
 
 # Model
 from model.user import UserModel
@@ -19,7 +17,7 @@ class SignInController(BaseController):
 
 	result_validation = {
 		'status': False,
-		'url': options.apis + "/login",
+		'url': "/login",
 		'type': None,
 		'msg': 'Username or password not valid.',
 	}
@@ -29,7 +27,6 @@ class SignInController(BaseController):
 			self.render('auth/login.html')
 		except Exception as e:
 			self.write(e)
-
 
 	def post(self):
 		body = tornado.escape.json_decode(self.request.body)
@@ -56,14 +53,14 @@ class SignInController(BaseController):
 
 	def save_cookies(self, username="", validation={}):
 		user = UserModel(officeid="none", host=options.apis, token=validation['token'])
-		response = user.get_user(db="local", type="username", id=username)
+		response = user.find(typeid="username", userid=username)
+
 		if response.status_code == 200:
 			self.cookies_data['userid'] = response.json()['result']['_id']
-			self.cookies_data['username'] = response.json()['result']['username']
+			self.cookies_data['username'] = username
 			self.cookies_data['officeid'] = response.json()['result']['officeid']
 			self.cookies_data['token'] = validation['token']
 			self.set_secure_cookie(options.cookies, tornado.escape.json_encode(self.cookies_data))
-
 
 class SignOutController(BaseController):
 
@@ -71,7 +68,6 @@ class SignOutController(BaseController):
 	def get(self):
 		self.clear_cookie(options.cookies)
 		self.redirect("/login")
-
 
 class NotFoundController (BaseController):
 

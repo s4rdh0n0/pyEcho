@@ -19,18 +19,17 @@ define("dir", default=os.path.dirname(__file__), help="root path")
 
 class Application(tornado.web.Application):
 
-   handlers = [(r"/logout", SignOutController),
+    handlers = [(r"/logout", SignOutController),
                (r"/login", SignInController),
                (r"/", DashboardController),
                (r"/administrator/daftarpegawai", DaftarPegawaiController),
                (r"/administrator/daftarpegawai/detail/userid=([A-Za-z0-9\-]+)", DaftarPegawaiController.PegawaiController),
                (r"/administrator/daftarpegawai/detail", DaftarPegawaiController.PegawaiController),
-               (r"/administrator/daftarpegawai/detail/role", DaftarPegawaiController.RoleController),
                (r"/.*", NotFoundController)]
 
-   def __init__(self):
+    def __init__(self):
 
-      settings = dict(
+        settings = dict(
           title='pyEcho',
           version='1.0.0',
           template_path=os.path.join(options.dir, 'view'),
@@ -38,10 +37,9 @@ class Application(tornado.web.Application):
           xsrf_cookies=True,
           cookie_secret='16b56537-b94e-49bc-9f98-9be58f0b2d28',
           login_url=r"/login",
-          debug=True,
-      )
+          debug=True)
 
-      super(Application, self).__init__(self.handlers, **settings)
+        super(Application, self).__init__(self.handlers, **settings)
 
 
 def logger():
@@ -73,6 +71,8 @@ def main():
     # call shutdown_event.set().
     shutdown_event = tornado.locks.Event()
     yield shutdown_event.wait()
+
+
 
 if __name__ == "__main__":
     tornado.ioloop.IOLoop.current().run_sync(main)
