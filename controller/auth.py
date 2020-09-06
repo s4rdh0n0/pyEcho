@@ -23,10 +23,7 @@ class SignInController(BaseController):
 	}
 
 	def get(self):
-		try:
-			self.render('auth/login.html')
-		except Exception as e:
-			self.write(e)
+		self.render('page/auth/login.html')
 
 	def post(self):
 		body = tornado.escape.json_decode(self.request.body)

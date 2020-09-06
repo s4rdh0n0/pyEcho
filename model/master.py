@@ -6,7 +6,7 @@ from model.base import BaseModel
 
 class MasterModel(BaseModel):
 
-    root = 'offices/master'
+    root = 'document/master'
 
     def __init__(self, type="", host="", token=""):
         self.type = type
