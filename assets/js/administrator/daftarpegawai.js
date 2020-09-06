@@ -160,16 +160,9 @@ var tablePegawai = $('#tablePegawai').DataTable({
                 pegawaiid: $('#pegawaiid').val(),
             }),
             headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
-            success: (function (data) {
-                // NOTE: print data
-                console.log(data)
-                
+            success: (function (data) {                
                 // NOTE: callback response ajax
-                if (data.status){
-                    callback(data);
-                }else{
-                    $('#tablePegawai').DataTable();
-                }
+                callback(data)
             }),
             error: (function (XMLHttpRequest, textStatus, errorThrown) {
                 alert("Error: " + errorThrown);

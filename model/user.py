@@ -14,13 +14,13 @@ class UserModel(BaseModel):
     def schema(self):
         return requests.get('{}/{}/schema'.format(self.host, self.root), headers=self.header)
 
-    def count(self, userid=""):
+    def count(self, typeid="", userid=""):
         if userid == "":
             param = 'officeid=' + self.officeid
         else:
-            param = 'officeid={}&userid={}'.format(self.officeid, userid)
+            param = 'officeid={}&typeid={}&userid={}'.format(self.officeid, typeid, userid)
             
-        return requests.get('{}/offices/users/count?{}'.format(self.host, param), headers=self.header)
+        return requests.get('{}/{}/count?{}'.format(self.host, self.root, param), headers=self.header)
 
     def find(self, typeid="", userid=""):
         param = 'typeid={}&userid={}'.format(typeid, userid)
@@ -31,7 +31,7 @@ class UserModel(BaseModel):
         return  requests.get('{}/{}/kkp?{}'.format(self.host, self.root, param), headers=self.header)
 
     def pagination(self, pegawaiid="", draw=0, page=0, limit=0, start=0):
-        record = self.count(userid="")
+        record = self.count(typeid="pegawaiid", userid=pegawaiid)
         if record.status_code == 200:
             param = 'officeid={}&pegawaiid={}&limit={}&page={}'.format(self.officeid, pegawaiid, limit, page)
             users = requests.get('{}/{}?{}'.format(self.host, self.root, param), headers=self.header)
@@ -42,8 +42,6 @@ class UserModel(BaseModel):
                     return {'status': False, 'draw': 0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0}
             else:
                 return {'status': False, 'draw': 0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0}
-        else:
-            return {'status': False, 'draw': 0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0}
 
     def add(self, data={}):
         param = {'officeid': self.officeid, 'user': data}

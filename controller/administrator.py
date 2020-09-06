@@ -2,7 +2,6 @@ import datetime
 import requests
 
 # Tornado Framework
-import tornado.web
 import tornado.gen
 import tornado.escape
 from tornado.options import options
@@ -27,7 +26,6 @@ class DaftarPegawaiController(BaseController):
             self.page_data['description'] = 'Pegawai Actived/Non Actived'
             self.render('administrator/daftarpegawai.html', page=self.page_data, useractived=response.json()['result'])
 
-
     @tornado.web.authenticated
     def post(self):
         # NOTE: refresh cookies data
@@ -36,7 +34,6 @@ class DaftarPegawaiController(BaseController):
         body = tornado.escape.json_decode(self.request.body)
         user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
         self.write(user.pagination(pegawaiid=body['pegawaiid'], draw=body['draw'], page=body['page'] + 1, limit=body['limit'], start=body['start']))
-
 
     @tornado.web.authenticated
     def put(self):
