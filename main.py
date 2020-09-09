@@ -26,6 +26,7 @@ class Application(tornado.web.Application):
                 (r"/administrator/daftarpegawai/kkp/username=([A-Za-z0-9\-]+)", DaftarPegawaiController.KKPPegawaiController),
                 (r"/administrator/daftarpegawai/detail/userid=([A-Za-z0-9\-]+)", DaftarPegawaiController.PegawaiController),
                 (r"/administrator/daftarpegawai/detail/role/userid=([A-Za-z0-9\-]+)", DaftarPegawaiController.RoleController),
+                (r"/administrator/daftarpegawai/detail/role/add", DaftarPegawaiController.RoleController),
                 (r"/.*", NotFoundController)]
 
     def __init__(self):

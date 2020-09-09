@@ -2,6 +2,7 @@ import requests
 
 # Model
 from model.base import BaseModel
+from model.master import MasterModel
 
 class UserModel(BaseModel):
     
@@ -13,6 +14,9 @@ class UserModel(BaseModel):
 
     def schema(self):
         return requests.get('{}/{}/schema'.format(self.host, self.root), headers=self.header)
+
+    def schemarole(self):
+        return requests.get('{}/{}/role/schema'.format(self.host, self.root), headers=self.header)
 
     def count(self, typeid="", userid=""):
         if userid == "":
@@ -56,6 +60,7 @@ class RoleModel(BaseModel):
     root = 'offices/users/role'
 
     def __init__(self, host="", token=""):
+        self.master = MasterModel(type="typeregister", host=host, token=token)
         super().__init__(host=host, token=token)
 
     def schema(self):
@@ -71,3 +76,7 @@ class RoleModel(BaseModel):
                 return {'status': False, 'draw': 0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0}
         else:
             return {'status': False, 'draw': 0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0}
+
+    def add(self, typeid="", userid="", role={}):
+        param = 'typeid={}&userid={}&role={}'.format(typeid, userid, role)
+        return requests.get('{}/{}/add?{}'.format(self.host, self.root, param), headers=self.header)

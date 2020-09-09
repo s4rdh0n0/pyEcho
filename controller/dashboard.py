@@ -17,4 +17,4 @@ class DashboardController(BaseController):
         if  response.status_code == 200:
             self.page_data['title'] = 'Dashboard'
             self.page_data['description'] = 'Rekapitulasi berkas register'
-            self.render('dashboard.html', page=self.page_data, useractived=response.json()['result'])
+            self.render('page/home/dashboard.html', page=self.page_data, useractived=response.json()['result'])

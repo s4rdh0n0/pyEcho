@@ -1,4 +1,5 @@
 import requests
+import datetime
 
 # Tornado Framework
 import tornado.gen
@@ -10,8 +11,6 @@ from controller.base import BaseController
 
 # Model
 from model.user import UserModel, RoleModel
-from model.master import MasterModel
-
 
 class DaftarPegawaiController(BaseController):
 
@@ -19,11 +18,11 @@ class DaftarPegawaiController(BaseController):
     @tornado.web.authenticated
     @tornado.gen.coroutine
     def get(self):
-        # NOTE: refresh cookies data
+        # refresh cookies data
         self.refresh_cookies(cookies=self.get_cookies_user())
         response = self.get_user_actived(cookies=self.get_cookies_user())
 
-        # NOTE: sleep
+        # sleep
         tornado.gen.sleep(0.5)
 
         if response.status_code == 200:
@@ -117,10 +116,37 @@ class DaftarPegawaiController(BaseController):
             self.refresh_cookies(cookies=self.get_cookies_user())
             cookies = self.get_cookies_user()
 
+            # sleep
             tornado.gen.sleep(0.5)
 
             role = RoleModel(host=options.apis, token=cookies['token'])
             self.write(role.pagination(userid=userid))
+
+        @tornado.web.authenticated
+        @tornado.gen.coroutine
+        def post(self):
+            # refresh cookies data
+            self.refresh_cookies(cookies=self.get_cookies_user())
+            cookies = self.get_cookies_user()
+
+            # sleep
+            tornado.gen.sleep(0.5)
+
+            # client request
+            body = tornado.escape.json_decode(self.request.body)
+
+            role = RoleModel( host=options.apis, token=cookies['token'])
+            schema = role.schema()
+
+            # convert
+            schema['code'] = body['code']
+            schema['createdate'] = datetime.datetime.now()
+            schema['usercreate'] = cookies['userid']
+            schema['description'] = body['description']
+
+            response = role.add(typeid="_id", userid=body['userid'], role=schema)
+            if response.status_code == 200:
+                self.write(response.json())
 
     class PegawaiController(BaseController):
 
@@ -131,12 +157,14 @@ class DaftarPegawaiController(BaseController):
             self.refresh_cookies(cookies=self.get_cookies_user())
             cookies = self.get_cookies_user()
 
+            tornado.gen.sleep(0.5)
+            
             user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-            master = MasterModel(type='typeregister', host=options.apis, token=cookies['token'])
+            role = RoleModel(host=options.apis, token=cookies['token'])
 
             ruser = user.find(typeid="_id", userid=userid)
             tornado.gen.sleep(0.5)
-            rmaster = master.get_master()
+            rtype = role.master.get_master()
 
-            if ruser.status_code == 200 and rmaster.status_code == 200:
-                self.render('node/detailpegawai.html', user=ruser.json()['result'], typeregister=rmaster.json()['result'])
+            if ruser.status_code == 200 and rtype.status_code == 200:
+                self.render('node/detailpegawai.html', user=ruser.json()['result'], typeregister=rtype.json()['result'])
