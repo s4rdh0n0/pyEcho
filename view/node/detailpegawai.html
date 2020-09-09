@@ -2,6 +2,7 @@
     <div class="box-body">
         <div id="formPegawai" class="form-horizontal">
             <input type="hidden" name="userid" value="{{ user['_id'] }}">
+            
             <div class="form-group form-group-md">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="pegawaiid">NIP/NIK:</label>
                 <div class="col-md-6 col-sm-6 col-xs-12">
@@ -88,18 +89,15 @@
                 'serverSide': true,
                 'ajax': function (data, callback) {
                     $.ajax({
-                        type: 'POST',
-                        url: '/administrator/daftarpegawai/detail/role',
-                        data: JSON.stringify({
-                            userid: $('input[name=userid]').val(),
-                        }),
+                        type: 'GET',
+                        url: '/administrator/daftarpegawai/detail/role/userid=' + $('input[name=userid]').val(),
                         headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                         success: (function (data) {
                             // NOTE: print data
-                            // console.log(data)
+                            console.log(data)
 
                             // NOTE: callback response ajax
-                            // callback(data);
+                            callback(data);
                         }),
                         error: (function (XMLHttpRequest, textStatus, errorThrown) {
                             alert("Error: " + errorThrown);

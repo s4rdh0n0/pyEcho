@@ -51,17 +51,23 @@ class UserModel(BaseModel):
         param = {'officeiid': self.officeid, 'user': data}
         return requests.put('{}/{}/update'.format(self.host, self.root), json=param, headers=self.header)
 
-    
 class RoleModel(BaseModel):
     
     root = 'offices/users/role'
 
-    def __init__(self,host="", token=""):
+    def __init__(self, host="", token=""):
         super().__init__(host=host, token=token)
 
     def schema(self):
         return requests.get('{}/{}/schema'.format(self.host, self.root), headers=self.header)
 
-    def get_role(self, userid=""):
-        param = 'userid={}'.format(userid)
-        return requests.get('{}/{}/find?{}'.format(self.host, self.root, param), headers=self.header)
+    def pagination(self, userid=""):
+        param = 'typeid={}&userid={}'.format("_id", userid)
+        response = requests.get('{}/{}?{}'.format(self.host, self.root, param), headers=self.header)
+        if response.status_code == 200:
+            if response.json()['result'] != None:
+                return {'status': True, 'draw': 0, 'data': response.json()['result'], 'recordsTotal': len(response.json()['result']), 'recordsFiltered': len(response.json()['result'])}
+            else:
+                return {'status': False, 'draw': 0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0}
+        else:
+            return {'status': False, 'draw': 0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0}
