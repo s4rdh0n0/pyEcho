@@ -12,19 +12,19 @@ class RegionModel (BaseModel):
         self.officeid = officeid
         self.officetypeid = officetypeid
 
-    def get_provinsi(self) -> requests.Response:
+    def get_provinsi(self):
         param = 'officeid={}&officetypeid={}'.format(self.officeid, self.officetypeid)
         return requests.get('{}/{}/provinsi?{}'.format(self.host, self.root, param), headers=self.header)
 
-    def get_kabupaten(self, parent="") -> requests.Response:
+    def get_kabupaten(self, parent=""):
         param = 'kabupatenid={}&officeid={}&officetypeid={}'.format(parent, self.officeid, self.officetypeid)
         return requests.get('{}/{}/kabupaten?{}'.format(self.host, self.root, param), headers=self.header)    
 
-    def get_kecamatan(self, parent="", ) -> requests.Response:
+    def get_kecamatan(self, parent="", ):
         param = 'kecamatanid={}&officeid={}&officetypeid={}'.format(parent, self.officeid, self.officetypeid)
         return requests.get('{}/{}/kecamatan?{}'.format(self.host, self.root, param), headers=self.header)     
 
-    def get_desa(self, parent="") -> requests.Response:
+    def get_desa(self, parent=""):
         param = 'desaid={}&officeid={}&officetypeid={}'.format(parent, self.officeid, self.officetypeid)
         return requests.get('{}/{}/desa?{}'.format(self.host, self.root, param), headers=self.header)
         
