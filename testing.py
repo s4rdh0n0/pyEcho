@@ -1,6 +1,5 @@
 import requests
 
-
 # Tornado
 import tornado.gen
 
@@ -16,7 +15,6 @@ def auth():
     return auth.json()['token']
 
 
-@tornado.gen.coroutine
 def TestingOffice():
     token = auth()
     office = OfficeModel(host="http://localhost:8000", token=token)
@@ -27,23 +25,77 @@ def TestingOffice():
         # print("Data     : {}".format(o))
         child = office.kkp(officeid=o['officeid'])
 
-        tornado.gen.sleep(0.5)
-
-        conveter = office.kkpTolocal(o['officeid'], child.json()['result'], False)
+        conveter = office.kkpTolocal(o['officeid'], child.json()['result'], True)
         print("Data     : {}".format(conveter))
 
-
-        tornado.gen.sleep(0.5)
-
         add = office.add(conveter)
-        print(add.json()['result'])
+        if add.status_code == 200:
+            print(add.json()['result'])
+
+            counter = {'key': 'REGISTER',
+                       'value': 0,
+                       'createdate': None,
+                       'updatedate': None,
+                       'actived': True}
+
+            # Add Counter
+            office.add_counter(typeid="_id", officeid=o['officeid'], counter=counter)
+
+            # Booking
+            counter['value'] = 1
+            office.update_counter(typeid="_id", officeid=o['officeid'], counter=counter)
         
 
     count = office.count().json()['result']
     print(count)
 
-    schema = office.schema().json()['result']
-    print(schema)
+def add_office():
+    token = auth()
+    office = OfficeModel(host="http://localhost:8000", token=token)
+    for o in office.all_kkp().json()['result']:
+        kkp = office.kkp(officeid=o['officeid'])
+        conveter = office.kkpTolocal(o['officeid'], kkp.json()['result'], True)
+        office.add(conveter)
 
+        con_document = {'key': 'DOCUMENT',
+                        'value': 0,
+                        'createdate': None,
+                        'updatedate': None,
+                        'actived': True}
 
-TestingOffice()
+        # Add Counter Document
+        office.add_counter(typeid="_id", officeid=o['officeid'], counter=con_document)
+
+        con_register = {'key': 'REGISTER',
+                        'value': 0,
+                        'createdate': None,
+                        'updatedate': None,
+                        'actived': True}
+
+        # Add Counter Register
+        office.add_counter(typeid="_id", officeid=o['officeid'], counter=con_register)
+
+        con_alatukur = {'key': 'ALATUKUR',
+                        'value': 0,
+                        'createdate': None,
+                        'updatedate': None,
+                        'actived': True}
+
+        # Add Counter Alat Ukur
+        office.add_counter(typeid="_id", officeid=o['officeid'], counter=con_alatukur)
+
+def delete_office():
+    token = auth()
+    office = OfficeModel(host="http://localhost:8000", token=token)
+    for o in office.all().json()['result']:
+        print("Data     : {}".format(o))
+        office.delete_counter(typeid="_id", officeid=o['_id'], counterid='REGISTER')
+
+def find_counter():
+    token = auth()
+    office = OfficeModel(host="http://localhost:8000", token=token)
+    co = office.counter(typeid="_id", officeid="93975C008CAAEA62E040A8C010017FFF", counterid="REGISTER")
+    if co.status_code == 200:
+        print(co.json())
+
+find_counter()

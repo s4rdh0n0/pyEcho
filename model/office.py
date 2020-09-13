@@ -1,5 +1,4 @@
 import requests
-import datetime
 
 # Model
 from model.base import BaseModel
@@ -9,17 +8,33 @@ class OfficeModel(BaseModel):
 
     root = 'offices'
 
+    schema = {'_id': None,
+             'code': None,
+             'officetypeid': None,
+             'parent': None,
+             'nama': None,
+             'kota': None,
+             'alamat': None,
+             'phone': None,
+             'email': None,
+             'fax': None,
+             'counter': [],
+             'actived': False}
+
+    counter_schema = {'key': None,
+                      'value': 0,
+                      'createdate': None,
+                      'updatedate': None,
+                      'actived': False}
+
     def __init__(self, host="", token=""):
         super().__init__(host=host, token=token)
-
-    def schema(self):
-        return requests.get('{}/{}/schema'.format(self.host, self.root), headers=self.header)
 
     def all(self):
         return requests.get('{}/{}'.format(self.host, self.root), headers=self.header)
 
     def kkpTolocal(self, officeid="", kkp={}, actived=False):
-        result = self.schema().json()['result']
+        result = self.schema
         result['_id'] = officeid
         result['code'] = kkp['code']
         result['officetypeid'] = kkp['officetypeid']
@@ -43,7 +58,7 @@ class OfficeModel(BaseModel):
         return requests.get('{}/{}/find?{}'.format(self.host, self.root, param), headers=self.header)
 
     def all_kkp(self):
-        return requests.get('{}/{}/allkkp'.format(self.host, self.root), headers=self.header)
+        return requests.get('{}/{}/kkp/all'.format(self.host, self.root), headers=self.header)
 
     def kkp(self, officeid=""):
         param = 'officeid={}'.format(officeid)
@@ -59,4 +74,33 @@ class OfficeModel(BaseModel):
 
     def delete(self, officeid=""):
         djson = {'officeid': officeid}
-        return requests.delete('{}/{}'.format(self.host, self.root), json=djson, headers=djson)
+        return requests.delete('{}/{}'.format(self.host, self.root), json=djson, headers=self.header)
+
+    def all_counter(self, typeid="", officeid=""):
+        param = 'type={}&officeid={}'.format(typeid, officeid)
+        return requests.get('{}/{}/counter?{}'.format(self.host, self.root, param), headers=self.header)
+
+    def counter(self, typeid="", officeid="", counterid=""):
+        param = 'typeid={}&officeid={}&key={}'.format(typeid, officeid, counterid)
+        return requests.get('{}/{}/counter/find?{}'.format(self.host, self.root, param), headers=self.header)
+
+    def add_counter(self, typeid="", officeid="",counter={}):
+        djson = {'typeid': typeid,
+                 'officeid': officeid,
+                 'counter': counter}
+
+        return requests.post('{}/{}/counter'.format(self.host, self.root), json=djson, headers=self.header)
+
+    def update_counter(self, typeid="", officeid="", counter={}):
+        djson = {'typeid': typeid,
+                 'officeid': officeid,
+                 'counter': counter}
+
+        return requests.put('{}/{}/counter'.format(self.host, self.root), json=djson, headers=self.header)
+
+    def delete_counter(self, typeid="", officeid="", counterid=""):
+        djson = {'typeid': typeid,
+                 'officeid': officeid,
+                 'key': counterid}
+
+        return requests.delete('{}/{}/counter'.format(self.host, self.root), json=djson, headers=self.header)
