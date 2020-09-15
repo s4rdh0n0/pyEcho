@@ -8,9 +8,10 @@ class RegionModel (BaseModel):
 
     root = 'offices/region'
 
-    def __init__(self, officeid="", officetypeid=""):
+    def __init__(self, officeid="", officetypeid="", host="", token=""):
         self.officeid = officeid
         self.officetypeid = officetypeid
+        super().__init__(host=host, token=token)
 
     def get_provinsi(self):
         param = 'officeid={}&officetypeid={}'.format(self.officeid, self.officetypeid)

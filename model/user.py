@@ -8,44 +8,33 @@ class UserModel(BaseModel):
     
     root = 'users'
 
-    user_schema = {
+    schema = {
         '_id': None,
         'username': None,
         'officeid': None, 
-        'pegawaiid': None, 
+        'pegawaiid': None,
+        'image': None, 
         'nama': None,
         'phone': None,
         'email': None,
+        'role': [],
+        'log': [],
         'createdate': None, 
         'updatedate': None,
-        'actived': None,
+        'actived': False,
+    }
+
+    role_schema = {
+        'userroleid': None,
+        'key': None,
+        'createdate': None,
+        'usercreate': None,
+        'description': None,
     }
 
     def __init__(self, officeid="", host="", token=""):
         self.officeid = officeid
         super().__init__(host=host, token=token)
-
-    def schema(self):
-        return requests.get('{}/{}/schema'.format(self.host, self.root), headers=self.header)
-
-    def schemarole(self):
-        return requests.get('{}/{}/role/schema'.format(self.host, self.root), headers=self.header)
-
-    def count(self, typeid="", userid=""):
-        if userid == "":
-            param = 'officeid=' + self.officeid
-        else:
-            param = 'officeid={}&typeid={}&userid={}'.format(self.officeid, typeid, userid)
-            
-        return requests.get('{}/{}/count?{}'.format(self.host, self.root, param), headers=self.header)
-
-    def find(self, typeid="", userid=""):
-        param = 'typeid={}&userid={}'.format(typeid, userid)
-        return requests.get('{}/{}/find?{}'.format(self.host, self.root, param), headers=self.header)
-
-    def kkp(self, username=""):
-        param = 'officeid={}&username={}'.format(self.officeid, username)
-        return  requests.get('{}/{}/kkp?{}'.format(self.host, self.root, param), headers=self.header)
 
     def pagination(self, pegawaiid="", draw=0, page=0, limit=0, start=0):
         record = self.count(typeid="pegawaiid", userid=pegawaiid)
@@ -60,16 +49,52 @@ class UserModel(BaseModel):
             else:
                 return {'status': False, 'draw': 0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0}
     
-    def add(self, data={}):
-        param = {'officeid': self.officeid, 'user': data}
-        return requests.post('{}/{}'.format(self.host, self.root), json=param, headers=self.header)
+    def kkpToLocal(self, officeid="", kkp={}, actived=False):
+        result = self.schema
+        result['officeid'] = officeid
+        result['pegawaiid'] = kkp['pegawaiid']
+        result['nama'] = kkp['nama']
+        result['phone'] = kkp['phone']
+        result['actived'] = actived
 
-    def update(self, data={}):
-        param = {'officeiid': self.officeid, 'user': data}
-        return requests.put('{}/{}'.format(self.host, self.root), json=param, headers=self.header)
-    
-    def role(self, userid=""):
-        param = 'typeid={}&userid={}'.format("_id", userid)
+        return result
+
+    def count(self, typeid="", userid=""):
+        if userid == "" or typeid == "":
+            param = 'officeid=' + self.officeid
+        else:
+            param = 'officeid={}&typeid={}&userid={}'.format(self.officeid, typeid, userid)
+            
+        return requests.get('{}/{}/count?{}'.format(self.host, self.root, param), headers=self.header)
+
+    def find(self, typeid="", userid=""):
+        param = 'typeid={}&userid={}'.format(typeid, userid)
+        return requests.get('{}/{}/find?{}'.format(self.host, self.root, param), headers=self.header)
+
+    def kkp(self, username=""):
+        param = 'officeid={}&username={}'.format(self.officeid, username)
+        return  requests.get('{}/{}/kkp?{}'.format(self.host, self.root, param), headers=self.header)
+
+    def add(self, user={}):
+        djson = {'officeid': self.officeid,
+                 'user': user}
+
+        return requests.post('{}/{}'.format(self.host, self.root), json=djson, headers=self.header)
+
+    def update(self, user={}):
+        djson = {'officeiid': self.officeid,
+                 'user': user}
+
+        return requests.put('{}/{}'.format(self.host, self.root), json=djson, headers=self.header)
+
+    def delete(self, typeid="", userid=""):
+        djson = {'typeid': typeid,
+                 'userid': userid}
+
+        return requests.delete('{}/{}'.format(self.host, self.root), json=djson, headers=self.header)
+
+    def role(self, typeid="", userid=""):
+        param = 'typeid={}&userid={}'.format(typeid, userid)
         response = requests.get('{}/{}/role?{}'.format(self.host, self.root, param), headers=self.header)
         if response.status_code == 200:
             if response.json()['result'] != None:
@@ -79,29 +104,29 @@ class UserModel(BaseModel):
         else:
             return {'status': False, 'draw': 0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0}
 
+    def find_role(self, typeid="", userid="", key=""):
+        param = 'typeid={}&userid={}&key={}'.format(typeid, userid, key)
+
+        return requests.get('{}/{}/role/find{}'.format(self.host, self.root, param), headers=self.header)
+
     def role_add(self, userid="", role={}):
         param = {'typeid': '_id',
                  'userid': userid,
                  'role': role}
+
+        return requests.post('{}/{}/role'.format(self.host, self.root), json=param, headers=self.header)
+
+    def role_update(self, typeid="", userid="", role={}):
+        param = {'typeid': '_id',
+                 'userid': userid,
+                 'role': role}
+        
         return requests.post('{}/{}/role'.format(self.host, self.root), json=param, headers=self.header)
 
     def role_delete(self, userid="", roleid=""):
         param = {'typeid': '_id',
                  'userid': userid,
                  'roleid': roleid}
+
         return requests.delete('{}/{}'.format(self.host, self.root), json=param, headers=self.header)
 
-
-def TestingUser():
-    auth_param = {
-        'username': 's4rdh0n0',
-        'password': '4231Dodon'
-    }
-    auth = requests.post('{}/{}/{}'.format("http://localhost:8000", 'auth', 'login'), json=auth_param)
-    token = auth.json()['result']['token']
-
-    print(token)
-    # user = UserModel(officeid="", host="http://localhost:8000", token=token)
-
-
-TestingUser()

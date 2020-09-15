@@ -80,6 +80,15 @@ class OfficeModel(BaseModel):
         param = 'type={}&officeid={}'.format(typeid, officeid)
         return requests.get('{}/{}/counter?{}'.format(self.host, self.root, param), headers=self.header)
 
+    def count_conter(self, typeid="", officeid="", counterid=""):
+        param = 'type={}&officeid={}'.format(typeid, officeid)
+        response = requests.get('{}/{}/counter?{}'.format(self.host, self.root, param), headers=self.header)
+
+        if response.status_code == 200:
+            return len(response.json()['result'])
+        else:
+            return 0
+
     def counter(self, typeid="", officeid="", counterid=""):
         param = 'typeid={}&officeid={}&key={}'.format(typeid, officeid, counterid)
         return requests.get('{}/{}/counter/find?{}'.format(self.host, self.root, param), headers=self.header)
