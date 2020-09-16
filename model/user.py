@@ -6,7 +6,7 @@ from model.master import MasterModel
 
 class UserModel(BaseModel):
     
-    root = 'users'
+    root = 'offices/users'
 
     schema = {
         '_id': None,
@@ -18,7 +18,6 @@ class UserModel(BaseModel):
         'phone': None,
         'email': None,
         'role': [],
-        'log': [],
         'createdate': None, 
         'updatedate': None,
         'actived': False,
@@ -35,6 +34,9 @@ class UserModel(BaseModel):
     def __init__(self, officeid="", host="", token=""):
         self.officeid = officeid
         super().__init__(host=host, token=token)
+
+    def auth(self, username="", password=""):
+        pass
 
     def pagination(self, pegawaiid="", draw=0, page=0, limit=0, start=0):
         record = self.count(typeid="pegawaiid", userid=pegawaiid)

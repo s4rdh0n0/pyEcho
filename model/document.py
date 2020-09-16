@@ -6,7 +6,7 @@ from model.base import BaseModel
 
 class PersilModel(BaseModel):
 
-    root = 'document/persil'
+    root = 'office/document/persil'
 
     def __init__(self, officeid="", desaid="", host="", token=""):
         self.officeid = officeid
@@ -29,7 +29,7 @@ class PersilModel(BaseModel):
 
 class SuratUkurModel(BaseModel):
 
-    root = 'document/suratukur'
+    root = 'office/document/suratukur'
 
     def __init__(self, officeid="", desaid="", host="", token=""):
         self.officeid = officeid
@@ -51,7 +51,7 @@ class SuratUkurModel(BaseModel):
 
 class BukuTanahModel(BaseModel):
 
-    root = 'document/bukutanah'
+    root = 'office/document/bukutanah'
 
     def __init__(self, officeid="",  desaid="", host="", token=""):
         self.officeid = officeid

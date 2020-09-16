@@ -28,4 +28,8 @@ class RegionModel (BaseModel):
     def get_desa(self, parent=""):
         param = 'desaid={}&officeid={}&officetypeid={}'.format(parent, self.officeid, self.officetypeid)
         return requests.get('{}/{}/desa?{}'.format(self.host, self.root, param), headers=self.header)
+
+    def get_alldesa(self):
+        param = 'officeid={}'.format(self.officeid)
+        return requests.get('{}/{}/desa/all?{}'.format(self.host, self.root, param), headers=self.header)
         
