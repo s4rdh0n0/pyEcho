@@ -10,7 +10,8 @@ from tornado.options import options
 from controller.base import BaseController
 
 # Model
-from model.user import UserModel, RoleModel
+from model.user import UserModel
+from model.master import MasterModel
 
 class DaftarPegawaiController(BaseController):
 
@@ -25,6 +26,7 @@ class DaftarPegawaiController(BaseController):
         # sleep
         tornado.gen.sleep(0.5)
 
+        # load view
         if response.status_code == 200:
             self.page_data['title'] = 'Daftar Pegawai'
             self.page_data['description'] = 'Pegawai Actived/Non Actived'
@@ -84,25 +86,23 @@ class DaftarPegawaiController(BaseController):
             tornado.gen.sleep(0.5)
 
             user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-            rschema = user.schema()
-            tornado.gen.sleep(0.5)
+            rschema = user.schema
             rkkp_user = user.kkp(username=username)
             
-            if rkkp_user.status_code == 200 and rschema.status_code == 200:
-                pschema  = rschema.json()['result']
+            if rkkp_user.status_code == 200:
                 pkkp_user = rkkp_user.json()['result']
                 
                 # converter
-                pschema['_id'] = pkkp_user['userid']
-                pschema['officeid'] = cookies['officeid']
-                pschema['username'] = username
-                pschema['pegawaiid'] = pkkp_user['pegawaiid']
-                pschema['nama'] = pkkp_user['nama']
-                pschema['image'] = pkkp_user['photo']
-                pschema['phone'] = pkkp_user['phone']
-                pschema['actived'] = True
+                rschema['_id'] = pkkp_user['userid']
+                rschema['officeid'] = cookies['officeid']
+                rschema['username'] = username
+                rschema['pegawaiid'] = pkkp_user['pegawaiid']
+                rschema['nama'] = pkkp_user['nama']
+                rschema['image'] = pkkp_user['photo']
+                rschema['phone'] = pkkp_user['phone']
+                rschema['actived'] = True
 
-                if user.add(data=pschema).status_code == 200:
+                if user.add(user=rschema).status_code == 200:
                     self.write({'status': True, 'type': 'success','msg': 'Pegawai berhasil disimpan.'})
                 else:
                     self.write({'sttaus': False, 'type': 'warning','msg': 'Pegawai gagal disimpan.'})
@@ -119,8 +119,8 @@ class DaftarPegawaiController(BaseController):
             # sleep
             tornado.gen.sleep(0.5)
 
-            role = RoleModel(host=options.apis, token=cookies['token'])
-            self.write(role.pagination(userid=userid))
+            user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
+            self.write(user.role(typeid="_id",userid=userid))
 
         @tornado.web.authenticated
         @tornado.gen.coroutine
@@ -135,8 +135,8 @@ class DaftarPegawaiController(BaseController):
             # client request
             body = tornado.escape.json_decode(self.request.body)
 
-            role = RoleModel( host=options.apis, token=cookies['token'])
-            schema = role.schema()
+            user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
+            schema = user.role_schema
 
             # convert
             schema['code'] = body['code']
@@ -144,7 +144,7 @@ class DaftarPegawaiController(BaseController):
             schema['usercreate'] = cookies['userid']
             schema['description'] = body['description']
 
-            response = role.add(typeid="_id", userid=body['userid'], role=schema)
+            response = user.role_add(typeid="_id", userid=body['userid'], role=schema)
             if response.status_code == 200:
                 self.write(response.json())
 
@@ -160,11 +160,11 @@ class DaftarPegawaiController(BaseController):
             tornado.gen.sleep(0.5)
             
             user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-            role = RoleModel(host=options.apis, token=cookies['token'])
-
+            master = MasterModel(type='typeregister', host=options.apis, token=cookies['token'])
+            
             ruser = user.find(typeid="_id", userid=userid)
             tornado.gen.sleep(0.5)
-            rtype = role.master.get_master()
+            rtype = master.get_master()
 
             if ruser.status_code == 200 and rtype.status_code == 200:
                 self.render('node/detailpegawai.html', user=ruser.json()['result'], typeregister=rtype.json()['result'])

@@ -6,7 +6,17 @@ from model.base import BaseModel
 
 class MasterModel(BaseModel):
 
-    root = 'document/master'
+    root = 'offices/master'
+
+    schema = {
+        '_id': None,
+        'type': None,
+        'code': None,
+        'description': None,
+        'createdate': None,
+        'updatedate': None,
+        'actived': False
+    }
 
     def __init__(self, type="", host="", token=""):
         self.type = type

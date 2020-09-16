@@ -111,8 +111,8 @@ class UserModel(BaseModel):
 
         return requests.get('{}/{}/role/find{}'.format(self.host, self.root, param), headers=self.header)
 
-    def role_add(self, userid="", role={}):
-        param = {'typeid': '_id',
+    def role_add(self, typeid="", userid="", role={}):
+        param = {'typeid': typeid,
                  'userid': userid,
                  'role': role}
 
