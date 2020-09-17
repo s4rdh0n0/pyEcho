@@ -24,7 +24,6 @@ class UserModel(BaseModel):
     }
 
     role_schema = {
-        'userroleid': None,
         'key': None,
         'createdate': None,
         'usercreate': None,
@@ -36,7 +35,8 @@ class UserModel(BaseModel):
         super().__init__(host=host, token=token)
 
     def auth(self, username="", password=""):
-        pass
+        djson = {"username": username, "password": password}
+        return requests.post('{}/{}'.format(self.host, 'auth/login'), json=djson)
 
     def pagination(self, pegawaiid="", draw=0, page=0, limit=0, start=0):
         record = self.count(typeid="pegawaiid", userid=pegawaiid)
@@ -51,7 +51,7 @@ class UserModel(BaseModel):
             else:
                 return {'status': False, 'draw': 0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0}
     
-    def kkpToLocal(self, officeid="", kkp={}, actived=False):
+    def kkpToUser(self, officeid="", kkp={}, actived=False):
         result = self.schema
         result['officeid'] = officeid
         result['pegawaiid'] = kkp['pegawaiid']

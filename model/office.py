@@ -33,7 +33,7 @@ class OfficeModel(BaseModel):
     def all(self):
         return requests.get('{}/{}'.format(self.host, self.root), headers=self.header)
 
-    def kkpTolocal(self, officeid="", kkp={}, actived=False):
+    def kkpTooffice(self, officeid="", kkp={}, actived=False):
         result = self.schema
         result['_id'] = officeid
         result['code'] = kkp['code']
@@ -79,15 +79,6 @@ class OfficeModel(BaseModel):
     def all_counter(self, typeid="", officeid=""):
         param = 'type={}&officeid={}'.format(typeid, officeid)
         return requests.get('{}/{}/counter?{}'.format(self.host, self.root, param), headers=self.header)
-
-    def count_conter(self, typeid="", officeid="", counterid=""):
-        param = 'type={}&officeid={}'.format(typeid, officeid)
-        response = requests.get('{}/{}/counter?{}'.format(self.host, self.root, param), headers=self.header)
-
-        if response.status_code == 200:
-            return len(response.json()['result'])
-        else:
-            return 0
 
     def counter(self, typeid="", officeid="", counterid=""):
         param = 'typeid={}&officeid={}&key={}'.format(typeid, officeid, counterid)

@@ -33,3 +33,8 @@ class RegionModel (BaseModel):
         param = 'officeid={}'.format(self.officeid)
         return requests.get('{}/{}/desa/all?{}'.format(self.host, self.root, param), headers=self.header)
         
+    def desa(self, kode=""):
+        data = self.get_alldesa()
+        for desa in data.json()['result']:
+            if desa['code'] == kode:
+                return desa
