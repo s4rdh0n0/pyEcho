@@ -18,30 +18,32 @@ class MasterModel(BaseModel):
         'actived': False
     }
 
-    def __init__(self, type="", host="", token=""):
-        self.type = type
+    def __init__(self, host="", token=""):
         super().__init__(host=host, token=token)
 
-    def get_master(self):
-        param = 'type={}'.format(self.type)
+    def get_master(self, type=""):
+        param = 'type={}'.format(type)
         return  requests.get('{}/{}?{}'.format(self.host, self.root, param), headers=self.header)
 
-    def find(self, code=""):
-        param = 'type={}&code={}'.format(self.type, code)
-        return requests.get('{}/{}/find?{}'.format(self.host, self.root, param), headers=self.header)
+    def count(self, type="", code=""):
+        param = 'type={}&code={}'.format(type, code)
+        return requests.get('{}/{}/count?{}'.format(self.host, self.root, param), headers=self.header)
 
+    def find(self, type ="", code=""):
+        param = 'type={}&code={}'.format(type, code)
+        return requests.get('{}/{}/find?{}'.format(self.host, self.root, param), headers=self.header)
 
     def add(self, master={}):
         djson = {'master': master}
         return requests.post('{}/{}'.format(self.host, self.root), json=djson, headers=self.header)
 
-    def update(self, code="", master={}):
-        djson = {'type': self.type,
+    def update(self, type="", code="", master={}):
+        djson = {'type': type,
                  'code': code,
                  'master': master}
         return requests.put('{}/{}'.format(self.host, self.root), json=djson, headers=self.header)
 
-    def delete(self, code=""):
-        djson = {'type': self.type,
+    def delete(self, type="", code=""):
+        djson = {'type': type,
                  'code': code}
         return requests.delete('{}/{}'.format(self.host, self.root), json=djson, headers=self.header)

@@ -10,9 +10,7 @@ from model.master import MasterModel
 
 
 config = {
-    'HOST': 'http://localhost:8000',
-    'TOKEN': None,
-    'OFFICEID': 'd8af2d0372b84f6fb33a97847b94cacd'
+    'HOST': 'http://localhost:8000'
 }
 
 
@@ -21,35 +19,69 @@ def token():
     result = user.auth(username="s4rdh0n0", password="4231Dodon")
     return result.json()
 
-def master():
-    role = MasterModel(type="typerole", host=config['HOST'], token=token()['token'])
+def role():
+    role = MasterModel(host=config['HOST'], token=token()['token'])
 
-    if role.find(code='REGIN').status_code == 400:
-        schema = role.schema
-        schema['_id'] = uuid.uuid4().__str__()
-        schema['type'] = role.type
-        schema['code'] = 'REGIN'
-        schema['description'] = 'Register Berkas Masuk'
-        schema['actived'] = True
-        print("Insert {}: {}".format(schema['description'], role.add(master=schema)))
+    schema = role.schema
+    schema['_id'] = uuid.uuid4().__str__()
+    schema['type'] = "typerole"
+    schema['code'] = 'REGIN'
+    schema['description'] = 'Register Berkas Masuk'
+    schema['actived'] = True
+    count = role.count(type=schema['type'], code=schema['code'])
+    if count.json()['result'] == 0:
+        print("Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
 
-    if role.find(code='REGOUT').status_code == 400:
-        schema = role.schema
-        schema['_id'] = uuid.uuid4().__str__()
-        schema['type'] = role.type
-        schema['code'] = 'REGOUT'
-        schema['description'] = 'Register Berkas Keluar'
-        schema['actived'] = True
-        print("Insert {}: {}".format(schema['description'], role.add(master=schema)))
+    schema = role.schema
+    schema['_id'] = uuid.uuid4().__str__()
+    schema['type'] = "typerole"
+    schema['code'] = 'REGOUT'
+    schema['description'] = 'Register Berkas Keluar'
+    schema['actived'] = True
+    count = role.count(type=schema['type'], code=schema['code'])
+    if count.json()['result'] == 0:
+        print("Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
 
-    if role.find(code='SURVEY').status_code == 400:
-        schema = role.schema
-        schema['_id'] = uuid.uuid4().__str__()
-        schema['type'] = role.type
-        schema['code'] = 'SURVEY'
-        schema['description'] = 'Petugas Ukur'
-        schema['actived'] = True
-        print("Insert {}: {}".format(schema['description'], role.add(master=schema)))
+    schema = role.schema
+    schema['_id'] = uuid.uuid4().__str__()
+    schema['type'] = "typerole"
+    schema['code'] = 'SURVEY'
+    schema['description'] = 'Petugas Ukur'
+    schema['actived'] = True
+    count = role.count(type=schema['type'], code=schema['code'])
+    if count.json()['result'] == 0:
+        print("Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
+
+    schema = role.schema
+    schema['_id'] = uuid.uuid4().__str__()
+    schema['type'] = "typerole"
+    schema['code'] = 'DRAWING'
+    schema['description'] = 'Petugas Penggambaran dan Pemetaan'
+    schema['actived'] = True
+    count = role.count(type=schema['type'], code=schema['code'])
+    if count.json()['result'] == 0:
+        print("Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
+
+    schema = role.schema
+    schema['_id'] = uuid.uuid4().__str__()
+    schema['type'] = "typerole"
+    schema['code'] = 'MANAGER'
+    schema['description'] = 'Koreksi dan Validasi Berkas dan Document'
+    schema['actived'] = True
+    count = role.count(type=schema['type'], code=schema['code'])
+    if count.json()['result'] == 0:
+        print("Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
+
+    schema = role.schema
+    schema['_id'] = uuid.uuid4().__str__()
+    schema['type'] = "typerole"
+    schema['code'] = 'ADMINISTRATOR'
+    schema['description'] = 'Pengelola Aplikasi dan Data'
+    schema['actived'] = True
+    count = role.count(type=schema['type'], code=schema['code'])
+    if count.json()['result'] == 0:
+        print(count.json())
+        print("Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
 
 def office():
     office = OfficeModel(host=config['HOST'], token=token()['token'])
@@ -83,12 +115,11 @@ def office():
                     tools['actived'] = True
                     office.add_counter(typeid="_id", officeid=o['officeid'], counter=tools)
 
-            
     else:
         print('Error: Response not found.')
 
 
 
 if __name__ == "__main__":
-    office()
-    master()
+    # office()
+    role()
