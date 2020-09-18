@@ -19,6 +19,9 @@ def token():
     result = user.auth(username="s4rdh0n0", password="4231Dodon")
     return result.json()
 
+def user():
+    pass
+
 def role():
     role = MasterModel(host=config['HOST'], token=token()['token'])
 
@@ -80,7 +83,6 @@ def role():
     schema['actived'] = True
     count = role.count(type=schema['type'], code=schema['code'])
     if count.json()['result'] == 0:
-        print(count.json())
         print("Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
 
 def office():

@@ -1,5 +1,4 @@
 import requests
-import datetime
 
 # Tornado Framework
 import tornado.gen
@@ -136,17 +135,20 @@ class DaftarPegawaiController(BaseController):
             body = tornado.escape.json_decode(self.request.body)
 
             user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-            schema = user.role_schema
+            master = MasterModel(host=options.apis, token=cookies['token'])
+            if user.find_role(typeid="_id", userid=body['userid'], key=body['key']).status_code == 400:
 
-            # convert
-            schema['code'] = body['code']
-            schema['createdate'] = datetime.datetime.now()
-            schema['usercreate'] = cookies['userid']
-            schema['description'] = body['description']
+                # convert
+                schema = user.role_schema
+                schema['key'] = body['key']
+                schema['usercreate'] = cookies['userid']
+                schema['description'] = master.find(type="typerole", code=body['key']).json()['result']['description']
 
-            response = user.role_add(typeid="_id", userid=body['userid'], role=schema)
-            if response.status_code == 200:
-                self.write(response.json())
+                response = user.role_add(typeid="_id", userid=body['userid'], role=schema)
+                if response.status_code == 200:
+                    self.write({"status": response.json(), "msg": "Success"})
+            else:
+                self.write({"status": False, "msg": "Data sudah ada."})
 
     class PegawaiController(BaseController):
 
@@ -160,11 +162,11 @@ class DaftarPegawaiController(BaseController):
             tornado.gen.sleep(0.5)
             
             user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-            master = MasterModel(type='typeregister', host=options.apis, token=cookies['token'])
+            master = MasterModel(host=options.apis, token=cookies['token'])
             
             ruser = user.find(typeid="_id", userid=userid)
             tornado.gen.sleep(0.5)
-            rtype = master.get_master()
+            rtype = master.get_master(type="typerole")
 
             if ruser.status_code == 200 and rtype.status_code == 200:
                 self.render('node/detailpegawai.html', user=ruser.json()['result'], typeregister=rtype.json()['result'])

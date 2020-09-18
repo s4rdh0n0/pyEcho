@@ -51,6 +51,7 @@ class UserModel(BaseModel):
             else:
                 return {'status': False, 'draw': 0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0}
     
+    # Convert schema kkp to schema locals
     def kkpToUser(self, officeid="", kkp={}, actived=False):
         result = self.schema
         result['officeid'] = officeid
@@ -108,22 +109,22 @@ class UserModel(BaseModel):
 
     def find_role(self, typeid="", userid="", key=""):
         param = 'typeid={}&userid={}&key={}'.format(typeid, userid, key)
-
-        return requests.get('{}/{}/role/find{}'.format(self.host, self.root, param), headers=self.header)
+        
+        return requests.get('{}/{}/role/find?{}'.format(self.host, self.root, param), headers=self.header)
 
     def role_add(self, typeid="", userid="", role={}):
-        param = {'typeid': typeid,
+        djson = {'typeid': typeid,
                  'userid': userid,
                  'role': role}
 
-        return requests.post('{}/{}/role'.format(self.host, self.root), json=param, headers=self.header)
+        return requests.post('{}/{}/role'.format(self.host, self.root), json=djson, headers=self.header)
 
     def role_update(self, typeid="", userid="", role={}):
         param = {'typeid': '_id',
                  'userid': userid,
                  'role': role}
         
-        return requests.post('{}/{}/role'.format(self.host, self.root), json=param, headers=self.header)
+        return requests.put('{}/{}/role'.format(self.host, self.root), json=param, headers=self.header)
 
     def role_delete(self, userid="", roleid=""):
         param = {'typeid': '_id',

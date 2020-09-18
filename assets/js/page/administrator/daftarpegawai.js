@@ -1,19 +1,7 @@
 + function ($) {
     'use strict';
 
-
     $('#formFilter').validate({
-        rules: {},
-        messages: {},
-        errorElement: "small",
-        highlight: function (element, errorClass, validClass) {
-            var elem = $(element);
-            elem.closest('.form-group').addClass('has-error');
-        },
-        unhighlight: function (element, errorClass, validClass) {
-            var elem = $(element);
-            elem.closest('.form-group').removeClass('has-error');
-        },
         submitHandler: function (form) {
             $('#tablePegawai').DataTable().ajax.reload();
         }
@@ -155,7 +143,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
                 start: $('#tablePegawai').dataTable().fnSettings()._iDisplayStart,
                 limit: $('#tablePegawai').dataTable().fnSettings()._iDisplayLength,
                 draw: $('#tablePegawai').dataTable().fnSettings().iDraw,
-                pegawaiid: $('#pegawaiid').val(),
+                pegawaiid: $('#pegawaiid_find').val(),
             }),
             headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
             success: (function (data) {
