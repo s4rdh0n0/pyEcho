@@ -163,28 +163,35 @@ var tablePegawai = $('#tablePegawai').DataTable({
             "targets": [0],
             "visible": false,
             "data": '_id',
-        },
-        {
+        },{
             "targets": [1],
-            "width": "3%",
-            "render": function () {
-                return '<i class="fa fa-user-o" aria-hidden="true"></i>';
-            },
-        },
-        {
+            "width": "5%",
+            "className": "dt-center text-center",
+            "render": function (data, type, row, meta) {
+                return meta.row + meta.settings._iDisplayStart + 1 ;
+            }
+        },{
             "targets": [2],
             "width": "20%",
             "data": 'pegawaiid',
-            "className": "dt-center"
-        },
-        {
+            "className": "dt-center text-center"
+        },{
             "targets": [3],
-            "width": "74%",
+            "width": "57%",
             "data": 'nama',
-            "className": "dt-center"
-        },
-        {
+            "className": "dt-center text-center"
+        },{
             "targets": [4],
+            "width": "15%",
+            "data": 'createdate',
+            "className": "dt-center text-center",
+            "render": function (data) {
+                var date = new Date(data);
+                var month = date.getMonth() + 1;
+                return date.getDate() + "/" + (month.toString().length > 1 ? month : "0" + month)  + "/" + date.getFullYear() + "  " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+            }
+        },{
+            "targets": [5],
             "width": "3%",
             "render": function () {
                 return '<a id="info" class="btn btn-primary btn-flat"><i class="fa fa-info-circle" aria-hidden="true"></i></a>';
@@ -193,6 +200,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
     ],
     'responsive': true,
     'paging': true,
+    'autoWidth': false,
     'pagingType': 'simple_numbers',
     'lengthChange': false,
     'pageLength': 20,
