@@ -13,7 +13,6 @@ class UserModel(BaseModel):
         'username': None,
         'officeid': None, 
         'pegawaiid': None,
-        'image': None, 
         'nama': None,
         'phone': None,
         'email': None,

@@ -22,7 +22,7 @@ def token():
 def user():
     pass
 
-def role():
+def type_role():
     role = MasterModel(host=config['HOST'], token=token()['token'])
 
     schema = role.schema
@@ -33,7 +33,7 @@ def role():
     schema['actived'] = True
     count = role.count(type=schema['type'], code=schema['code'])
     if count.json()['result'] == 0:
-        print("Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
+        print("-> Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
 
     schema = role.schema
     schema['_id'] = uuid.uuid4().__str__()
@@ -43,7 +43,7 @@ def role():
     schema['actived'] = True
     count = role.count(type=schema['type'], code=schema['code'])
     if count.json()['result'] == 0:
-        print("Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
+        print("-> Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
 
     schema = role.schema
     schema['_id'] = uuid.uuid4().__str__()
@@ -53,7 +53,7 @@ def role():
     schema['actived'] = True
     count = role.count(type=schema['type'], code=schema['code'])
     if count.json()['result'] == 0:
-        print("Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
+        print("-> Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
 
     schema = role.schema
     schema['_id'] = uuid.uuid4().__str__()
@@ -63,7 +63,7 @@ def role():
     schema['actived'] = True
     count = role.count(type=schema['type'], code=schema['code'])
     if count.json()['result'] == 0:
-        print("Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
+        print("-> Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
 
     schema = role.schema
     schema['_id'] = uuid.uuid4().__str__()
@@ -73,7 +73,7 @@ def role():
     schema['actived'] = True
     count = role.count(type=schema['type'], code=schema['code'])
     if count.json()['result'] == 0:
-        print("Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
+        print("-> Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
 
     schema = role.schema
     schema['_id'] = uuid.uuid4().__str__()
@@ -83,7 +83,7 @@ def role():
     schema['actived'] = True
     count = role.count(type=schema['type'], code=schema['code'])
     if count.json()['result'] == 0:
-        print("Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
+        print("-> Insert {}: {}".format(schema['description'], role.add(master=schema).json()['result']))
 
 def office():
     office = OfficeModel(host=config['HOST'], token=token()['token'])
@@ -124,4 +124,4 @@ def office():
 
 if __name__ == "__main__":
     # office()
-    role()
+    type_role()

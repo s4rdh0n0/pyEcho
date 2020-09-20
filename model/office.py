@@ -19,6 +19,8 @@ class OfficeModel(BaseModel):
              'email': None,
              'fax': None,
              'counter': [],
+             'createdate': None,
+             'updatedate': None,
              'actived': False}
 
     counter_schema = {'key': None,
