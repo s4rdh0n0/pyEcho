@@ -45,7 +45,6 @@
                         $("#pegawaiid_kkplog").val(result.data.result.pegawaiid);
                         $("#username_kkplog").val($("#username").val());     
                         $("#name_kkplog").val(result.data.result.nama);
-                        $("#phone_kkplog").val(result.data.result.phone);
 
                     } else {
                         $(".kkplog_alert").show();

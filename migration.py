@@ -16,11 +16,15 @@ config = {
 
 def token():
     user = UserModel(officeid=None, host=config['HOST'], token=None)
-    result = user.auth(username="s4rdh0n0", password="4231Dodon")
+    result = user.auth(username="s4rdh0n0", password="YCxa2SJxLXQhFN")
     return result.json()
 
 def user():
-    pass
+    user = UserModel(officeid='d8af2d0372b84f6fb33a97847b94cacd', host=config['HOST'], token=token()['token'])
+
+    user.kkp(username="")
+    schema = user.schema
+
 
 def type_role():
     role = MasterModel(host=config['HOST'], token=token()['token'])
@@ -123,5 +127,5 @@ def office():
 
 
 if __name__ == "__main__":
-    # office()
+    office()
     type_role()

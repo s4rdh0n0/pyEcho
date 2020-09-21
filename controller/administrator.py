@@ -170,3 +170,21 @@ class DaftarPegawaiController(BaseController):
 
             if ruser.status_code == 200 and rtype.status_code == 200:
                 self.render('node/detailpegawai.html', user=ruser.json()['result'], typeregister=rtype.json()['result'])
+
+
+class ActivationUserController (BaseController):
+
+
+    def get(self):
+        # refresh cookies data
+        self.refresh_cookies(cookies=self.get_cookies_user())
+        response = self.get_user_actived(cookies=self.get_cookies_user())
+
+        # sleep
+        tornado.gen.sleep(0.5)
+
+        # load view
+        if response.status_code == 200:
+            self.page_data['title'] = 'Activation'
+            self.page_data['description'] = 'Pegawai ASN dan PPNPN'
+            self.render('page/administrator/activationuser.html', page=self.page_data, useractived=response.json()['result'])

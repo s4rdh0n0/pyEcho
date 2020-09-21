@@ -18,7 +18,6 @@ class UserModel(BaseModel):
         'email': None,
         'role': [],
         'createdate': None, 
-        'updatedate': None,
         'actived': False,
     }
 
