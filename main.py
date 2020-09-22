@@ -22,7 +22,10 @@ class Application(tornado.web.Application):
     handlers = [(r"/logout", SignOutController),
                 (r"/login", SignInController),
                 (r"/", DashboardController),
+
                 (r"/administrator/activationuser", ActivationUserController),
+                (r"/administrator/activationuser/username=([A-Za-z0-9\ -@.]+)", ActivationUserController.InformasiPegawaiController),
+
                 (r"/administrator/daftarpegawai", DaftarPegawaiController),
                 (r"/administrator/daftarpegawai/kkp/username=([A-Za-z0-9\ -@.]+)", DaftarPegawaiController.KKPPegawaiController),
                 (r"/administrator/daftarpegawai/detail/userid=([A-Za-z0-9\ -@.]+)", DaftarPegawaiController.PegawaiController),

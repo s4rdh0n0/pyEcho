@@ -14,8 +14,6 @@ class UserModel(BaseModel):
         'officeid': None, 
         'pegawaiid': None,
         'nama': None,
-        'phone': None,
-        'email': None,
         'role': [],
         'createdate': None, 
         'actived': False,
@@ -54,8 +52,8 @@ class UserModel(BaseModel):
         result = self.schema
         result['officeid'] = officeid
         result['pegawaiid'] = kkp['pegawaiid']
+        result['username'] = kkp['username']
         result['nama'] = kkp['nama']
-        result['phone'] = kkp['phone']
         result['actived'] = actived
 
         return result
@@ -72,9 +70,17 @@ class UserModel(BaseModel):
         param = 'typeid={}&userid={}'.format(typeid, userid)
         return requests.get('{}/{}/find?{}'.format(self.host, self.root, param), headers=self.header)
 
-    def kkp(self, username=""):
+    def entity(self, username=""):
         param = 'officeid={}&username={}'.format(self.officeid, username)
-        return  requests.get('{}/{}/kkp?{}'.format(self.host, self.root, param), headers=self.header)
+        return  requests.get('{}/{}/kkp/entity?{}'.format(self.host, self.root, param), headers=self.header)
+
+    def entityfoto(self, pegawaiid=""):
+        param = 'pegawaiid={}'.format(pegawaiid)
+        return requests.get('{}/{}/foto?{}'.format(self.host, self.root, param), headers=self.header)
+
+    def pegawai(self, username=""):
+        param = 'username={}'.format(username)
+        return requests.get('{}/{}/kkp/pegawai?{}'.format(self.host, self.root, param), headers=self.header)
 
     def add(self, user={}):
         djson = {'officeid': self.officeid,

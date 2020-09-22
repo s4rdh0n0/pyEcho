@@ -42,7 +42,7 @@ class BaseController(tornado.web.RequestHandler):
 
 	def get_user_actived(self, cookies={}):
 		user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-		return user.find(typeid="_id", userid=cookies['userid'])
+		return user.pegawai(username=cookies['username'])
 
 	def get_office_actived(self, cookies={}):
 		dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}

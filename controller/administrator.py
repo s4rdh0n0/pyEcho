@@ -62,7 +62,7 @@ class DaftarPegawaiController(BaseController):
             tornado.gen.sleep(0.5)
 
             user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-            response_kkp_user = user.kkp(username=username)
+            response_kkp_user = user.entity(username=username)
             if response_kkp_user.status_code == 200:
                 if response_kkp_user.json()['result']['profile']['profilepegawai'] != None:
                     if user.find(typeid="username", userid=username).status_code == 200:
@@ -86,7 +86,7 @@ class DaftarPegawaiController(BaseController):
 
             user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
             rschema = user.schema
-            rkkp_user = user.kkp(username=username)
+            rkkp_user = user.entity(username=username)
             
             if rkkp_user.status_code == 200:
                 pkkp_user = rkkp_user.json()['result']
@@ -174,11 +174,13 @@ class DaftarPegawaiController(BaseController):
 
 class ActivationUserController (BaseController):
 
-
+    @tornado.web.authenticated
+    @tornado.gen.coroutine
     def get(self):
         # refresh cookies data
         self.refresh_cookies(cookies=self.get_cookies_user())
         response = self.get_user_actived(cookies=self.get_cookies_user())
+
 
         # sleep
         tornado.gen.sleep(0.5)
@@ -186,5 +188,51 @@ class ActivationUserController (BaseController):
         # load view
         if response.status_code == 200:
             self.page_data['title'] = 'Activation'
-            self.page_data['description'] = 'Pegawai ASN dan PPNPN'
+            self.page_data['description'] = 'Pegawai ASN atau PPNPN'
             self.render('page/administrator/activationuser.html', page=self.page_data, useractived=response.json()['result'])
+
+    @tornado.web.authenticated
+    @tornado.gen.coroutine
+    def post(self):
+        # refresh cookies data
+        self.refresh_cookies(cookies=self.get_cookies_user())
+        cookies = self.get_cookies_user()
+
+        # client request
+        body = tornado.escape.json_decode(self.request.body)
+
+        # sleep
+        tornado.gen.sleep(0.5)
+
+        user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
+        response_entity = user.entity(username=body['username'])
+        # print(response_entity.json())
+        if response_entity.status_code == 200:
+            if response_entity.json()['result']['profile']['profilepegawai'] == None:
+                self.write({'status': False, 'type': 'warning', 'username': None, 'msg': 'Username tidak terdaftar pada database http://kkp.atrbpn.go.id/ Kantah Trenggalek'})
+            else:
+                self.write({'status': True, 'type': 'success', 'username': body['username']})
+        else:
+            self.write({'status': False, 'type': 'danger', 'username': None, 'msg': 'Error response http://kkp.atrbpn.go.id/'})
+
+
+    class InformasiPegawaiController(BaseController):
+
+        @tornado.web.authenticated
+        @tornado.gen.coroutine
+        def get(self, username=""):            
+            # refresh cookies data
+            self.refresh_cookies(cookies=self.get_cookies_user())
+            cookies = self.get_cookies_user()
+            
+            # class
+            user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
+
+            # sleep
+            tornado.gen.sleep(0.5)
+            response_count = user.count(typeid="username", userid=username)
+            tornado.gen.sleep(0.5)
+            response_pegawai = user.pegawai(username=username)
+
+            if response_pegawai.status_code == 200 & response_count.status_code == 200:
+                self.render('node/detailuser.html', pegawai=response_pegawai.json()['result'], count=response_count.json()['result'])
