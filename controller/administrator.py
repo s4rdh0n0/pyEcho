@@ -105,9 +105,26 @@ class DaftarPegawaiController(BaseController):
 
                 response = user.role_add(typeid="_id", userid=body['userid'], role=schema)
                 if response.status_code == 200:
-                    self.write({"status": response.json(), "msg": "Success"})
+                    self.write({"status": response.json()})
             else:
                 self.write({"status": False, "msg": "Data sudah ada."})
+
+        @tornado.web.authenticated
+        @tornado.gen.coroutine
+        def delete(self):
+            # refresh cookies data
+            self.refresh_cookies(cookies=self.get_cookies_user())
+            cookies = self.get_cookies_user()
+
+            # sleep
+            tornado.gen.sleep(0.5)
+
+            # client request
+            body = tornado.escape.json_decode(self.request.body)
+            user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
+            response = user.role_delete(userid=body['userid'], key=body['key'])
+            if response.status_code == 200:
+                self.write({'status': response.json()['result']})
 
     class PegawaiController(BaseController):
 
@@ -128,7 +145,7 @@ class DaftarPegawaiController(BaseController):
             rtype = master.get_master(type="typerole")
 
             if ruser.status_code == 200 and rtype.status_code == 200:
-                self.render('node/detailpegawai.html', user=ruser.json()['result'], typeregister=rtype.json()['result'])
+                self.render('node/detailrole.html', user=ruser.json()['result'], typeregister=rtype.json()['result'])
 
         @tornado.web.authenticated
         @tornado.gen.coroutine
@@ -176,7 +193,6 @@ class ActivationUserController (BaseController):
 
         user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
         response_entity = user.entity(username=body['username'])
-        # print(response_entity.json())
         if response_entity.status_code == 200:
             if response_entity.json()['result']['profile']['profilepegawai'] == None:
                 self.write({'status': False, 'type': 'warning', 'username': None, 'msg': 'Username tidak terdaftar pada database http://kkp.atrbpn.go.id/ Kantah Trenggalek'})

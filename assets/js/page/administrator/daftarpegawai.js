@@ -68,28 +68,27 @@
 
     });
 
-    // NOTE: modal-add hide
+    // NOTE: modal-activation hide
     $('#modal-activation').on('hide.bs.modal', function () {
         $('#inputUsername').val("");
         $('#userView').empty();
     });
 
-    // NOTE: Refresh table
-    $('#btnRefresh').on('click', function () {
-        $('#tablePegawai').DataTable().ajax.reload();
+    // NOTE: modal-role hide
+    $('#modal-role').on('hide.bs.modal', function () {
+        $('#userRole').empty();
     });
 
-    // Info Pegawai
-    $('#tablePegawai tbody').on('click', '#btnInfoPegawai', function () {
+    // Role Pegawai
+    $('#tablePegawai tbody').on('click', '#btnRolePegawai', function () {
         var selected_row = $(this).parents('tr');
         if (selected_row.hasClass('child')) {
             selected_row = selected_row.prev();
         }
 
         if (tablePegawai.row(selected_row).data()[0] != "") {
-            run_wait('#detail');
-            $('#detail').load('/administrator/daftarpegawai/userid=' + tablePegawai.row(selected_row).data()['_id']);
-            $('.nav-tabs a[href="#detail"]').tab('show');
+            $('#userRole').load('/administrator/daftarpegawai/userid=' + tablePegawai.row(selected_row).data()['_id']);
+            $('#modal-role').modal('show');            
         }
     });
 
@@ -205,7 +204,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
             "targets": [6],
             "width": "3%",
             "render": function () {
-                return '<a id="btnInfoPegawai" class="btn btn-primary btn-flat"><i class="fa fa-info-circle" aria-hidden="true"></i></a>';
+                return '<a id="btnRolePegawai" class="btn btn-primary btn-flat"><i class="fa fa-universal-access" aria-hidden="true"></i></a>';
             }
         }
     ],

@@ -130,10 +130,10 @@ class UserModel(BaseModel):
         
         return requests.put('{}/{}/role'.format(self.host, self.root), json=param, headers=self.header)
 
-    def role_delete(self, userid="", roleid=""):
+    def role_delete(self, userid="", key=""):
         param = {'typeid': '_id',
                  'userid': userid,
-                 'roleid': roleid}
+                 'key': key}
 
-        return requests.delete('{}/{}'.format(self.host, self.root), json=param, headers=self.header)
+        return requests.delete('{}/{}/role'.format(self.host, self.root), json=param, headers=self.header)
 
