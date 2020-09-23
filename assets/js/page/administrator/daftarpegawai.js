@@ -211,7 +211,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
     ],
     'responsive': true,
     'paging': true,
-    'autoWidth': false,
+    'autoWidth': true,
     'pagingType': 'simple_numbers',
     'lengthChange': false,
     'pageLength': 20,
