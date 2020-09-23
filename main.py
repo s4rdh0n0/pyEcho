@@ -23,14 +23,12 @@ class Application(tornado.web.Application):
                 (r"/login", SignInController),
                 (r"/", DashboardController),
 
-                (r"/administrator/activationuser", ActivationUserController),
-                (r"/administrator/activationuser/username=([A-Za-z0-9\ -@.]+)", ActivationUserController.InformasiPegawaiController),
-
                 (r"/administrator/daftarpegawai", DaftarPegawaiController),
-                (r"/administrator/daftarpegawai/kkp/username=([A-Za-z0-9\ -@.]+)", DaftarPegawaiController.KKPPegawaiController),
-                (r"/administrator/daftarpegawai/detail/userid=([A-Za-z0-9\ -@.]+)", DaftarPegawaiController.PegawaiController),
-                (r"/administrator/daftarpegawai/detail/role", DaftarPegawaiController.RoleController),
-                (r"/administrator/daftarpegawai/detail/role/userid=([A-Za-z0-9\ -@.]+)", DaftarPegawaiController.RoleController),
+                (r"/administrator/daftarpegawai/userid=([A-Za-z0-9\ -@.]+)", DaftarPegawaiController.PegawaiController),
+                (r"/administrator/daftarpegawai/activation", ActivationUserController),
+                (r"/administrator/daftarpegawai/activation/username=([A-Za-z0-9\ -@.]+)", ActivationUserController.InformasiPegawaiController),
+                (r"/administrator/daftarpegawai/role", DaftarPegawaiController.RoleController),
+                (r"/administrator/daftarpegawai/role/userid=([A-Za-z0-9\ -@.]+)", DaftarPegawaiController.RoleController),
                 (r"/.*", NotFoundController)]
 
     def __init__(self):
@@ -77,7 +75,6 @@ def main():
     # call shutdown_event.set().
     shutdown_event = tornado.locks.Event()
     yield shutdown_event.wait()
-
 
 
 if __name__ == "__main__":

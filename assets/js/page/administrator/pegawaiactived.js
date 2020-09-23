@@ -1,15 +1,14 @@
 + function ($) {
     'use strict';
 
-    /* Initial Form Filter */
     $('#formFilter').validate({
         submitHandler: function (form) {
             $('#tablePegawai').DataTable().ajax.reload();
         }
     });
 
-    /* Initial Form Activation */
-    $('#formActivation').validate({
+
+    $('#formAddPegawai').validate({
         rules: {
             username: {
                 required: true,
@@ -28,59 +27,85 @@
         unhighlight: function (element, errorClass, validClass) {
             var elem = $(element);
             elem.closest('.form-group').removeClass('has-error');
-        }, errorPlacement: function (error, element) {
-            error.insertAfter('.input-group'); //So i putted it after the .form-group so it will not include to your append/prepend group.
         },
         submitHandler: function (form) {
             $.ajax({
-                type: 'POST',
-                url: '/administrator/daftarpegawai/activation',
-                data: JSON.stringify({
-                    username: $('#inputUsername').val(),
-                }),
+                type: 'GET',
+                url: '/administrator/daftarpegawai/kkp/username=' + $('#username').val(),
                 headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
-                success: (function (data) {
+                success: (function (result) {
+                    if (result.status) {
 
-                    if (data.status) {
-                        $('#userView').load('/administrator/daftarpegawai/activation/username=' + data.username);
+                        // NOTE : 
+                        $(".kkplog").show();
+                        $(".kkplog_finder").hide();
+                        $(".kkplog_alert").hide();
+
+                        // NOTE :
+                        $("#pegawaiid_kkplog").val(result.data.result.pegawaiid);
+                        $("#username_kkplog").val($("#username").val());
+                        $("#name_kkplog").val(result.data.result.nama);
+
                     } else {
-
-                        $.notify({
-                            title: '<strong><i class="fa fa-info-circle" aria-hidden="true"></i> Info</strong> <br>',
-                            message: data.msg,
-                        }, {
-                            type: data.type,
-                            animate: {
-                                enter: 'animated fadeInRight',
-                                exit: 'animated fadeOutRight'
-                            }
-                        });
-
-                        $('#modal-activation').modal('hide');
+                        $(".kkplog_alert").show();
+                        $(".kkplog_alert").html('<h4><i class="icon fa fa-warning"></i>Warning!</h4>' + result.msg)
                     }
-
                 }),
                 error: (function (XMLHttpRequest, textStatus, errorThrown) {
                     alert("Error: " + errorThrown);
                 })
             });
         }
-
     });
 
     // NOTE: modal-add hide
-    $('#modal-activation').on('hide.bs.modal', function () {
-        $('#inputUsername').val("");
-        $('#userView').empty();
+    $('#modal-add').on('hide.bs.modal', function () {
+        $(".kkplog_alert").hide();
+        $(".kkplog").hide();
+        $(".kkplog_finder").show();
+        $("#username").val("");
     });
 
-    // NOTE: Refresh table
-    $('#btnRefresh').on('click', function () {
-        $('#tablePegawai').DataTable().ajax.reload();
+    // NOTE: modal-add click button(batalregisterpegawai)
+    $('#batalregisterpegawai').on('click', function () {
+        $(".kkplog_alert").hide();
+        $(".kkplog").hide();
+        $(".kkplog_finder").show();
+        $("#username").val("");
+        $("#username").focus();
+    });
+
+    $('#registerpegawai').on('click', function () {
+        $.ajax({
+            type: 'POST',
+            url: '/administrator/daftarpegawai/kkp/username=' + $('#username_kkplog').val(),
+            headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+            success: (function (result) {
+                $('#modal-add').modal('hide')
+                $.notify({
+                    title: '<strong><i class="fa fa-info-circle" aria-hidden="true"></i> Info</strong> <br>',
+                    message: result.msg,
+                }, {
+                    type: result.type,
+                    animate: {
+                        enter: 'animated fadeInRight',
+                        exit: 'animated fadeOutRight'
+                    }
+                });
+
+                if (result.status) {
+                    $('#tablePegawai').DataTable().ajax.reload();
+                }
+
+            }),
+            error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                alert("Error: " + errorThrown);
+            })
+        });
     });
 
     // Info Pegawai
-    $('#tablePegawai tbody').on('click', '#btnInfoPegawai', function () {
+    $('#tablePegawai tbody').on('click', '#info', function () {
         var selected_row = $(this).parents('tr');
         if (selected_row.hasClass('child')) {
             selected_row = selected_row.prev();
@@ -88,43 +113,13 @@
 
         if (tablePegawai.row(selected_row).data()[0] != "") {
             run_wait('#detail');
-            $('#detail').load('/administrator/daftarpegawai/userid=' + tablePegawai.row(selected_row).data()['_id']);
+            $('#detail').load('/administrator/daftarpegawai/detail/userid=' + tablePegawai.row(selected_row).data()['_id']);
             $('.nav-tabs a[href="#detail"]').tab('show');
-        }
-    });
-
-    // Delete Pegawai
-    $('#tablePegawai tbody').on('click', '#btnDeletePegawai', function () {
-        var selected_row = $(this).parents('tr');
-        if (selected_row.hasClass('child')) {
-            selected_row = selected_row.prev();
-        }
-
-        if (tablePegawai.row(selected_row).data()[0] != "") {
-            if (confirm('Apakah anda yakin akan menghapus data ini ?')) {
-                $.ajax({
-                    type: 'DELETE',
-                    url: '/administrator/daftarpegawai',
-                    data: JSON.stringify({
-                        userid: tablePegawai.row(selected_row).data()['_id'],
-                    }),
-                    headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
-                    success: (function (data) {
-                        if (data.status) {
-                            $('#tablePegawai').DataTable().ajax.reload();
-                        }
-                    }),
-                    error: (function (XMLHttpRequest, textStatus, errorThrown) {
-                        alert("Error: " + errorThrown);
-                    })
-                });
-            }
         }
     });
 
 }(jQuery);
 
-/* Initial Loading */
 function run_wait(element) {
     $(element).waitMe({
         effect: 'bounce',
@@ -133,7 +128,6 @@ function run_wait(element) {
         color: '#000'
     });
 }
-
 
 /* Initial Table Pegawai */
 var tablePegawai = $('#tablePegawai').DataTable({
@@ -148,13 +142,13 @@ var tablePegawai = $('#tablePegawai').DataTable({
                 start: $('#tablePegawai').dataTable().fnSettings()._iDisplayStart,
                 limit: $('#tablePegawai').dataTable().fnSettings()._iDisplayLength,
                 draw: $('#tablePegawai').dataTable().fnSettings().iDraw,
-                pegawaiid: $('#inputPegawaiid').val(),
+                pegawaiid: $('#pegawaiid_find').val(),
             }),
             headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
             success: (function (data) {
-                
+
                 console.log(data);
-                
+
                 // NOTE: callback response ajax
                 callback(data)
             }),
@@ -168,24 +162,24 @@ var tablePegawai = $('#tablePegawai').DataTable({
             "targets": [0],
             "visible": false,
             "data": '_id',
-        },{
+        }, {
             "targets": [1],
             "width": "5%",
             "className": "dt-center text-center",
             "render": function (data, type, row, meta) {
-                return meta.row + meta.settings._iDisplayStart + 1 ;
+                return meta.row + meta.settings._iDisplayStart + 1;
             }
-        },{
+        }, {
             "targets": [2],
             "width": "20%",
             "data": 'pegawaiid',
             "className": "dt-center text-center"
-        },{
+        }, {
             "targets": [3],
-            "width": "54%",
+            "width": "57%",
             "data": 'nama',
             "className": "dt-center text-center"
-        },{
+        }, {
             "targets": [4],
             "width": "15%",
             "data": 'createdate',
@@ -193,19 +187,13 @@ var tablePegawai = $('#tablePegawai').DataTable({
             "render": function (data) {
                 var date = new Date(data);
                 var month = date.getMonth() + 1;
-                return date.getDate() + "/" + (month.toString().length > 1 ? month : "0" + month)  + "/" + date.getFullYear() + "  " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                return date.getDate() + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getFullYear() + "  " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
             }
-        },{
+        }, {
             "targets": [5],
             "width": "3%",
             "render": function () {
-                return '<a id="btnDeletePegawai" class="btn btn-danger btn-flat"><i class="fa fa-times" aria-hidden="true"></i></a>';
-            }
-        },{
-            "targets": [6],
-            "width": "3%",
-            "render": function () {
-                return '<a id="btnInfoPegawai" class="btn btn-primary btn-flat"><i class="fa fa-info-circle" aria-hidden="true"></i></a>';
+                return '<a id="info" class="btn btn-primary btn-flat"><i class="fa fa-info-circle" aria-hidden="true"></i></a>';
             }
         }
     ],

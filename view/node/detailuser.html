@@ -4,7 +4,7 @@
 
     <div class="box-header with-border">
        
-        <h3 class="box-title">
+        <h4 class="text-center">
             Informasi Pegawai (
             {% if count > 0 %}
                 <small class="text-green">USER SUDAH AKTIF</small>
@@ -12,72 +12,104 @@
                 <small class="text-red">USER BELUM AKTIF</small>
             {% end %}
             )
-        </h3>
+        </h4>
     </div>
 
-    <div class="box-body">
-        <form class="form-horizontal">
-            
-            <input type="hidden" name="userid" value="{{ pegawai['userid'] }}">
+    <form class="form-horizontal" id="formSave">
+        <div class="box-body">
+            <input type="hidden" name="usernameid" value="{{ username }}">
             <div class="form-group">
-                <label class="control-label col-md-4 col-sm-4 col-xs-12" for="pegawaiid">Pegawai ID :</label>
-                <div class="col-md-5 col-sm-5 col-xs-12">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="pegawaiid">Pegawai ID :</label>
+                <div class="col-md-8 col-sm-8 col-xs-12">
                     <input type="text" class="form-control" id="pegawaiid" name="pegawaiid" value="{{ pegawai['pegawaiid']  }}" readonly>
                 </div>
             </div>
             <div class="form-group">
-                <label class="control-label col-md-4 col-sm-4 col-xs-12" for="nik">NIK :</label>
-                <div class="col-md-5 col-sm-5 col-xs-12">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="nik">NIK :</label>
+                <div class="col-md-8 col-sm-8 col-xs-12">
                     <input type="text" class="form-control" id="nik" name="nik" value="{{ pegawai['nomoridentitas'] }}" readonly>
                 </div>
             </div>
             <div class="form-group">
-                <label class="control-label col-md-4 col-sm-4 col-xs-12" for="nama">Nama :</label>
-                <div class="col-md-5 col-sm-5 col-xs-12">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="nama">Nama :</label>
+                <div class="col-md-8 col-sm-8 col-xs-12">
                     <input type="text" class="form-control" id="nama" name="nama" value="{{ pegawai['gelardepan'] }} {{ pegawai['nama'] }} {{ pegawai['gelarbelakang'] }}" readonly>
                 </div>
             </div>
             <div class="form-group">
-                <label class="control-label col-md-4 col-sm-4 col-xs-12" for="alamat">Alamat :</label>
-                <div class="col-md-5 col-sm-5 col-xs-12">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="alamat">Alamat :</label>
+                <div class="col-md-8 col-sm-8 col-xs-12">
                     <textarea name="alamat" id="alamat" class="form-control" rows="3" readonly>
                         {{ pegawai['alamat'] }}
                     </textarea>
                 </div>
             </div>
             <div class="form-group">
-                <label class="control-label col-md-4 col-sm-4 col-xs-12" for="tempatlahir">Tempat Lahir :</label>
-                <div class="col-md-5 col-sm-5 col-xs-12">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="tempatlahir">Tempat Lahir :</label>
+                <div class="col-md-8 col-sm-8 col-xs-12">
                     <input type="text" class="form-control" id="tempatlahir" name="tempatlahir" value="{{ pegawai['tempatlahir'] }}" readonly>
                 </div>
             </div>
             <div class="form-group">
-                <label class="control-label col-md-4 col-sm-4 col-xs-12" for="tanggallahir">Tanggal Lahir :</label>
-                <div class="col-md-5 col-sm-5 col-xs-12">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="tanggallahir">Tanggal Lahir :</label>
+                <div class="col-md-8 col-sm-8 col-xs-12">
                     <input type="text" class="form-control" id="tanggallahir" name="tanggallahir" value="{{ datetime.datetime.strptime(pegawai['tanggallahir'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y')}}" readonly>
                 </div>
             </div>
             <div class="form-group">
-                <label class="control-label col-md-4 col-sm-4 col-xs-12" for="phone">Phone :</label>
-                <div class="col-md-5 col-sm-5 col-xs-12">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="phone">Phone :</label>
+                <div class="col-md-8 col-sm-8 col-xs-12">
                     <input type="text" class="form-control" id="phone" name="phone" value="{{ pegawai['phone'] }}" readonly>
                 </div>
             </div>
             <div class="form-group">
-                <label class="control-label col-md-4 col-sm-4 col-xs-12" for="email">Email :</label>
-                <div class="col-md-5 col-sm-5 col-xs-12">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="email">Email :</label>
+                <div class="col-md-8 col-sm-8 col-xs-12">
                     <input type="text" class="form-control" id="email" name="email" value="{{ pegawai['email'] }}" readonly>
                 </div>
             </div>
+        </div>
+        
+        <div class="box-footer text-center">
+            <button type="button" class="btn btn-default btn-flat" data-dismiss="modal"><i class="fa fa-close"></i> Close</button>
+            {% if count == 0 %}
+            <button type="button" id="savePegawai" name="savePegawai" class="btn btn-primary btn-flat"><i class="fa fa-save"></i> Simpan</button>
+            {% end %}
+        </div>
+    </form>
+        
+    {% if count == 0 %}
+        <script>
+            // NOTE: modal-add click button(batalregisterpegawai)
+            $('#savePegawai').on('click', function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '/administrator/daftarpegawai/activation/username=' + $('[name="usernameid"]').val(),
+                    headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+                    success: (function (result) {
+                        $('#modal-activation').modal('hide');
 
-            <div class="form-group">
-                <div class="col-md-4 col-sm-4 col-xs-12 col-md-offset-5">
-                    <div class="pull-right">
-                        <button type="submit" id="registerrole" name="registerrole" class="btn btn-primary btn-flat"><i class="fa fa-save"></i> Simpan</button>
-                    </div>
-                </div>
-            </div>
+                        $.notify({
+                            title: '<strong><i class="fa fa-info-circle" aria-hidden="true"></i> Info</strong> <br>',
+                            message: result.msg,
+                        }, {
+                            type: result.type,
+                            animate: {
+                                enter: 'animated fadeInRight',
+                                exit: 'animated fadeOutRight'
+                            }
+                        });
 
-        </form>
-    </div>
+                        if (result.status){
+                            $('#tablePegawai').DataTable().ajax.reload();
+                        }
+
+                    }),
+                    error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert("Error: " + errorThrown);
+                    })
+                });
+            });
+        </script>
+    {% end %}
 </div>

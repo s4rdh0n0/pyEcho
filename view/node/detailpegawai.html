@@ -35,7 +35,7 @@
                 </div>
             </div>
         </form>
-    
+
         <!-- TableRole -->
         <table id="tableRole" class="table table-striped table-bordered dt-responsive" style="width:100%">
             <thead>
@@ -64,7 +64,7 @@
                 submitHandler: function (form) {
                     $.ajax({
                         type: 'POST',
-                        url: '/administrator/daftarpegawai/detail/role',
+                        url: '/administrator/daftarpegawai/role',
                         data: JSON.stringify({
                             userid: $('input[name=userid]').val(),
                             key: $('#role').val()
@@ -89,7 +89,7 @@
                 'ajax': function (data, callback) {
                     $.ajax({
                         type: 'GET',
-                        url: '/administrator/daftarpegawai/detail/role/userid=' + $('input[name=userid]').val(),
+                        url: '/administrator/daftarpegawai/role/userid=' + $('input[name=userid]').val(),
                         headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                         success: (function (data) {
                             // NOTE: print data
@@ -135,7 +135,7 @@
                         "width": "5%",
                         "className": "dt-center text-center",
                         "render": function () {
-                            return '<a id="info" class="btn btn-primary btn-flat"><i class="fa fa-info-circle" aria-hidden="true"></i></a>';
+                            return '<a id="btnDeleteRole" class="btn btn-danger btn-flat"><i class="fa fa-times" aria-hidden="true"></i></a>';
                         }
                     }
                 ],

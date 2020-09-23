@@ -48,6 +48,7 @@
                                 exit: 'animated fadeOutRight'
                             }
                         });
+
                         $('#userkkp').empty();
                     }
 
@@ -57,6 +58,8 @@
                 })
             });
         }
+
+        
     });
 
 }(jQuery);
