@@ -113,7 +113,6 @@ class UserModel(BaseModel):
 
     def find_role(self, typeid="", userid="", key=""):
         param = 'typeid={}&userid={}&key={}'.format(typeid, userid, key)
-        
         return requests.get('{}/{}/role/find?{}'.format(self.host, self.root, param), headers=self.header)
 
     def role_add(self, typeid="", userid="", role={}):
