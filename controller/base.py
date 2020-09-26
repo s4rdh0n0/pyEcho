@@ -19,9 +19,12 @@ class BaseController(tornado.web.RequestHandler):
    
 	"""  """
 	
+	static_file = options.apis + '/static/'
+
 	cookies_data = {
 		'userid': None,
 		'username': None,
+		'pegawaiid': None,
 		'officeid': None,
 		'token': None,
 	}
@@ -43,6 +46,10 @@ class BaseController(tornado.web.RequestHandler):
 	def get_user_actived(self, cookies={}):
 		user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
 		return user.pegawai(username=cookies['username'])
+
+	def get_user_role(self, cookies={}, key=""):
+		user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
+		return user.find_role(typeid="_id", userid=cookies['userid'], key=key)
 
 	def get_office_actived(self, cookies={}):
 		dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}

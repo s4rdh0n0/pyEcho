@@ -19,12 +19,6 @@ def token():
     result = user.auth(username="s4rdh0n0", password="YCxa2SJxLXQhFN")
     return result.json()
 
-def user():
-    user = UserModel(officeid='d8af2d0372b84f6fb33a97847b94cacd', host=config['HOST'], token=token()['token'])
-
-    user.kkp(username="")
-    schema = user.schema
-
 
 def type_role():
     role = MasterModel(host=config['HOST'], token=token()['token'])

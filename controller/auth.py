@@ -23,7 +23,7 @@ class SignInController(BaseController):
 	}
 
 	def get(self):
-		self.render('page/auth/login.html')
+		self.render('page/auth/login.html', static_file=self.static_file)
 
 	def post(self):
 		body = tornado.escape.json_decode(self.request.body)
@@ -55,6 +55,7 @@ class SignInController(BaseController):
 		if response.status_code == 200:
 			self.cookies_data['userid'] = response.json()['result']['_id']
 			self.cookies_data['username'] = username
+			self.cookies_data['pegawaiid'] = response.json()['result']['pegawaiid']
 			self.cookies_data['officeid'] = response.json()['result']['officeid']
 			self.cookies_data['token'] = validation['token']
 			self.set_secure_cookie(options.cookies, tornado.escape.json_encode(self.cookies_data))

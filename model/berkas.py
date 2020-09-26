@@ -6,7 +6,7 @@ from model.base import BaseModel
 
 class BerkasModel(BaseModel):
 
-    root = 'berkas'
+    root = 'offices/berkas'
 
     def __init__(self, officeid="", host="", token=""):
         self.officeid = officeid
@@ -20,6 +20,14 @@ class BerkasModel(BaseModel):
             return {'status': True, 'draw': draw, 'data': response.json()['result'], 'recordsTotal': response.json()['count'], 'recordsFiltered': response.json()['count']}
         else:
             return {'status': True, 'draw': draw, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0}
+
+    def search(self, nomor="", tahun=""):
+        param = 'officeid={}&nomor={}&tahun={}&start={}&limit={}&count={}'.format(self.officeid, nomor, tahun, "0", "1", "-1")
+        response = requests.get('{}/{}?{}'.format(self.host, self.root, param), headers=self.header)
+        if response.status_code == 200:
+            return {'status': True, 'data': response.json()}
+        else:
+            return {'status': False, 'data': ""}
 
     def find(self, berkasid=""):
         param =  'berkasid={}'.format(berkasid)

@@ -12,7 +12,8 @@ from tornado.log import app_log, gen_log, access_log, LogFormatter
 # Controller
 from controller.auth import SignInController, SignOutController, NotFoundController
 from controller.dashboard import DashboardController
-from controller.administrator import DaftarPegawaiController, ActivationUserController
+from controller.register import ComponseController
+from controller.administrator import DaftarPegawaiViewController, PegawaiController, RoleController
 
 
 define("dir", default=os.path.dirname(__file__), help="root path")
@@ -23,12 +24,17 @@ class Application(tornado.web.Application):
                 (r"/login", SignInController),
                 (r"/", DashboardController),
 
-                (r"/administrator/daftarpegawai", DaftarPegawaiController),
-                (r"/administrator/daftarpegawai/userid=([A-Za-z0-9\ -@.]+)", DaftarPegawaiController.PegawaiController),
-                (r"/administrator/daftarpegawai/activation", ActivationUserController),
-                (r"/administrator/daftarpegawai/activation/username=([A-Za-z0-9\ -@.]+)", ActivationUserController.InformasiPegawaiController),
-                (r"/administrator/daftarpegawai/role", DaftarPegawaiController.RoleController),
-                (r"/administrator/daftarpegawai/role/userid=([A-Za-z0-9\ -@.]+)", DaftarPegawaiController.RoleController),
+                (r"/register/compose", ComponseController),
+
+                (r"/administrator/daftarpegawai", DaftarPegawaiViewController),
+                (r"/administrator/daftarpegawai/pegawai/view/username=([A-Za-z0-9\ -@.]+)", PegawaiController),
+                (r"/administrator/daftarpegawai/pegawai", PegawaiController),
+                (r"/administrator/daftarpegawai/pegawai/add", PegawaiController),
+                (r"/administrator/daftarpegawai/pegawai/delete", PegawaiController),
+                (r"/administrator/daftarpegawai/role/view/userid=([A-Za-z0-9\ -@.]+)", RoleController),
+                (r"/administrator/daftarpegawai/role", RoleController),
+                (r"/administrator/daftarpegawai/role/add", RoleController),
+                (r"/administrator/daftarpegawai/role/delete", RoleController),
                 (r"/.*", NotFoundController)]
 
     def __init__(self):

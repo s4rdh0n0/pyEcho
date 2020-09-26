@@ -11,7 +11,10 @@ class RegisterModel(BaseModel):
         '_id': None,
         'nomorregister': None,
         'pegawaiactived': None,
-        'region': None,
+        'kecamatanid': None,
+        'namakecamatan': None,
+        'desaid': None,
+        'namadesa': None,
         'alashak': [],
         'officeid': None,
         'nomorberkas': None,
@@ -37,15 +40,32 @@ class RegisterModel(BaseModel):
         'selesai': False,
     }
 
+    schema_pemilik = {
+        'pemilikberkasid': None,
+        'kantorid': None,
+        'berkasid': None,
+        'pemilikid': None,
+        'tipepemilikid': None,
+        'nomoridentitas': None,
+        'nik': None,
+        'gelardepan':None,
+        'nama': None,
+        'gelarbelakang': None,
+        'jeniskelamin': None,
+        'tempatlahir': None,
+        'tanggallahir': None,
+        'alamat': None,
+    }
+
     schema_alashak = {
-        'alashakid': None,
         'typealashakid': None,
+        'alashakid': None,
         'nomor': None,
     }
 
     schema_document = {
-        'documentid': None,
         'typedocumentid': None,
+        'documentid': None,
         'nomor': None,
     }
 
