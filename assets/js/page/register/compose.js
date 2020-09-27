@@ -4,19 +4,21 @@
     /* Initial Cari Berkas */
     $('#formCariBerkas').validate({
         rules: {
-            nomorBerkas: {
+            nomor: {
                 required: true,
+                digits: true
             },
-            tahunBerkas: {
+            tahun: {
                 required: true,
+                digits: true
             }
         },
         messages: {
-            nomorBerkas: {
-                required: 'Nomor berkas tidak boleh kosong.',
+            nomor: {
+                required: 'Nomor berkas wajib diisi.',
             },
-            tahunBerkas: {
-                required: 'Tahun berkas tidak boleh kosong.',
+            tahun: {
+                required: 'Tahun berkas wajib diisi.',
             }
         },
         errorElement: "small",
@@ -33,13 +35,27 @@
                 type: 'POST',
                 url: '/register/compose',
                 data: JSON.stringify({
-                    nomor: $('#nomorBerkas').val(),
-                    tahun: $('#tahunBerkas').val(),
+                    nomor: $('#nomor').val(),
+                    tahun: $('#tahun').val(),
                 }),
                 async: false,
                 headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
-                success: (function (data) {
-                    console.log(data);
+                success: (function (result) {
+                    if (result.status){
+                        $('#berkasView').load('/register/berkas/detail/berkasid=' + result.data[0].berkasid, function (event) {
+                            $("#typeAlasHak").select2({
+                                placeholder: "Pilih alas hak",
+                                theme: "bootstrap"
+                            });
+
+                            $("#desaAlasHak").select2({
+                                placeholder: "Pilih desa",
+                                theme: "bootstrap"
+                            });
+                        });
+                    }else{
+                        $('#berkasView').load('/node/error/400');
+                    }
                 }),
                 error: (function (XMLHttpRequest, textStatus, errorThrown) {
                     alert("Error: " + errorThrown);

@@ -11,8 +11,9 @@ from tornado.log import app_log, gen_log, access_log, LogFormatter
 
 # Controller
 from controller.auth import SignInController, SignOutController, NotFoundController
+from controller.error import NodeNotFoundController
 from controller.dashboard import DashboardController
-from controller.register import ComponseController
+from controller.register import ComponseController, RegisterBerkasViewController
 from controller.administrator import DaftarPegawaiViewController, PegawaiController, RoleController
 
 
@@ -24,7 +25,9 @@ class Application(tornado.web.Application):
                 (r"/login", SignInController),
                 (r"/", DashboardController),
 
+
                 (r"/register/compose", ComponseController),
+                (r"/register/berkas/detail/berkasid=([A-Za-z0-9\ -@.]+)", RegisterBerkasViewController),
 
                 (r"/administrator/daftarpegawai", DaftarPegawaiViewController),
                 (r"/administrator/daftarpegawai/pegawai/view/username=([A-Za-z0-9\ -@.]+)", PegawaiController),
@@ -35,6 +38,9 @@ class Application(tornado.web.Application):
                 (r"/administrator/daftarpegawai/role", RoleController),
                 (r"/administrator/daftarpegawai/role/add", RoleController),
                 (r"/administrator/daftarpegawai/role/delete", RoleController),
+
+
+                (r"/node/error/400", NodeNotFoundController),
                 (r"/.*", NotFoundController)]
 
     def __init__(self):
