@@ -53,8 +53,8 @@ class BaseController(tornado.web.RequestHandler):
 
 	def get_office_actived(self, cookies={}):
 		dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}
-		param = 'id={}&type=officeid'.format(cookies['officeid'])
-		return requests.get('{}/offices/find?{}'.format(options.api, param), headers=dheader)
+		param = 'officeid={}&typeid=_id'.format(cookies['officeid'])
+		return requests.get('{}/offices/find?{}'.format(options.apis, param), headers=dheader)
 	
 	def refresh_cookies(self, cookies={}):
 		dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}

@@ -7,6 +7,11 @@
         $('#tablePegawai').DataTable().ajax.reload();
     });
 
+    $("#btnResetFilter").click(function (event) {
+        event.preventDefault();
+        $('#inputPegawaiid').val("")
+        $('#tablePegawai').DataTable().ajax.reload();
+    });
 
     /* Initial Form Activation */
     $('#formActivation').validate({
@@ -29,7 +34,18 @@
             var elem = $(element);
             elem.closest('.form-group').removeClass('has-error');
         }, errorPlacement: function (error, element) {
-            error.insertAfter('.input-group'); //So i putted it after the .form-group so it will not include to your append/prepend group.
+            if (element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else if (element.prop('type') === 'radio' && element.parent('.radio-inline').length) {
+                error.insertAfter(element.parent().parent());
+            }
+            else if (element.prop('type') === 'checkbox' || element.prop('type') === 'radio') {
+                error.appendTo(element.parent().parent());
+            }
+            else {
+                error.insertAfter(element);
+            }
         },
         submitHandler: function () {
             $.ajax({
@@ -47,7 +63,7 @@
 
                         });
                     } else {
-
+                        $('#modal-activation').modal('hide');
                         $.notify({
                             title: '<strong><i class="fa fa-info-circle" aria-hidden="true"></i> Info</strong> <br>',
                             message: data.msg,
@@ -78,7 +94,7 @@
 
     // NOTE: modal-role hide
     $('#modal-role').on('hide.bs.modal', function () {
-        tablePegawai.ajax.reload(null, false);
+        // tablePegawai.ajax.reload(null, false);
         $('#userRole').empty();
     });
 
@@ -92,7 +108,7 @@
         if (tablePegawai.row(selected_row).data()[0] != "") {
             $('#modal-role').modal('show'); 
             $('#userRole').load('/administrator/daftarpegawai/role/view/userid=' + tablePegawai.row(selected_row).data()['_id'], function () {
-                $("#role").select2({
+                $("#typeRole").select2({
                     placeholder: "Pilih role..",
                     theme: "bootstrap"
                 });
@@ -105,7 +121,7 @@
                         url: '/administrator/daftarpegawai/role/add',
                         data: JSON.stringify({
                             userid: $('input[name=userid]').val(),
-                            key: $('#role').val(),
+                            key: $('#typeRole').val(),
                         }),
                         async: false,   
                         headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
@@ -169,7 +185,7 @@
                             headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                             success: (function (data) {
                                 // NOTE: print data
-                                console.log(data)
+                                // console.log(data)
 
                                 // NOTE: callback response ajax
                                 callback(data);
@@ -211,7 +227,7 @@
                             "width": "5%",
                             "className": "dt-center text-center",
                             "render": function () {
-                                return '<a id="btnDeleteRole" class="btn btn-danger btn-flat"><i class="fa fa-times" aria-hidden="true"></i></a>';
+                                return '<a id="btnDeleteRole" class="btn btn-danger btn-flat"><i class="fa fa-trash" aria-hidden="true"></i></a>';
                             }
                         }
                     ],
@@ -236,7 +252,7 @@
         }
 
         if (tablePegawai.row(selected_row).data()[0] != "") {
-            if (confirm('Apakah anda yakin akan menghapus ' + tablePegawai.row(selected_row).data()['nama'] + ' ?')) {
+            if (confirm('Apakah anda yakin menghapus ' + tablePegawai.row(selected_row).data()['nama'] + ' ?')) {
                 event.preventDefault();
                 $.ajax({
                     type: 'DELETE',
@@ -244,7 +260,7 @@
                     data: JSON.stringify({
                         userid: tablePegawai.row(selected_row).data()['_id'],
                     }),
-                    async: false,   
+                    async: true,   
                     headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                     success: (function (data) {
                         if (data.status) {
@@ -261,6 +277,37 @@
         }
     });
 
+
+    // Status Pegawai
+    $('#tablePegawai tbody').on('click', '#btnActivedPegawai', function (event) {
+        var selected_row = $(this).parents('tr');
+        if (selected_row.hasClass('child')) {
+            selected_row = selected_row.prev();
+        }
+
+        if (tablePegawai.row(selected_row).data()[0] != "") {
+            if (confirm('Apakah anda yakin merubah status ' + tablePegawai.row(selected_row).data()['nama'] + ' ?')) {
+                event.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: '/administrator/daftarpegawai/pegawai/status',
+                    data: JSON.stringify({
+                        userid: tablePegawai.row(selected_row).data()['_id'],
+                    }),
+                    async: true,
+                    headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+                    success: (function (data) {
+                        if (data.status) {
+                            tablePegawai.ajax.reload(null, false);
+                        }
+                    }),
+                    error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert("Error: " + errorThrown);
+                    })
+                });
+            }
+        }
+    });    
 }(jQuery);
 
 /* Initial Loading */
@@ -293,7 +340,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
             headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
             success: (function (data) {
                 
-                console.log(data);
+                // console.log(data);
                 
                 // NOTE: callback response ajax
                 callback(data)
@@ -322,7 +369,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
             "className": "dt-center text-center"
         },{
             "targets": [3],
-            "width": "54%",
+            "width": "51%",
             "data": 'nama',
             "className": "dt-center text-center"
         },{
@@ -336,16 +383,27 @@ var tablePegawai = $('#tablePegawai').DataTable({
                 return date.getDate() + "/" + (month.toString().length > 1 ? month : "0" + month)  + "/" + date.getFullYear() + "  " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
             }
         },{
-            "targets": [5],
+            "targets": [4],
             "width": "3%",
             "render": function () {
-                return '<a id="btnDeletePegawai" class="btn btn-danger btn-flat"><i class="fa fa-times" aria-hidden="true"></i></a>';
+                return '<a id="btnRolePegawai" class="btn btn-primary btn-flat"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>';
+            }
+        },{
+            "targets": [5],
+            "width": "3%",
+            "data": 'actived',
+            "render": function (data) {
+                if (data){
+                    return '<a id="btnActivedPegawai" class="btn btn-info btn-flat"><i class="fa fa-check" aria-hidden="true"></i></a>';
+                }else{
+                    return '<a id="btnActivedPegawai" class="btn btn-warning btn-flat"><i class="fa fa-times" aria-hidden="true"></i></a>';
+                }
             }
         },{
             "targets": [6],
             "width": "3%",
             "render": function () {
-                return '<a id="btnRolePegawai" class="btn btn-primary btn-flat"><i class="fa fa-universal-access" aria-hidden="true"></i></a>';
+                return '<a id="btnDeletePegawai" class="btn btn-danger btn-flat"><i class="fa fa-trash" aria-hidden="true"></i></a>';
             }
         }
     ],

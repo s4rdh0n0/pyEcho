@@ -9,6 +9,7 @@ from tornado.options import options
 from controller.base import BaseController
 
 # Model
+from model.region import RegionModel
 from model.berkas import BerkasModel
 
 
@@ -69,20 +70,29 @@ class RegisterBerkasViewController(BaseController):
         pemohon = []
         pemilik = []
 
+        region = RegionModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
         berkas = BerkasModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
         infoResponse = berkas.find(berkasid=berkasid)
         simponiResponse = berkas.simponi(berkasid=berkasid)
         produkResponse = berkas.produk(berkasid=berkasid)
         daftarisianResponse = berkas.daftarisian(berkasid=berkasid)
+        officeResponse = self.get_office_actived(cookies=cookies)
+        regionResponse = region.get_alldesa()
 
+        office = officeResponse.json()['result']
+        desa = regionResponse.json()['result']
         info = infoResponse.json()['result']['infoberkas']
         simponi = simponiResponse.json()['result']
         produk = produkResponse.json()['result']
         daftarisian = daftarisianResponse.json()['result']
+
         for p in infoResponse.json()['result']['pemohon']:
             if p['typepemilikid'] == 'P':
                 pemohon.append(p)
             elif p['typepemilikid'] == 'M':
                 pemilik.append(p)
 
-        self.render("node/detailberkas.html", info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)
+        if infoResponse.status_code == 200 and simponiResponse.status_code == 200 and produkResponse.status_code == 200 and daftarisianResponse.status_code == 200 and officeResponse.status_code == 200:
+            self.render("node/detailberkas.html", office=office, desa=desa, info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)
+        else:
+            self.render("page/error/400.html")

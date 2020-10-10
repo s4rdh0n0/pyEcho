@@ -89,7 +89,7 @@
                     data: JSON.stringify({
                         'username': $('[name="usernameid"]').val()
                     }),
-                    async: true,  
+                    async: false,  
                     headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                     success: (function (result) {
                         $('#modal-activation').modal('hide');

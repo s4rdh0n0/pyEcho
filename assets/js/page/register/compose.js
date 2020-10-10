@@ -29,8 +29,24 @@
         unhighlight: function (element, errorClass, validClass) {
             var elem = $(element);
             elem.closest('.form-group').removeClass('has-error');
+        },errorPlacement: function (error, element) {
+            if (element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else if (element.prop('type') === 'radio' && element.parent('.radio-inline').length) {
+                error.insertAfter(element.parent().parent());
+            }
+            else if (element.prop('type') === 'checkbox' || element.prop('type') === 'radio') {
+                error.appendTo(element.parent().parent());
+            }
+            else {
+                error.insertAfter(element);
+            }
+        }, 
+        invalidHandler: function(){
         },
         submitHandler: function () {
+            run_wait('.content');
             $.ajax({
                 type: 'POST',
                 url: '/register/compose',
@@ -41,25 +57,22 @@
                 async: false,
                 headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                 success: (function (result) {
-                    if (result.status){
-                        $('#berkasView').load('/register/berkas/detail/berkasid=' + result.data[0].berkasid, function (event) {
-                            $("#typeAlasHak").select2({
-                                placeholder: "Pilih alas hak",
-                                theme: "bootstrap"
-                            });
 
-                            $("#desaAlasHak").select2({
-                                placeholder: "Pilih desa",
-                                theme: "bootstrap"
-                            });
+                    if (result.status){
+                        $('#berkasView').load('/register/berkas/detail/berkasid=' + result.data[0].berkasid, function () {
+                            $('.content').waitMe("hide");
                         });
                     }else{
-                        $('#berkasView').load('/node/error/400');
+                        $('#berkasView').load('/node/error/400', function () {
+                            $('.content').waitMe("hide");
+                        });
                     }
+
                 }),
                 error: (function (XMLHttpRequest, textStatus, errorThrown) {
                     alert("Error: " + errorThrown);
-                })
+                }) 
+
             });
         }
 

@@ -50,6 +50,30 @@ class DaftarPegawaiViewController(BaseController):
         self.write(user.pagination(pegawaiid=body['pegawaiid'], draw=body['draw'], page=body['page'] + 1, limit=body['limit'], start=body['start']))
 
 
+class StatusPegawaiController(BaseController):
+
+    @tornado.web.authenticated
+    def post(self):
+        # refresh cookies data
+        self.refresh_cookies(cookies=self.get_cookies_user())
+        cookies = self.get_cookies_user()
+
+        body = tornado.escape.json_decode(self.request.body)
+
+        user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
+        responseUser = user.find(typeid="_id", userid=body['userid'])
+        userSchema = responseUser.json()['result']
+
+        if userSchema['actived']:
+            userSchema['actived'] = False
+            user.update(user=userSchema)
+        else:
+            userSchema['actived'] = True
+            user.update(user=userSchema)
+
+        self.write({'status': True})
+
+
 class PegawaiController(BaseController):
 
     @tornado.web.authenticated

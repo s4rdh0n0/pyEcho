@@ -30,35 +30,42 @@ class SignInController(BaseController):
 		djson = {"username": body["username"],
 		         "password": body["password"]}
 		try:
-			respon = requests.post('{}/{}/{}'.format(options.apis, 'auth', 'login'), json=djson)
-			if respon.status_code == 200:
-				self.result_validation['status'] = True
-				self.result_validation['url'] = self.get_query_argument('next', u'/')
-				self.result_validation['type'] = 'success'
-				self.result_validation['msg'] = None
+			responseJWT = requests.post('{}/{}/{}'.format(options.apis, 'auth', 'login'), json=djson)
+			if responseJWT.status_code == 200:
+				user = UserModel(officeid="none", host=options.apis, token=responseJWT.json()['token'])
+				responseUser = user.find(typeid="username", userid=body["username"])
 
-				self.save_cookies(body["username"],respon.json())
-			elif respon.status_code == 401:
+				if responseUser.json()['result']['actived']:
+					self.result_validation['status'] = True
+					self.result_validation['url'] = self.get_query_argument('next', u'/')
+					self.result_validation['type'] = 'success'
+					self.result_validation['msg'] = None
+					self.save_cookies(body["username"], responseUser.json(), responseJWT.json()['token'])
+				else:
+					self.result_validation['status'] = False
+					self.result_validation['url'] = None
+					self.result_validation['type'] = 'warning'
+					self.result_validation['msg'] = 'Username not actived.'
+
+			elif responseJWT.status_code == 401:
 				self.result_validation['status'] = False
 				self.result_validation['url'] = None
 				self.result_validation['type'] = 'warning'
 				self.result_validation['msg'] = 'Username or password not valid.'
+
+
 		except Exception as e:
 			self.write(e)
 		finally:
 			self.write(self.result_validation)
 
-	def save_cookies(self, username="", validation={}):
-		user = UserModel(officeid="none", host=options.apis, token=validation['token'])
-		response = user.find(typeid="username", userid=username)
-
-		if response.status_code == 200:
-			self.cookies_data['userid'] = response.json()['result']['_id']
-			self.cookies_data['username'] = username
-			self.cookies_data['pegawaiid'] = response.json()['result']['pegawaiid']
-			self.cookies_data['officeid'] = response.json()['result']['officeid']
-			self.cookies_data['token'] = validation['token']
-			self.set_secure_cookie(options.cookies, tornado.escape.json_encode(self.cookies_data))
+	def save_cookies(self, username="", userdatabase={}, token=""):
+		self.cookies_data['userid'] = userdatabase['result']['_id']
+		self.cookies_data['username'] = username
+		self.cookies_data['pegawaiid'] = userdatabase['result']['pegawaiid']
+		self.cookies_data['officeid'] = userdatabase['result']['officeid']
+		self.cookies_data['token'] = token
+		self.set_secure_cookie(options.cookies, tornado.escape.json_encode(self.cookies_data))
 
 class SignOutController(BaseController):
 

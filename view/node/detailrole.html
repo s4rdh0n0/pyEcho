@@ -27,7 +27,7 @@
             <div class="form-group">
                 <label for="node" class="control-label col-md-3 col-sm-3 col-xs-12"> Role:</label>
                 <div class="col-md-8 col-sm-8 col-xs-12">
-                    <select id="role" class="select2 form-control" style="width: 100%;">
+                    <select id="typeRole" class="select2 form-control" style="width: 100%;">
                         {% for item in typeregister %}
                         <option value="{{ item['code'] }}">{{ item['description'] }}</option>
                         {% end %}
@@ -37,7 +37,7 @@
             <div class="form-group">
                 <div class="col-md-8 col-sm-8 col-xs-12 col-md-offset-3">
                     <div class="pull-right">
-                        <button type="submit" id="btnAddRole" name="btnAddRole" class="btn btn-primary btn-flat"> Tambah</button>
+                        <button type="submit" id="btnAddRole" name="btnAddRole" class="btn btn-success btn-flat"> Tambah</button>
                     </div>
                 </div>
             </div>
