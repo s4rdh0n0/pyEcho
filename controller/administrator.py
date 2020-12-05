@@ -21,23 +21,27 @@ class DaftarPegawaiViewController(BaseController):
         self.refresh_cookies(cookies=self.get_cookies_user())
         useractived = self.get_user_actived(cookies=self.get_cookies_user())
 
-        role = self.get_user_role(cookies=self.get_cookies_user(), key="ADMINISTRATOR")
-        if role.status_code == 200:
+        if useractived.status_code == 200:
+            role = self.get_user_role(cookies=self.get_cookies_user(), key="ADMINISTRATOR")
+            if role.status_code == 200:
 
-            # load view
-            if useractived.status_code == 200:
+                # load view
                 self.page_data['description'] = 'ASN dan PPNPN Actived'
                 self.page_data['title'] = 'Daftar Pegawai'
                 self.render('page/administrator/daftarpegawai.html', page=self.page_data, useractived=useractived.json()['result'])
+                    
             else:
-                self.redirect("/login")
+
+                self.page_data['title'] = '403'
+                self.page_data['description'] = 'Access denied'
+                self.render("page/error/403.html", page=self.page_data,  useractived=useractived.json()['result'])
         else:
-            self.page_data['title'] = '403'
-            self.page_data['description'] = 'Access denied'
-            self.render("page/error/403.html", page=self.page_data,  useractived=useractived.json()['result'])
+            self.redirect("/login")
+
 
     # Load Data.
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def post(self):
         # refresh cookies data
         self.refresh_cookies(cookies=self.get_cookies_user())
@@ -47,13 +51,19 @@ class DaftarPegawaiViewController(BaseController):
         body = tornado.escape.json_decode(self.request.body)
 
         user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-        self.write(user.pagination(pegawaiid=body['pegawaiid'], draw=body['draw'], page=body['page'] + 1, limit=body['limit'], start=body['start']))
-
-
-class StatusPegawaiController(BaseController):
+        count_reponse = user.count(typeid="pegawaiid", userid=body['pegawaiid'])
+        if count_reponse.status_code == 200:
+            tornado.gen.sleep(0.5)
+            list_response = user.pagination(pegawaiid=body['pegawaiid'], page=body['page'] + 1, limit=body['limit'])
+            if list_response.status_code == 200:
+                self.write({'status': True, 'draw': body['draw'], 'data': list_response.json()['result'], 'recordsTotal': count_reponse.json()['result'], 'recordsFiltered': count_reponse.json()['result']})
+            else:
+                self.write({'status': False, 'draw':0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0 })
+        else:
+            self.write({'status': False, 'draw':0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0 })
 
     @tornado.web.authenticated
-    def post(self):
+    def put(self):
         # refresh cookies data
         self.refresh_cookies(cookies=self.get_cookies_user())
         cookies = self.get_cookies_user()

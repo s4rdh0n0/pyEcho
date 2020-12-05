@@ -35,17 +35,11 @@ class SignInController(BaseController):
 				user = UserModel(officeid="none", host=options.apis, token=responseJWT.json()['token'])
 				responseUser = user.find(typeid="username", userid=body["username"])
 
-				if responseUser.json()['result']['actived']:
-					self.result_validation['status'] = True
-					self.result_validation['url'] = self.get_query_argument('next', u'/')
-					self.result_validation['type'] = 'success'
-					self.result_validation['msg'] = None
-					self.save_cookies(body["username"], responseUser.json(), responseJWT.json()['token'])
-				else:
-					self.result_validation['status'] = False
-					self.result_validation['url'] = None
-					self.result_validation['type'] = 'warning'
-					self.result_validation['msg'] = 'Username not actived.'
+				self.result_validation['status'] = True
+				self.result_validation['url'] = self.get_query_argument('next', u'/')
+				self.result_validation['type'] = 'success'
+				self.result_validation['msg'] = None
+				self.save_cookies(body["username"], responseUser.json(), responseJWT.json()['token'])
 
 			elif responseJWT.status_code == 401:
 				self.result_validation['status'] = False

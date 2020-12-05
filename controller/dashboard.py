@@ -18,3 +18,5 @@ class DashboardController(BaseController):
             self.page_data['title'] = 'Dashboard'
             self.page_data['description'] = 'Rekapitulasi berkas register'
             self.render('page/home/dashboard.html', page=self.page_data, useractived=response.json()['result'])
+        else:
+            self.redirect("/login")

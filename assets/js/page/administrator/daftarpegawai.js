@@ -181,7 +181,6 @@
                             data: JSON.stringify({
                                 userid: $('input[name=userid]').val()
                             }),
-                            async: true,   
                             headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                             success: (function (data) {
                                 // NOTE: print data
@@ -253,7 +252,6 @@
 
         if (tablePegawai.row(selected_row).data()[0] != "") {
             if (confirm('Apakah anda yakin menghapus ' + tablePegawai.row(selected_row).data()['nama'] + ' ?')) {
-                event.preventDefault();
                 $.ajax({
                     type: 'DELETE',
                     url: '/administrator/daftarpegawai/pegawai/delete',
@@ -275,6 +273,7 @@
                 });
             }
         }
+        return false
     });
 
 
@@ -286,28 +285,35 @@
         }
 
         if (tablePegawai.row(selected_row).data()[0] != "") {
-            if (confirm('Apakah anda yakin merubah status ' + tablePegawai.row(selected_row).data()['nama'] + ' ?')) {
-                event.preventDefault();
-                $.ajax({
-                    type: 'POST',
-                    url: '/administrator/daftarpegawai/pegawai/status',
-                    data: JSON.stringify({
-                        userid: tablePegawai.row(selected_row).data()['_id'],
-                    }),
-                    async: true,
-                    headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
-                    success: (function (data) {
-                        if (data.status) {
-                            tablePegawai.ajax.reload(null, false);
-                        }
-                    }),
-                    error: (function (XMLHttpRequest, textStatus, errorThrown) {
-                        alert("Error: " + errorThrown);
-                    })
-                });
-            }
+            $.ajax({
+                type: 'PUT',
+                url: '/administrator/daftarpegawai/pegawai/status',
+                data: JSON.stringify({
+                    userid: tablePegawai.row(selected_row).data()['_id'],
+                }),
+                async: false,
+                headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+                success: (function (data) {
+                    if (data.status) {
+                        tablePegawai.ajax.reload(null, false);
+                    } else {
+                        window.location.reload();
+                    }
+                }),
+                error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("Error: " + errorThrown);
+                })
+            });
         }
-    });    
+
+        return false
+    });
+
+    
+    $('#tablePegawai').on('processing', function (e, processing) {
+        e.preventDefault();
+        $('#tablePegawai').off('edit');
+    });
 }(jQuery);
 
 /* Initial Loading */
@@ -319,6 +325,8 @@ function run_wait(element) {
         color: '#000'
     });
 }
+
+
 
 
 /* Initial Table Pegawai */
@@ -339,11 +347,12 @@ var tablePegawai = $('#tablePegawai').DataTable({
             async: true,
             headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
             success: (function (data) {
-                
-                // console.log(data);
-                
-                // NOTE: callback response ajax
-                callback(data)
+                if (data.status){
+                    // NOTE: callback response ajax
+                    callback(data)
+                }else{
+                    window.location.reload();
+                }
             }),
             error: (function (XMLHttpRequest, textStatus, errorThrown) {
                 alert("Error: " + errorThrown);
@@ -407,6 +416,9 @@ var tablePegawai = $('#tablePegawai').DataTable({
             }
         }
     ],
+    "oLanguage": {
+        "sProcessing": "pro record..."
+    },
     'responsive': true,
     'paging': true,
     'autoWidth': true,

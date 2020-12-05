@@ -34,18 +34,9 @@ class UserModel(BaseModel):
         djson = {"username": username, "password": password}
         return requests.post('{}/{}'.format(self.host, 'auth/login'), json=djson)
 
-    def pagination(self, pegawaiid="", draw=0, page=0, limit=0, start=0):
-        record = self.count(typeid="pegawaiid", userid=pegawaiid)
-        if record.status_code == 200:
-            param = 'officeid={}&pegawaiid={}&limit={}&page={}'.format(self.officeid, pegawaiid, limit, page)
-            users = requests.get('{}/{}?{}'.format(self.host, self.root, param), headers=self.header)
-            if users.status_code == 200:
-                if users.json()['result'] != None:
-                    return {'status': True, 'draw': draw, 'data': users.json()['result'], 'recordsTotal': record.json()['result'], 'recordsFiltered': record.json()['result']}
-                else:
-                    return {'status': False, 'draw': 0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0}
-            else:
-                return {'status': False, 'draw': 0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0}
+    def pagination(self, pegawaiid="", page=0, limit=0):
+        param = 'officeid={}&pegawaiid={}&limit={}&page={}'.format(self.officeid, pegawaiid, limit, page)
+        return requests.get('{}/{}?{}'.format(self.host, self.root, param), headers=self.header)
     
     # Convert schema kkp to schema locals
     def kkpToUser(self, officeid="", kkp={}, actived=False):

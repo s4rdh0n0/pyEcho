@@ -14,7 +14,7 @@ from controller.auth import SignInController, SignOutController, NotFoundControl
 from controller.error import NodeNotFoundController
 from controller.dashboard import DashboardController
 from controller.register import ComponseController, RegisterBerkasViewController
-from controller.administrator import DaftarPegawaiViewController, PegawaiController, RoleController, StatusPegawaiController
+from controller.administrator import DaftarPegawaiViewController, PegawaiController, RoleController
 
 
 define("dir", default=os.path.dirname(__file__), help="root path")
@@ -34,7 +34,7 @@ class Application(tornado.web.Application):
                 (r"/administrator/daftarpegawai/pegawai", PegawaiController),
                 (r"/administrator/daftarpegawai/pegawai/add", PegawaiController),
                 (r"/administrator/daftarpegawai/pegawai/delete", PegawaiController),
-                (r"/administrator/daftarpegawai/pegawai/status", StatusPegawaiController),
+                (r"/administrator/daftarpegawai/pegawai/status", DaftarPegawaiViewController),
                 (r"/administrator/daftarpegawai/role/view/userid=([A-Za-z0-9\ -@.]+)", RoleController),
                 (r"/administrator/daftarpegawai/role", RoleController),
                 (r"/administrator/daftarpegawai/role/add", RoleController),
