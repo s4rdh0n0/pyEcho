@@ -88,7 +88,7 @@ def add_office():
     offices = office.all_kkp()
     if offices.status_code == 200:
         for o in offices.json()['result']:
-            if o['code'] == '2205':
+            if o['code'] == '0201':
                 print("{} - {}".format(o['code'], o['name']))
 
                 schema_office = office.kkpTooffice(officeid=o['officeid'],kkp=office.kkp(officeid=o['officeid']).json()['result'], actived=True)
@@ -284,24 +284,50 @@ def add_office():
 
 
 def add_user():
+    schema = {}
+    user = UserModel(officeid="5700b4aafd70430fb5512a250d77856a", host=config['HOST'], token=token()['token'])
+    data = user.pegawai(username="datsindo-medan2").json()['result']
+    schema['_id'] = data['userid']
+    schema['username'] = "datsindo-medan2"
+    schema['officeid'] = "5700b4aafd70430fb5512a250d77856a"
+    schema['pegawaiid'] = data['pegawaiid']
+    schema['nama'] = data['nama']
+    schema['role'] = []
+    schema['actived'] = True
+    print(user.add(user=schema).json())
+
     # schema = {}
-    # user = UserModel(officeid="61352FE6680B5E7BE040A8C01001254C", host=config['HOST'], token=token()['token'])
-    # data = user.pegawai(username="herup3").json()['result']
+    # user = UserModel(officeid="5DD53E09B5AA2614E040A8C010011E50", host=config['HOST'], token=token()['token'])
+    # data = user.pegawai(username="RDS02").json()['result']
     # schema['_id'] = data['userid']
-    # schema['username'] = "herup3"
-    # schema['officeid'] = "61352FE6680B5E7BE040A8C01001254C"
+    # schema['username'] = "RDS02"
+    # schema['officeid'] = "5DD53E09B5AA2614E040A8C010011E50"
     # schema['pegawaiid'] = data['pegawaiid']
     # schema['nama'] = data['nama']
     # schema['role'] = []
     # schema['actived'] = True
     # print(user.add(user=schema).json())
 
+
     # schema = {}
-    # user = UserModel(officeid="61352FE6680B5E7BE040A8C01001254C", host=config['HOST'], token=token()['token'])
-    # data = user.pegawai(username="majidp3").json()['result']
+    # user = UserModel(officeid="5DD53E09B5AA2614E040A8C010011E50", host=config['HOST'], token=token()['token'])
+    # data = user.pegawai(username="RDS01").json()['result']
     # schema['_id'] = data['userid']
-    # schema['username'] = "majidp3"
-    # schema['officeid'] = "61352FE6680B5E7BE040A8C01001254C"
+    # schema['username'] = "RDS01"
+    # schema['officeid'] = "5DD53E09B5AA2614E040A8C010011E50"
+    # schema['pegawaiid'] = data['pegawaiid']
+    # schema['nama'] = data['nama']
+    # schema['role'] = []
+    # schema['actived'] = True
+    # print(user.add(user=schema).json())
+
+
+    # schema = {}
+    # user = UserModel(officeid="d8af2d0372b84f6fb33a97847b94cacd", host=config['HOST'], token=token()['token'])
+    # data = user.pegawai(username="salis0207").json()['result']
+    # schema['_id'] = data['userid']
+    # schema['username'] = "salis0207"
+    # schema['officeid'] = "d8af2d0372b84f6fb33a97847b94cacd"
     # schema['pegawaiid'] = data['pegawaiid']
     # schema['nama'] = data['nama']
     # schema['role'] = []
@@ -321,17 +347,17 @@ def add_user():
     # print(user.add(user=schema).json())
 
 
-    schema = {}
-    user = UserModel(officeid="d8af2d0372b84f6fb33a97847b94cacd", host=config['HOST'], token=token()['token'])
-    data = user.pegawai(username="hayudeny").json()['result']
-    schema['_id'] = data['userid']
-    schema['username'] = "hayudeny"
-    schema['officeid'] = "d8af2d0372b84f6fb33a97847b94cacd"
-    schema['pegawaiid'] = data['pegawaiid']
-    schema['nama'] = data['nama']
-    schema['role'] = []
-    schema['actived'] = True
-    print(user.add(user=schema).json())
+    # schema = {}
+    # user = UserModel(officeid="d8af2d0372b84f6fb33a97847b94cacd", host=config['HOST'], token=token()['token'])
+    # data = user.pegawai(username="hayudeny").json()['result']
+    # schema['_id'] = data['userid']
+    # schema['username'] = "hayudeny"
+    # schema['officeid'] = "d8af2d0372b84f6fb33a97847b94cacd"
+    # schema['pegawaiid'] = data['pegawaiid']
+    # schema['nama'] = data['nama']
+    # schema['role'] = []
+    # schema['actived'] = True
+    # print(user.add(user=schema).json())
 
     # schema = {}
     # user = UserModel(officeid="d8af2d0372b84f6fb33a97847b94cacd", host=config['HOST'], token=token()['token'])

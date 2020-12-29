@@ -19,14 +19,10 @@ class OfficeModel(BaseModel):
              'email': None,
              'fax': None,
              'counter': [],
-             'createdate': None,
-             'updatedate': None,
              'actived': False}
 
     counter_schema = {'key': None,
                       'value': 0,
-                      'createdate': None,
-                      'updatedate': None,
                       'actived': False}
 
     def __init__(self, host="", token=""):

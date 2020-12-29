@@ -33,7 +33,6 @@ class Application(tornado.web.Application):
                 (r"/administrator/daftarpegawai/pegawai/view/username=([A-Za-z0-9\ -@.]+)", PegawaiController),
                 (r"/administrator/daftarpegawai/pegawai", PegawaiController),
                 (r"/administrator/daftarpegawai/pegawai/add", PegawaiController),
-                (r"/administrator/daftarpegawai/pegawai/delete", PegawaiController),
                 (r"/administrator/daftarpegawai/pegawai/status", DaftarPegawaiViewController),
                 (r"/administrator/daftarpegawai/role/view/userid=([A-Za-z0-9\ -@.]+)", RoleController),
                 (r"/administrator/daftarpegawai/role", RoleController),

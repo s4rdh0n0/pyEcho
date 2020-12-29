@@ -75,9 +75,11 @@ class DaftarPegawaiViewController(BaseController):
         userSchema = responseUser.json()['result']
 
         if userSchema['actived']:
+            userSchema['userupdate'] = cookies['userid']
             userSchema['actived'] = False
             user.update(user=userSchema)
         else:
+            userSchema['userupdate'] = cookies['userid']
             userSchema['actived'] = True
             user.update(user=userSchema)
 
@@ -87,6 +89,7 @@ class DaftarPegawaiViewController(BaseController):
 class PegawaiController(BaseController):
 
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def get(self, username=""):
         # refresh cookies data
         self.refresh_cookies(cookies=self.get_cookies_user())
@@ -94,6 +97,7 @@ class PegawaiController(BaseController):
         
         user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
         response_count = user.count(typeid="username", userid=username)
+        tornado.gen.sleep(0.5)
         response_pegawai = user.pegawai(username=username)
         if response_pegawai.status_code == 200 & response_count.status_code == 200:
             self.render('node/detailuser.html', pegawai=response_pegawai.json()['result'], username=username, count=response_count.json()['result'])
@@ -131,34 +135,24 @@ class PegawaiController(BaseController):
         user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
         entity = user.entity(username=body['username'])
         if entity.status_code == 200:
+            count_reponse = user.count(typeid="_id", userid=entity.json()['result']['userid'])
             schema = user.schema
             schema['_id'] = entity.json()['result']['userid']
             schema['officeid'] = cookies['officeid']
             schema['username'] = body['username']
             schema['pegawaiid'] = entity.json()['result']['pegawaiid']
             schema['nama'] = entity.json()['result']['nama']
+            schema['phone'] = entity.json()['result']['phone']
+            schema['usercreate'] = cookies['userid']
             schema['actived'] = True
+
+            print(count_reponse.json())
 
             add = user.add(user=schema)
             if add.status_code == 200:
                 self.write({'status': add.json()['result'], 'type': 'success', 'msg': '{} Actived'.format(schema['nama'])})
             else:
                 self.write({'status': False, 'type': 'danger', 'msg': '{} Gagal Activation'.format(schema['nama'])})
-
-    def delete(self):
-        # refresh cookies data
-        self.refresh_cookies(cookies=self.get_cookies_user())
-        cookies = self.get_cookies_user()
-
-        # client request
-        body = tornado.escape.json_decode(self.request.body)
-
-        user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-        response = user.delete(typeid="_id", userid=body['userid'])
-        if response.status_code == 200:
-            self.write({'status': response.json()['result']})
-        else:
-            self.write({'status': False})
 
 
 class RoleController(BaseController):

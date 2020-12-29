@@ -250,41 +250,7 @@
             selected_row = selected_row.prev();
         }
 
-        if (tablePegawai.row(selected_row).data()[0] != "") {
-            if (confirm('Apakah anda yakin menghapus ' + tablePegawai.row(selected_row).data()['nama'] + ' ?')) {
-                $.ajax({
-                    type: 'DELETE',
-                    url: '/administrator/daftarpegawai/pegawai/delete',
-                    data: JSON.stringify({
-                        userid: tablePegawai.row(selected_row).data()['_id'],
-                    }),
-                    async: true,   
-                    headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
-                    success: (function (data) {
-                        if (data.status) {
-                            tablePegawai.row(selected_row).remove().draw();
-                        } else{
-                            tablePegawai.ajax.reload(null, false);
-                        }
-                    }),
-                    error: (function (XMLHttpRequest, textStatus, errorThrown) {
-                        alert("Error: " + errorThrown);
-                    })
-                });
-            }
-        }
-        return false
-    });
-
-
-    // Status Pegawai
-    $('#tablePegawai tbody').on('click', '#btnActivedPegawai', function (event) {
-        var selected_row = $(this).parents('tr');
-        if (selected_row.hasClass('child')) {
-            selected_row = selected_row.prev();
-        }
-
-        if (tablePegawai.row(selected_row).data()[0] != "") {
+        if (tablePegawai.row(selected_row).data()[0] != "") {            
             $.ajax({
                 type: 'PUT',
                 url: '/administrator/daftarpegawai/pegawai/status',
@@ -295,9 +261,7 @@
                 headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                 success: (function (data) {
                     if (data.status) {
-                        tablePegawai.ajax.reload(null, false);
-                    } else {
-                        window.location.reload();
+                        tablePegawai.row(selected_row).remove().draw();
                     }
                 }),
                 error: (function (XMLHttpRequest, textStatus, errorThrown) {
@@ -325,9 +289,6 @@ function run_wait(element) {
         color: '#000'
     });
 }
-
-
-
 
 /* Initial Table Pegawai */
 var tablePegawai = $('#tablePegawai').DataTable({
@@ -397,18 +358,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
             "render": function () {
                 return '<a id="btnRolePegawai" class="btn btn-primary btn-flat"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>';
             }
-        },{
-            "targets": [5],
-            "width": "3%",
-            "data": 'actived',
-            "render": function (data) {
-                if (data){
-                    return '<a id="btnActivedPegawai" class="btn btn-info btn-flat"><i class="fa fa-check" aria-hidden="true"></i></a>';
-                }else{
-                    return '<a id="btnActivedPegawai" class="btn btn-warning btn-flat"><i class="fa fa-times" aria-hidden="true"></i></a>';
-                }
-            }
-        },{
+        }, {
             "targets": [6],
             "width": "3%",
             "render": function () {
@@ -417,14 +367,14 @@ var tablePegawai = $('#tablePegawai').DataTable({
         }
     ],
     "oLanguage": {
-        "sProcessing": "pro record..."
+        "sProcessing": "Loading..."
     },
     'responsive': true,
     'paging': true,
     'autoWidth': true,
     'pagingType': 'simple_numbers',
     'lengthChange': false,
-    'pageLength': 15,
+    'pageLength': 20,
     'ordering': false,
     'searching': false,
     'info': true

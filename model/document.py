@@ -5,7 +5,7 @@ from model.base import BaseModel
 
 
 class PersilModel(BaseModel):
-
+    host = 'http://localhost:8000'
     root = 'office/document/persil'
 
     def __init__(self, officeid="", desaid="", host="", token=""):
