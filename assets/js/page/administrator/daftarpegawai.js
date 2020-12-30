@@ -8,7 +8,6 @@
     });
 
     $("#btnResetFilter").click(function (event) {
-        event.preventDefault();
         $('#inputPegawaiid').val("")
         $('#tablePegawai').DataTable().ajax.reload();
     });
@@ -48,6 +47,7 @@
             }
         },
         submitHandler: function () {
+            
             $.ajax({
                 type: 'PUT',
                 url: '/administrator/daftarpegawai/pegawai',
@@ -56,12 +56,13 @@
                 }),
                 async: false,   
                 headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+                beforeSend: function () {
+                    $('#userView').empty();
+                },
                 success: (function (data) {
 
                     if (data.status) {
-                        $('#userView').load('/administrator/daftarpegawai/pegawai/view/username=' + data.username, function () {
-
-                        });
+                        $('#userView').load('/administrator/daftarpegawai/pegawai/view/username=' + data.username);
                     } else {
                         $('#modal-activation').modal('hide');
                         $.notify({
@@ -81,6 +82,8 @@
                     alert("Error: " + errorThrown);
                 })
             });
+
+
         }
 
     });
@@ -88,6 +91,10 @@
     // NOTE: modal-activation hide
     $('#modal-activation').on('hide.bs.modal', function () {
         tablePegawai.ajax.reload(null, false);
+    });
+
+    // NOTE: modal-activation show
+    $('#modal-activation').on('show.bs.modal', function () {
         $('#inputUsername').val("");
         $('#userView').empty();
     });
@@ -105,9 +112,9 @@
             selected_row = selected_row.prev();
         }
 
-        if (tablePegawai.row(selected_row).data()[0] != "") {
-            $('#modal-role').modal('show'); 
+        if (tablePegawai.row(selected_row).data()[0] != "") { 
             $('#userRole').load('/administrator/daftarpegawai/role/view/userid=' + tablePegawai.row(selected_row).data()['_id'], function () {
+
                 $("#typeRole").select2({
                     placeholder: "Pilih role..",
                     theme: "bootstrap"
@@ -214,7 +221,7 @@
                         }, {
                             "targets": [3],
                             "width": "20%",
-                            "data": 'createdate',
+                            "data": 'startdate',
                             "className": "dt-center text-center",
                             "render": function (data) {
                                 var date = new Date(data);
@@ -240,37 +247,36 @@
                     'info': true
                 });
             });           
+            $('#modal-role').modal('show');
         }
     });
 
     // Delete Pegawai
-    $('#tablePegawai tbody').on('click', '#btnDeletePegawai', function (event) {
+    $('#tablePegawai tbody').on('click', '#btnDeAndActivation', function (event) {
         var selected_row = $(this).parents('tr');
         if (selected_row.hasClass('child')) {
             selected_row = selected_row.prev();
         }
+        
+        if (tablePegawai.row(selected_row).data()[0] != "") {    
+            var answer = window.confirm(tablePegawai.row(selected_row).data()['nama'].toUpperCase() + " AKAN DINONAKTIFKAN.....?" );
+            if (answer) {
+                $.ajax({
+                    type: 'PUT',
+                    url: '/administrator/daftarpegawai/pegawai/status',
+                    data: JSON.stringify({
+                        userid: tablePegawai.row(selected_row).data()['_id'],
+                    }),
+                    async: true,
+                    headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+                    error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert("Error: " + errorThrown);
+                    })
+                });
 
-        if (tablePegawai.row(selected_row).data()[0] != "") {            
-            $.ajax({
-                type: 'PUT',
-                url: '/administrator/daftarpegawai/pegawai/status',
-                data: JSON.stringify({
-                    userid: tablePegawai.row(selected_row).data()['_id'],
-                }),
-                async: false,
-                headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
-                success: (function (data) {
-                    if (data.status) {
-                        tablePegawai.row(selected_row).remove().draw();
-                    }
-                }),
-                error: (function (XMLHttpRequest, textStatus, errorThrown) {
-                    alert("Error: " + errorThrown);
-                })
-            });
+                tablePegawai.ajax.reload();
+            }
         }
-
-        return false
     });
 
     
@@ -284,7 +290,7 @@
 function run_wait(element) {
     $(element).waitMe({
         effect: 'bounce',
-        text: 'Harap tunggu...',
+        text: '<b>Sedang proses...</b> <br> harap tunggu',
         bg: 'rgba(255,255,255,0.6)',
         color: '#000'
     });
@@ -311,14 +317,18 @@ var tablePegawai = $('#tablePegawai').DataTable({
                 if (data.status){
                     // NOTE: callback response ajax
                     callback(data)
-                }else{
-                    window.location.reload();
                 }
             }),
             error: (function (XMLHttpRequest, textStatus, errorThrown) {
                 alert("Error: " + errorThrown);
             })
         })
+    }, 'createdRow': function (row, data, dataIndex) {
+        if (data['actived']) {
+            $(row).removeClass('strikeout');
+        }else{
+            $(row).addClass('strikeout');
+        }
     },
     'columns': [
         {
@@ -341,7 +351,10 @@ var tablePegawai = $('#tablePegawai').DataTable({
             "targets": [3],
             "width": "51%",
             "data": 'nama',
-            "className": "dt-center text-center"
+            "className": "dt-center text-center",
+            "render": function (data) {
+                return data.toUpperCase();
+            }
         },{
             "targets": [4],
             "width": "15%",
@@ -353,21 +366,32 @@ var tablePegawai = $('#tablePegawai').DataTable({
                 return date.getDate() + "/" + (month.toString().length > 1 ? month : "0" + month)  + "/" + date.getFullYear() + "  " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
             }
         },{
-            "targets": [4],
+            "targets": [5],
             "width": "3%",
-            "render": function () {
-                return '<a id="btnRolePegawai" class="btn btn-primary btn-flat"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>';
+            "data": 'actived',
+            "className": "dt-center text-center",
+            "render": function (data) {
+                if (data) {
+                    return '<a id="btnRolePegawai" class="btn btn-primary btn-flat"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>'
+                }else{
+                    return ''
+                }
             }
         }, {
             "targets": [6],
             "width": "3%",
-            "render": function () {
-                return '<a id="btnDeletePegawai" class="btn btn-danger btn-flat"><i class="fa fa-trash" aria-hidden="true"></i></a>';
+            "className": "dt-center text-center",
+            "render": function (data, type, row) {
+                if (row.actived){
+                    return '<a id="btnDeAndActivation" class="btn btn-danger btn-flat btn-small"><i class="fa fa-window-close" aria-hidden="true"></i></a>'
+                }else{
+                    return ''
+                }
             }
         }
     ],
     "oLanguage": {
-        "sProcessing": "Loading..."
+        "sProcessing": "<b>Sedang proses...</b> <br> harap tunggu"
     },
     'responsive': true,
     'paging': true,

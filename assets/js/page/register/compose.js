@@ -84,7 +84,7 @@
 function run_wait(element) {
     $(element).waitMe({
         effect: 'bounce',
-        text: 'Harap tunggu...',
+        text: '<b>Sedang proses...</b> <br> harap tunggu',
         bg: 'rgba(255,255,255,0.6)',
         color: '#000'
     });

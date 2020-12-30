@@ -45,6 +45,23 @@
     th.dt-center {
         text-align: center;
     }
+
+    td { position: relative; }
+
+    tr.strikeout td:before {
+    content: " ";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    border-bottom: 1px solid #111;
+    width: 100%;
+    }
+
+    tr.strikeout td:after {
+    content: "\00B7";
+    font-size: 1px;
+    }
+
 </style>
 {% end %}
 
@@ -104,7 +121,7 @@
                         <th>Nama</th>
                         <th>Create Date</th>
                         <th>Edit</th>
-                        <th>Hapus</th>
+                        <th>Deactived</th>
                     </tr>
                 </thead>
                 <tbody style="cursor: pointer;">

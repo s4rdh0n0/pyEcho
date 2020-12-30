@@ -25,7 +25,6 @@ class DaftarPegawaiViewController(BaseController):
             role = self.get_user_role(cookies=self.get_cookies_user(), key="ADMINISTRATOR")
             if role.status_code == 200:
 
-                # load view
                 self.page_data['description'] = 'ASN dan PPNPN Actived'
                 self.page_data['title'] = 'Daftar Pegawai'
                 self.render('page/administrator/daftarpegawai.html', page=self.page_data, useractived=useractived.json()['result'])
@@ -37,7 +36,6 @@ class DaftarPegawaiViewController(BaseController):
                 self.render("page/error/403.html", page=self.page_data,  useractived=useractived.json()['result'])
         else:
             self.redirect("/login")
-
 
     # Load Data.
     @tornado.web.authenticated
@@ -53,51 +51,59 @@ class DaftarPegawaiViewController(BaseController):
         user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
         count_reponse = user.count(typeid="pegawaiid", userid=body['pegawaiid'])
         if count_reponse.status_code == 200:
-            tornado.gen.sleep(0.5)
             list_response = user.pagination(pegawaiid=body['pegawaiid'], page=body['page'] + 1, limit=body['limit'])
             if list_response.status_code == 200:
-                self.write({'status': True, 'draw': body['draw'], 'data': list_response.json()['result'], 'recordsTotal': count_reponse.json()['result'], 'recordsFiltered': count_reponse.json()['result']})
+                data = list_response.json()['result']
+                count = count_reponse.json()['result']
+                if data == None:
+                    data = []
+                    count = 0 
+
+                self.write({'status': True, 'draw': body['draw'], 'data': data, 'recordsTotal': count, 'recordsFiltered': count})
             else:
                 self.write({'status': False, 'draw':0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0 })
         else:
             self.write({'status': False, 'draw':0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0 })
 
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def put(self):
         # refresh cookies data
         self.refresh_cookies(cookies=self.get_cookies_user())
         cookies = self.get_cookies_user()
 
+        # client request
         body = tornado.escape.json_decode(self.request.body)
 
         user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
         responseUser = user.find(typeid="_id", userid=body['userid'])
-        userSchema = responseUser.json()['result']
 
-        if userSchema['actived']:
-            userSchema['userupdate'] = cookies['userid']
-            userSchema['actived'] = False
-            user.update(user=userSchema)
+        if responseUser.status_code == 200:
+            userSchema = responseUser.json()['result']
+            if userSchema['actived']:
+                userSchema['userupdate'] = cookies['userid']
+                userSchema['actived'] = False
+                user.update(user=userSchema)
+            else:
+                userSchema['userupdate'] = cookies['userid']
+                userSchema['actived'] = True
+                user.update(user=userSchema)
+
+            self.write({'status': True})
         else:
-            userSchema['userupdate'] = cookies['userid']
-            userSchema['actived'] = True
-            user.update(user=userSchema)
-
-        self.write({'status': True})
+            self.write({'status': False})
 
 
 class PegawaiController(BaseController):
 
     @tornado.web.authenticated
-    @tornado.gen.coroutine
     def get(self, username=""):
         # refresh cookies data
-        self.refresh_cookies(cookies=self.get_cookies_user())
+        # self.refresh_cookies(cookies=self.get_cookies_user())
         cookies = self.get_cookies_user()
         
         user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
         response_count = user.count(typeid="username", userid=username)
-        tornado.gen.sleep(0.5)
         response_pegawai = user.pegawai(username=username)
         if response_pegawai.status_code == 200 & response_count.status_code == 200:
             self.render('node/detailuser.html', pegawai=response_pegawai.json()['result'], username=username, count=response_count.json()['result'])
@@ -105,9 +111,10 @@ class PegawaiController(BaseController):
 	        self.redirect("/login")
 
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def put(self):
         # refresh cookies data
-        self.refresh_cookies(cookies=self.get_cookies_user())
+        # self.refresh_cookies(cookies=self.get_cookies_user())
         cookies = self.get_cookies_user()
 
         # client request
@@ -124,6 +131,7 @@ class PegawaiController(BaseController):
             self.write({'status': False, 'type': 'danger', 'username': None, 'msg': 'Error response http://kkp.atrbpn.go.id/'})
 
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def post(self):
         # refresh cookies data
         self.refresh_cookies(cookies=self.get_cookies_user())
@@ -146,8 +154,6 @@ class PegawaiController(BaseController):
             schema['usercreate'] = cookies['userid']
             schema['actived'] = True
 
-            print(count_reponse.json())
-
             add = user.add(user=schema)
             if add.status_code == 200:
                 self.write({'status': add.json()['result'], 'type': 'success', 'msg': '{} Actived'.format(schema['nama'])})
@@ -161,7 +167,7 @@ class RoleController(BaseController):
     def get(self, userid=""):
         # refresh cookies data
         self.refresh_cookies(cookies=self.get_cookies_user())
-        cookies = self.get_cookies_user()   
+        cookies = self.get_cookies_user()
 
         user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
         master = MasterModel(host=options.apis, token=cookies['token'])
