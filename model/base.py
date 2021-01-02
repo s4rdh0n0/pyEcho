@@ -25,8 +25,13 @@ class BaseModel():
     def delete(self, filter: {}):
         return CRUDModel(collection=self.collection).delete(filter=filter)
 
+
+    def select(self, filter: {}):
+        return CRUDModel(collection=self.collection).select(filter=filter)
+
+
     def get(self, filter: {}):
-        return CRUDModel(collection=self.collection).find(filter=filter)
+        return CRUDModel(collection=self.collection).find(filter=filter, field={})
 
     def count(self, filter: {}):
         return CRUDModel(collection=self.collection).count(filter=filter)

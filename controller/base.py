@@ -7,19 +7,29 @@ import tornado.web
 from tornado.options import options, define
 
 # Model
+from model.base import ConnectionModel
 from model.user import UserModel
+from model.office import OfficeModel
 
 
 # Global variable
-define("apis", default="http://localhost:8000", help="web service")
+define("db_host", default="localhost", help="Mongo DB")
+define("db_port", default="27017", help="Mongo DB")
+define("db_user", default="1228_adminregister", help="Mongo DB")
+define("db_password", default="1228trenggalek", help="Mongo DB")
+
+define("service", default="http://localhost:8000", help="web service")
 define("cookies", default="pyEchoCookies", help="web")
 
 
+
+
+
 class BaseController(tornado.web.RequestHandler):
-   
-	"""  """
 	
-	static_file = options.apis + '/static/'
+	static_file = options.service + '/static/'
+
+	CONNECTION = ConnectionModel(username=options.db_user, password=options.db_password, server=options.db_host, port=options.db_port)
 
 	cookies_data = {
 		'userid': None,
@@ -35,8 +45,6 @@ class BaseController(tornado.web.RequestHandler):
 	}
 
 
-	"""  """
-
 	def get_cookies_user(self):
 		return tornado.escape.json_decode(self.get_secure_cookie(options.cookies))
 
@@ -44,23 +52,17 @@ class BaseController(tornado.web.RequestHandler):
 		return self.get_secure_cookie(options.cookies)
 
 	def get_user_actived(self, cookies={}):
-		user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-		return user.pegawai(username=cookies['username'])
+		collection = self.CONNECTION.collection(database="registerdb", name="users")
+		user = UserModel(collection=collection, service=options.service)
+		return user.get(filter={"username": cookies['username']})
 
-	def get_user_role(self, cookies={}, key=""):
-		user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-		return user.find_role(typeid="_id", userid=cookies['userid'], key=key)
+	def get_user_role(self, cookies:{}, key:str):
+		collection = self.CONNECTION.collection(database="registerdb", name="users")
+		user = UserModel(collection=collection, service=options.service)
+		return user.find_role(usersid=cookies['userid'], role=key)
 
 	def get_office_actived(self, cookies={}):
-		dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}
-		param = 'officeid={}&typeid=_id'.format(cookies['officeid'])
-		return requests.get('{}/offices/find?{}'.format(options.apis, param), headers=dheader)
-	
-	def refresh_cookies(self, cookies={}):
-		dheader = {'Authorization': 'Bearer {}'.format(cookies['token'])}
-		response = requests.get('{}/{}/{}'.format(options.apis, 'auth', 'refresh_token'), headers=dheader)
-		if response.status_code == 200:
-			cookies['token'] = response.json()['token']
-			self.set_secure_cookie(options.cookies, tornado.escape.json_encode(cookies))
-		else:
-			self.redirect("/login")
+		collection = self.CONNECTION.collection(database="registerdb", name="offices")
+		office = OfficeModel(collection=collection, service=options.service)
+		
+		return office.get(filter={"officeid": cookies['officeid']})

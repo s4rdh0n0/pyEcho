@@ -42,7 +42,7 @@ class="hold-transition skin-blue fixed sidebar-mini"
                                 <img src="{{ static_url('img/unknown.png') }}" class="img-circle" alt="User Image">
                                 <p>
                                     {{ useractived['nama'] }}  <br>
-                                    Last update, {{ datetime.datetime.strptime(useractived['lastupdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y %H:%M:%S')}} <br>
+                                    User create, {{ useractived['createdate'].strftime('%d/%m/%Y %H:%M:%S')}} <br>
                                 </p>
                             </li>
                             <!-- Menu Footer-->

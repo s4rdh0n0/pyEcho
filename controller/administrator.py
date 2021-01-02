@@ -1,4 +1,8 @@
 import requests
+import datetime
+from bson import json_util
+import json
+import uuid
 
 # Tornado Framework
 import tornado.gen
@@ -17,23 +21,19 @@ class DaftarPegawaiViewController(BaseController):
 
     @tornado.web.authenticated
     def get(self):
-        # refresh cookies data
-        self.refresh_cookies(cookies=self.get_cookies_user())
         useractived = self.get_user_actived(cookies=self.get_cookies_user())
-
-        if useractived.status_code == 200:
-            role = self.get_user_role(cookies=self.get_cookies_user(), key="ADMINISTRATOR")
-            if role.status_code == 200:
+        if useractived != None:
+            collection = self.CONNECTION.collection(database="registerdb", name="users")
+            if UserModel(collection=collection, service=options.service).find_role(userid=useractived['_id'], role="ADMINISTRATOR") != None and useractived['actived']:
 
                 self.page_data['description'] = 'ASN dan PPNPN Actived'
                 self.page_data['title'] = 'Daftar Pegawai'
-                self.render('page/administrator/daftarpegawai.html', page=self.page_data, useractived=useractived.json()['result'])
+                self.render('page/administrator/daftarpegawai.html', page=self.page_data, useractived=useractived)
                     
             else:
-
                 self.page_data['title'] = '403'
                 self.page_data['description'] = 'Access denied'
-                self.render("page/error/403.html", page=self.page_data,  useractived=useractived.json()['result'])
+                self.render("page/error/403.html", page=self.page_data,  useractived=useractived)
         else:
             self.redirect("/login")
 
@@ -41,54 +41,50 @@ class DaftarPegawaiViewController(BaseController):
     @tornado.web.authenticated
     @tornado.gen.coroutine
     def post(self):
-        # refresh cookies data
-        self.refresh_cookies(cookies=self.get_cookies_user())
         cookies = self.get_cookies_user()
 
         # client request
         body = tornado.escape.json_decode(self.request.body)
 
-        user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-        count_reponse = user.count(typeid="pegawaiid", userid=body['pegawaiid'])
-        if count_reponse.status_code == 200:
-            list_response = user.pagination(pegawaiid=body['pegawaiid'], page=body['page'] + 1, limit=body['limit'])
-            if list_response.status_code == 200:
-                data = list_response.json()['result']
-                count = count_reponse.json()['result']
-                if data == None:
-                    data = []
-                    count = 0 
+        collection = self.CONNECTION.collection(database="registerdb", name="users")
+        user = UserModel(collection=collection, service=options.service)
+        list_response = []
+        count_reponse = 0
 
-                self.write({'status': True, 'draw': body['draw'], 'data': data, 'recordsTotal': count, 'recordsFiltered': count})
-            else:
-                self.write({'status': False, 'draw':0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0 })
+        if body['pegawaiid'] != "":
+            count_reponse = user.count(filter={"$and": [{'officeid': cookies['officeid']} ,{"pegawaiid": str(body['pegawaiid'])}]})
+            list_response = user.pagination(filter={"$and": [{'officeid': cookies['officeid']}, {"pegawaiid": str(body['pegawaiid'])}]}, page_size=count_reponse, page_num=body['page'] + 1)
+
         else:
-            self.write({'status': False, 'draw':0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0 })
+            count_reponse = user.count(filter={"officeid": cookies['officeid']})
+            list_response = user.pagination(filter={'officeid': cookies['officeid']}, page_size=count_reponse, page_num=body['page'] + 1)
+            
+        
+        self.write({'status': True, 'draw': body['draw'], 'data': json.dumps(list_response, default=json_util.default), 'recordsTotal': count_reponse, 'recordsFiltered': count_reponse})
 
     @tornado.web.authenticated
     @tornado.gen.coroutine
     def put(self):
-        # refresh cookies data
-        self.refresh_cookies(cookies=self.get_cookies_user())
-        cookies = self.get_cookies_user()
-
         # client request
+        cookies = self.get_cookies_user()
         body = tornado.escape.json_decode(self.request.body)
+        collection = self.CONNECTION.collection(database="registerdb", name="users")
 
-        user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-        responseUser = user.find(typeid="_id", userid=body['userid'])
+        user = UserModel(collection=collection, service=options.service)
+        responseUser = user.get(filter={"_id": body['userid']})
 
-        if responseUser.status_code == 200:
-            userSchema = responseUser.json()['result']
+        if responseUser != None:
+            userSchema = responseUser
             if userSchema['actived']:
                 userSchema['userupdate'] = cookies['userid']
+                userSchema['updatedate'] = datetime.datetime.now()
                 userSchema['actived'] = False
-                user.update(user=userSchema)
             else:
                 userSchema['userupdate'] = cookies['userid']
+                userSchema['updatedate'] = datetime.datetime.now()
                 userSchema['actived'] = True
-                user.update(user=userSchema)
 
+            user.update(filter={"_id": body['userid']}, schema=userSchema)
             self.write({'status': True})
         else:
             self.write({'status': False})
@@ -98,30 +94,27 @@ class PegawaiController(BaseController):
 
     @tornado.web.authenticated
     def get(self, username=""):
-        # refresh cookies data
-        # self.refresh_cookies(cookies=self.get_cookies_user())
         cookies = self.get_cookies_user()
-        
-        user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-        response_count = user.count(typeid="username", userid=username)
-        response_pegawai = user.pegawai(username=username)
-        if response_pegawai.status_code == 200 & response_count.status_code == 200:
-            self.render('node/detailuser.html', pegawai=response_pegawai.json()['result'], username=username, count=response_count.json()['result'])
+
+        collection = self.CONNECTION.collection(database="registerdb", name="users")
+        user = UserModel(collection=collection, service=options.service)
+        response_count = user.count(filter={"username": username})
+        response_pegawai = user.kkp(officeid=cookies['officeid'],username=username)
+        if response_pegawai.status_code == 200:
+            self.render('node/detailuser.html', pegawai=response_pegawai.json()['result'], username=username, count=response_count)
         else:
 	        self.redirect("/login")
 
     @tornado.web.authenticated
     @tornado.gen.coroutine
     def put(self):
-        # refresh cookies data
-        # self.refresh_cookies(cookies=self.get_cookies_user())
         cookies = self.get_cookies_user()
 
         # client request
         body = tornado.escape.json_decode(self.request.body)
-
-        user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-        response_entity = user.entity(username=body['username'])
+        collection = self.CONNECTION.collection(database="registerdb", name="users")
+        user = UserModel(collection=collection, service=options.service)
+        response_entity = user.kkp(officeid=cookies['officeid'], username=body['username'])
         if response_entity.status_code == 200:
             if response_entity.json()['result']['profile']['profilepegawai'] == None:
                 self.write({'status': False, 'type': 'warning', 'username': None, 'msg': 'Username tidak terdaftar pada database http://kkp.atrbpn.go.id/ Kantah Trenggalek'})
@@ -133,106 +126,95 @@ class PegawaiController(BaseController):
     @tornado.web.authenticated
     @tornado.gen.coroutine
     def post(self):
-        # refresh cookies data
-        self.refresh_cookies(cookies=self.get_cookies_user())
         cookies = self.get_cookies_user()
 
         # client request
         body = tornado.escape.json_decode(self.request.body)
+        collection = self.CONNECTION.collection(database="registerdb", name="users")
+        user = UserModel(collection=collection, service=options.service)
+        count_reponse = user.count(filter={"_id": body['userid']})
+        if count_reponse == 0:
+            schema = user.schema
 
-        user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-        count_reponse = user.count(typeid="_id", userid=body['userid'])
-        schema = user.schema
+            schema['_id'] = body['userid']
+            schema['officeid'] = cookies['officeid']
+            schema['username'] = body['username']
+            schema['password'] = body['password']
+            schema['pegawaiid'] = body['pegawaiid']
+            schema['nama'] = body['nama']
+            schema['phone'] = body['phone']
+            schema['email'] = body['email']
+            schema['usercreate'] = cookies['userid']
+            schema['createdate'] = datetime.datetime.now()
+            schema['actived'] = True
 
-        schema['_id'] = body['userid']
-        schema['officeid'] = cookies['officeid']
-        schema['username'] = body['username']
-        schema['password'] = body['password']
-        schema['pegawaiid'] = body['pegawaiid']
-        schema['nama'] = body['nama']
-        schema['phone'] = body['phone']
-        schema['email'] = body['email']
-        schema['usercreate'] = cookies['userid']
-        schema['actived'] = True
-
-        add = user.add(user=schema)
-        if add.status_code == 200:
-            self.write({'status': add.json()['result'], 'type': 'success', 'msg': '{} Actived'.format(schema['nama'])})
-        else:
-            self.write({'status': False, 'type': 'danger', 'msg': '{} Gagal Activation'.format(schema['nama'])})
-
+            user.add(schema=schema)
+            self.write({'status': True, 'type': 'success', 'msg': '{} Actived'.format(schema['nama'])})
 
 class RoleController(BaseController):
 
     @tornado.web.authenticated
     @tornado.gen.coroutine
     def get(self, userid=""):
-        # refresh cookies data
-        self.refresh_cookies(cookies=self.get_cookies_user())
         cookies = self.get_cookies_user()
 
-        user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-        master = MasterModel(host=options.apis, token=cookies['token'])
+        user_collection = self.CONNECTION.collection(database="registerdb", name="users")
+        master_collection = self.CONNECTION.collection(database="registerdb", name="master")
 
-        ruser = user.find(typeid="_id", userid=userid)
-        rtype = master.get_master(type="typerole")  
-        if ruser.status_code == 200 and rtype.status_code == 200:
-            self.render('node/detailrole.html', user=ruser.json()['result'], typeregister=rtype.json()['result'])
-        else:
-            self.redirect("/login")
+        ruser = UserModel(collection=user_collection, service=options.service).get(filter={"_id": userid})
+        rtype = MasterModel(collection=master_collection, service=options.service).select(filter={"type": "typerole"})
+        self.render('node/detailrole.html', user=ruser, typeregister=rtype)
+
 
     @tornado.web.authenticated
     @tornado.gen.coroutine
     def post(self):
-        # refresh cookies data
-        self.refresh_cookies(cookies=self.get_cookies_user())
         cookies = self.get_cookies_user()
 
         # client request
         body = tornado.escape.json_decode(self.request.body)
 
-        user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-        self.write(user.role(typeid="_id", userid=body['userid']))
+        collection = self.CONNECTION.collection(database="registerdb", name="users")
+        user = UserModel(collection=collection, service=options.service).get(filter={"_id": body['userid']})
+        self.write({'status': True, 'draw': 0, 'data': json.dumps(user['role'], default=json_util.default), 'recordsTotal': len(user['role']), 'recordsFiltered': len(user['role'])})
 
     @tornado.web.authenticated
     @tornado.gen.coroutine
     def put(self):
-        # refresh cookies data
-        self.refresh_cookies(cookies=self.get_cookies_user())
         cookies = self.get_cookies_user()
 
         # client request
         body = tornado.escape.json_decode(self.request.body)
 
-        user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-        master = MasterModel(host=options.apis, token=cookies['token'])
-        role = master.find(type="typerole", code=body['key'])
-        if user.find_role(typeid="_id", userid=body['userid'], key=body['key']).status_code == 400 and role.status_code == 200:
+        user_collection = self.CONNECTION.collection(database="registerdb", name="users")
+        master_collection = self.CONNECTION.collection(database="registerdb", name="master")
+        master = MasterModel(collection=master_collection, service=options.service).get(filter={"type": "typerole", "code": body['key']})
 
-            # convert
-            schema = user.role_schema
-            schema['key'] = role.json()['result']['code']
-            schema['description'] = role.json()['result']['description']
+        if UserModel(collection=user_collection, service=options.service).find_role(userid=body['userid'], role=master['code']) == None:
 
-            response = user.role_add(typeid="_id", userid=body['userid'], role=schema)
-            if response.status_code == 200:
-                self.write({"status": response.json(), "data": schema})
-            else:
-                self.write({"status": False, "msg": "Internal server error."})
+            schema_role = UserModel(collection=user_collection, service=options.service).schema_role
+            schema_role['key'] = master['code']
+            schema_role['description'] = master['description']
+            schema_role['startdate'] = datetime.datetime.now()
+            UserModel(collection=user_collection, service=options.service).add_role(userid=body['userid'], schema=schema_role)
+
+            schema_user = UserModel(collection=user_collection, service=options.service).get(filter={"_id": body['userid']})
+            schema_user['userupdate'] = cookies['userid']
+            schema_user['updatedate'] = datetime.datetime.now()
+
+            UserModel(collection=user_collection, service=options.service).update(filter={"_id": body['userid']}, schema=schema_user)
+            self.write({"status": True, "msg": None})
         else:
             self.write({"status": False, "msg": "Data sudah ada."})
 
     @tornado.web.authenticated
     @tornado.gen.coroutine
     def delete(self):
-        # refresh cookies data
-        self.refresh_cookies(cookies=self.get_cookies_user())
         cookies = self.get_cookies_user()
 
         # client request
         body = tornado.escape.json_decode(self.request.body)
 
-        user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-        response = user.role_delete(userid=body['userid'], key=body['key'])
-        if response.status_code == 200:
-            self.write({'status': response.json()['result']})
+        user_collection = self.CONNECTION.collection(database="registerdb", name="users")
+        user = UserModel(collection=user_collection, service=options.service).delete_role(userid=body['userid'], role=body['key'])
+        self.write({'status': True})

@@ -1,25 +1,31 @@
 + function ($) {
     'use strict';
 
-    /* Initial Form Filter */
-    $("#formFilter").submit(function () {
-        $('#tablePegawai').DataTable().ajax.reload();
+    $('#inputPegawaiid').keypress(function (e) {
+        if (e.which == 13) {
+            $('#tablePegawai').DataTable().ajax.reload(null, false);
+            return false;    //<---- Add this line
+        }
+    });
+
+    $("#btnFilterPegawaiid").click(function () {
+        $('#tablePegawai').DataTable().ajax.reload(null, false);
     });
 
     $("#btnResetFilter").click(function () {
         $('#inputPegawaiid').val("")
-        $('#tablePegawai').DataTable().ajax.reload();
+        $('#tablePegawai').DataTable().ajax.reload(null, false);
     });
 
-    /* Initial Form Activation */
+    // NOTE: Form Activation Pegawai
     $('#formActivation').validate({
         rules: {
-            username: {
+            inputUsername: {
                 required: true,
             }
         },
         messages: {
-            username: {
+            inputUsername: {
                 required: 'Username tidak boleh kosong.',
             }
         },
@@ -46,7 +52,6 @@
             }
         },
         submitHandler: function () {
-            
             $.ajax({
                 type: 'PUT',
                 url: '/administrator/daftarpegawai/pegawai',
@@ -62,7 +67,6 @@
 
                     if (data.status) {
                         $('#userView').load('/administrator/daftarpegawai/pegawai/view/username=' + data.username);
-                        return false
                     } else {
                         $('#modal-activation').modal('hide');
                         $.notify({
@@ -83,20 +87,28 @@
                 })
             });
 
-
+            return false
         }
 
     });
+
+
     // NOTE: modal-activation show
     $('#modal-activation').on('show.bs.modal', function () {
+        $('#userView').empty();
+    });
+
+    // NOTE: modal-activation hide
+    $('#modal-activation').on('hide.bs.modal', function () {
         $('#inputUsername').val("");
         $('#userView').empty();
+        $('#tablePegawai').DataTable().ajax.reload(null, false);
     });
 
     // NOTE: modal-role hide
     $('#modal-role').on('hide.bs.modal', function () {
-        // tablePegawai.ajax.reload(null, false);
         $('#userRole').empty();
+        $('#tablePegawai').DataTable().ajax.reload(null, false);
     });
 
     // Role Pegawai
@@ -126,12 +138,14 @@
                         async: true,   
                         headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                         success: (function (result) {
-                            tableRole.ajax.reload();
+                            $('#tableRole').DataTable().ajax.reload();
                         }),
                         error: (function (XMLHttpRequest, textStatus, errorThrown) {
                             alert("Error: " + errorThrown);
                         })
                     });
+
+                    return false
                 });
 
                 // Delete Role Pegawai
@@ -156,7 +170,7 @@
                                 if (data.status) {
                                     tableRole.row(selected_row).remove().draw();
                                 } else {
-                                    tableRole.ajax.reload();
+                                    tableRole.ajax.reload(false, null);
                                 }
                             }),
                             error: (function (XMLHttpRequest, textStatus, errorThrown) {
@@ -179,7 +193,12 @@
                             }),
                             headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                             success: (function (data) {
-                                callback(data);
+                                if (typeof (data.data) == "string") {
+                                    data.data = JSON.parse(data.data)
+                                    callback(data)
+                                } else {
+                                    callback(data)
+                                }
                             }),
                             error: (function (XMLHttpRequest, textStatus, errorThrown) {
                                 alert("Error: " + errorThrown);
@@ -209,9 +228,9 @@
                             "data": 'startdate',
                             "className": "dt-center text-center",
                             "render": function (data) {
-                                var date = new Date(data);
-                                var month = date.getMonth() + 1;
-                                return date.getDate() + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getFullYear() + "  " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                                var date = new Date(data.$date);
+                                var month = date.getUTCMonth() + 1;
+                                return (date.getUTCDate().toString().length > 1 ? date.getUTCDate() : "0" + date.getUTCDate()) + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCFullYear() + "  " + date.getUTCHours() + ":" + date.getUTCMinutes() + ":" + date.getUTCSeconds();
                             }
                         }, {
                             "targets": [4],
@@ -236,7 +255,7 @@
         }
     });
 
-    // Delete Pegawai
+    // NOTE: Delete Pegawai
     $('#tablePegawai tbody').on('click', '#btnDeAndActivation', function (event) {
         var selected_row = $(this).parents('tr');
         if (selected_row.hasClass('child')) {
@@ -259,22 +278,12 @@
                     })
                 });
 
-                tablePegawai.ajax.reload();
+                $('#tablePegawai').DataTable().ajax.reload(null, false);
             }
         }
     });
 
 }(jQuery);
-
-/* Initial Loading */
-function run_wait(element) {
-    $(element).waitMe({
-        effect: 'bounce',
-        text: '<b>Sedang proses...</b> <br> harap tunggu',
-        bg: 'rgba(255,255,255,0.6)',
-        color: '#000'
-    });
-}
 
 /* Initial Table Pegawai */
 var tablePegawai = $('#tablePegawai').DataTable({
@@ -294,8 +303,10 @@ var tablePegawai = $('#tablePegawai').DataTable({
             async: true,
             headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
             success: (function (data) {
-                if (data.status){
-                    // NOTE: callback response ajax
+                if (typeof (data.data) == "string"){
+                    data.data = JSON.parse(data.data)
+                    callback(data)
+                }else{
                     callback(data)
                 }
             }),
@@ -305,9 +316,9 @@ var tablePegawai = $('#tablePegawai').DataTable({
         })
     }, 'createdRow': function (row, data, dataIndex) {
         if (data['actived']) {
-            $(row).removeClass('strikeout');
+            $(row).removeClass('bg-teal disabled color-palette');
         }else{
-            $(row).addClass('strikeout');
+            $(row).addClass('bg-teal disabled color-palette');
         }
     },
     'columns': [
@@ -341,9 +352,9 @@ var tablePegawai = $('#tablePegawai').DataTable({
             "data": 'createdate',
             "className": "dt-center text-center",
             "render": function (data) {
-                var date = new Date(data);
-                var month = date.getMonth() + 1;
-                return date.getDate() + "/" + (month.toString().length > 1 ? month : "0" + month)  + "/" + date.getFullYear() + "  " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                var date = new Date(data.$date);
+                var month = date.getUTCMonth() + 1;
+                return (date.getUTCDate().toString().length > 1 ? date.getUTCDate() : "0" + date.getUTCDate()) + "/" + (month.toString().length > 1 ? month : "0" + month)  + "/" + date.getUTCFullYear() + "  " + date.getUTCHours() + ":" + date.getUTCMinutes() + ":" + date.getUTCSeconds();
             }
         },{
             "targets": [5],

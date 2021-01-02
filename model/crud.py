@@ -10,11 +10,8 @@ class CRUDModel():
     def __init__(self, collection:None):
         self.collection = collection
 
-    def pagination(self, page_size:int, page_num:int):
-        skips = page_size * (page_num - 1)
-        cursor = self.collection.find().skip(skips).limit(page_size)
-
-        return [x for x in cursor]
+    def select(self, filter:{}):
+        return self.collection.find(filter)
 
     def find(self, filter:{}, field:{}):
         if field == {}:

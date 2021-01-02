@@ -7,21 +7,34 @@
     <div class="modal-body">
         <div id="formPegawai" class="form-horizontal">        
             <div class="form-group form-group-md">
-                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="pegawaiid">PegawaiID:</label>
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="pegawaiid">Pegawai ID :</label>
                 <div class="col-md-8 col-sm-8 col-xs-12">
                     <input type="text" class="form-control" name="pegawaiid" id="pegawaiid" value="{{ user['pegawaiid'] }}" readonly>
                 </div>
             </div>
             <div class="form-group form-group-md">
-                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="name">Nama:</label>
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="nama">Nama :</label>
                 <div class="col-md-8 col-sm-8 col-xs-12">
-                    <input type="text" class="form-control" name="name" id="name" value="{{ user['nama'] }}" readonly>
+                    <input type="text" class="form-control" name="nama" id="nama" value="{{ user['nama'] }}" readonly>
+                </div>
+            </div>
+            <div class="form-group form-group-md">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="email">Email :</label>
+                <div class="col-md-8 col-sm-8 col-xs-12">
+                    <input type="text" class="form-control" name="email" id="email" value="{{ user['email'] }}" readonly>
+                </div>
+            </div>
+            <div class="form-group form-group-md">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="phone">Phone :</label>
+                <div class="col-md-8 col-sm-8 col-xs-12">
+                    <input type="text" class="form-control" name="phone" id="phone" value="{{ user['phone'] }}" readonly>
                 </div>
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <form id="formAddRole" class="form-horizontal">
+        <form id="formAddRole" class="form-horizontal" method="put">
+            {% module xsrf_form_html() %}
             <input type="hidden" name="userid" value="{{ user['_id'] }}">
             <div class="form-group">
                 <label for="node" class="control-label col-md-3 col-sm-3 col-xs-12"> Role:</label>

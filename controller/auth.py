@@ -27,21 +27,21 @@ class SignInController(BaseController):
 
 	def post(self):
 		body = tornado.escape.json_decode(self.request.body)
-		djson = {"username": body["username"],
-		         "password": body["password"]}
 		try:
-			responseJWT = requests.post('{}/{}/{}'.format(options.apis, 'auth', 'login'), json=djson)
-			if responseJWT.status_code == 200:
-				user = UserModel(officeid="none", host=options.apis, token=responseJWT.json()['token'])
-				responseUser = user.find(typeid="username", userid=body["username"])
+			collection = self.CONNECTION.collection(database="registerdb", name="users")
+			user = UserModel(collection=collection, service=options.service)
+			responseAUTH = user.auth(username= body['username'], password= body['password'])
+			if responseAUTH:
+				result = user.get(filter={"username": body['username'], "password": body['password']})
 
+				print(result)
 				self.result_validation['status'] = True
 				self.result_validation['url'] = self.get_query_argument('next', u'/')
 				self.result_validation['type'] = 'success'
 				self.result_validation['msg'] = None
-				self.save_cookies(body["username"], responseUser.json(), responseJWT.json()['token'])
+				self.save_cookies(result)
 
-			elif responseJWT.status_code == 401:
+			else:
 				self.result_validation['status'] = False
 				self.result_validation['url'] = None
 				self.result_validation['type'] = 'warning'
@@ -53,12 +53,11 @@ class SignInController(BaseController):
 		finally:
 			self.write(self.result_validation)
 
-	def save_cookies(self, username="", userdatabase={}, token=""):
-		self.cookies_data['userid'] = userdatabase['result']['_id']
-		self.cookies_data['username'] = username
-		self.cookies_data['pegawaiid'] = userdatabase['result']['pegawaiid']
-		self.cookies_data['officeid'] = userdatabase['result']['officeid']
-		self.cookies_data['token'] = token
+	def save_cookies(self, userdatabase={}):
+		self.cookies_data['userid'] = userdatabase['_id']
+		self.cookies_data['username'] = userdatabase['username']
+		self.cookies_data['pegawaiid'] = userdatabase['pegawaiid']
+		self.cookies_data['officeid'] = userdatabase['officeid']
 		self.set_secure_cookie(options.cookies, tornado.escape.json_encode(self.cookies_data))
 
 class SignOutController(BaseController):
