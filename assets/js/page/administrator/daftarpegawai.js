@@ -230,7 +230,7 @@
                             "render": function (data) {
                                 var date = new Date(data.$date);
                                 var month = date.getUTCMonth() + 1;
-                                return (date.getUTCDate().toString().length > 1 ? date.getUTCDate() : "0" + date.getUTCDate()) + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCFullYear() + "  " + date.getUTCHours() + ":" + date.getUTCMinutes() + ":" + date.getUTCSeconds();
+                                return (date.getUTCDate().toString().length > 1 ? date.getUTCDate() : "0" + date.getUTCDate()) + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCFullYear() + "  " + (date.getUTCHours().toString().length > 1 ? date.getUTCHours() : "0" + date.getUTCHours()) + ":" + (date.getUTCMinutes().toString().length > 1 ? date.getUTCMinutes() : "0" + date.getUTCMinutes()) + ":" + (date.getUTCSeconds().toString().length > 1 ? date.getUTCSeconds() : "0" + date.getUTCSeconds());
                             }
                         }, {
                             "targets": [4],
@@ -256,7 +256,7 @@
     });
 
     // NOTE: Delete Pegawai
-    $('#tablePegawai tbody').on('click', '#btnDeAndActivation', function (event) {
+    $('#tablePegawai tbody').on('click', '#btnDeactivation', function (event) {
         var selected_row = $(this).parents('tr');
         if (selected_row.hasClass('child')) {
             selected_row = selected_row.prev();
@@ -278,7 +278,7 @@
                     })
                 });
 
-                $('#tablePegawai').DataTable().ajax.reload(null, false);
+                tablePegawai.ajax.reload(false, null);
             }
         }
     });
@@ -354,7 +354,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
             "render": function (data) {
                 var date = new Date(data.$date);
                 var month = date.getUTCMonth() + 1;
-                return (date.getUTCDate().toString().length > 1 ? date.getUTCDate() : "0" + date.getUTCDate()) + "/" + (month.toString().length > 1 ? month : "0" + month)  + "/" + date.getUTCFullYear() + "  " + date.getUTCHours() + ":" + date.getUTCMinutes() + ":" + date.getUTCSeconds();
+                return (date.getUTCDate().toString().length > 1 ? date.getUTCDate() : "0" + date.getUTCDate()) + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCFullYear() + "  " + (date.getUTCHours().toString().length > 1 ? date.getUTCHours() : "0" + date.getUTCHours()) + ":" + (date.getUTCMinutes().toString().length > 1 ? date.getUTCMinutes() : "0" + date.getUTCMinutes()) + ":" + (date.getUTCSeconds().toString().length > 1 ? date.getUTCSeconds() : "0" + date.getUTCSeconds());
             }
         },{
             "targets": [5],
@@ -363,7 +363,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
             "className": "dt-center text-center",
             "render": function (data) {
                 if (data) {
-                    return '<a id="btnRolePegawai" class="btn btn-primary btn-flat"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>'
+                    return '<a id="btnRolePegawai" class="btn btn-primary btn-flat"><i class="fa fa-check-square-o" aria-hidden="true"></i></a>'
                 }else{
                     return ''
                 }
@@ -374,7 +374,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
             "className": "dt-center text-center",
             "render": function (data, type, row) {
                 if (row.actived){
-                    return '<a id="btnDeAndActivation" class="btn btn-danger btn-flat btn-small"><i class="fa fa-window-close" aria-hidden="true"></i></a>'
+                    return '<a id="btnDeactivation" class="btn btn-danger btn-flat btn-small"><i class="fa fa-genderless" aria-hidden="true"></i></a>'
                 }else{
                     return ''
                 }

@@ -35,7 +35,7 @@ class DaftarPegawaiViewController(BaseController):
                 self.page_data['description'] = 'Access denied'
                 self.render("page/error/403.html", page=self.page_data,  useractived=useractived)
         else:
-            self.redirect("/login")
+            self.redirect("/logout")
 
     # Load Data.
     @tornado.web.authenticated
@@ -103,7 +103,7 @@ class PegawaiController(BaseController):
         if response_pegawai.status_code == 200:
             self.render('node/detailuser.html', pegawai=response_pegawai.json()['result'], username=username, count=response_count)
         else:
-	        self.redirect("/login")
+	        self.redirect("/logout")
 
     @tornado.web.authenticated
     @tornado.gen.coroutine

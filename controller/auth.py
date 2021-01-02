@@ -34,7 +34,6 @@ class SignInController(BaseController):
 			if responseAUTH:
 				result = user.get(filter={"username": body['username'], "password": body['password']})
 
-				print(result)
 				self.result_validation['status'] = True
 				self.result_validation['url'] = self.get_query_argument('next', u'/')
 				self.result_validation['type'] = 'success'
@@ -45,7 +44,7 @@ class SignInController(BaseController):
 				self.result_validation['status'] = False
 				self.result_validation['url'] = None
 				self.result_validation['type'] = 'warning'
-				self.result_validation['msg'] = 'Username or password not valid.'
+				self.result_validation['msg'] = 'Gagal login. Nama pengguna atau kata sandi yang anda masukkan salah.'
 
 
 		except Exception as e:

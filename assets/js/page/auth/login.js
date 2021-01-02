@@ -37,10 +37,14 @@
                } else {
                   $('#password').val('');
                   $.notify({
-                     title: '<strong>Warning!</strong> <br>',
+                     title: '<strong>Perhatian</strong> <br>',
                      message: result.msg,
                      },{
-                     type: result.type,
+                     type: 'minimalist',
+                     template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+                        '<span data-notify="title">{1}</span>' +
+                        '<span data-notify="message">{2}</span>' +
+                        '</div>',
                      animate: {
                         enter: 'animated fadeInRight',
                         exit: 'animated fadeOutRight'
