@@ -5,9 +5,7 @@
         </button>
     </div>
     <div class="modal-body">
-        <div id="formPegawai" class="form-horizontal">
-            <input type="hidden" name="userid" value="{{ user['_id'] }}">
-        
+        <div id="formPegawai" class="form-horizontal">        
             <div class="form-group form-group-md">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="pegawaiid">PegawaiID:</label>
                 <div class="col-md-8 col-sm-8 col-xs-12">
@@ -24,6 +22,7 @@
     </div>
     <div class="modal-footer">
         <form id="formAddRole" class="form-horizontal">
+            <input type="hidden" name="userid" value="{{ user['_id'] }}">
             <div class="form-group">
                 <label for="node" class="control-label col-md-3 col-sm-3 col-xs-12"> Role:</label>
                 <div class="col-md-8 col-sm-8 col-xs-12">
@@ -50,7 +49,7 @@
                     <th>Key</th>
                     <th>No</th>
                     <th>Role</th>
-                    <th>Create Date</th>
+                    <th>Start Date</th>
                     <th></th>
                 </tr>
             </thead>

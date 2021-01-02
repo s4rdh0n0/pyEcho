@@ -18,6 +18,7 @@
     <form class="form-horizontal" id="formSavePegawai">
         <div class="box-body">
             <input type="hidden" name="usernameid" value="{{ username }}">
+            <input type="hidden" name="userid" value="{{ pegawai['userid'] }}">
             <div class="form-group">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="pegawaiid">Pegawai ID :</label>
                 <div class="col-md-8 col-sm-8 col-xs-12">
@@ -36,38 +37,26 @@
                     <input type="text" class="form-control" id="nama" name="nama" value="{{ pegawai['gelardepan'] }} {{ pegawai['nama'] }} {{ pegawai['gelarbelakang'] }}" readonly>
                 </div>
             </div>
+            {% if count == 0 %}
             <div class="form-group">
-                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="alamat">Alamat :</label>
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="password">Password :</label>
                 <div class="col-md-8 col-sm-8 col-xs-12">
-                    <textarea name="alamat" id="alamat" class="form-control" rows="3" readonly>
-                        {{ pegawai['alamat'] }}
-                    </textarea>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="tempatlahir">Tempat Lahir :</label>
-                <div class="col-md-8 col-sm-8 col-xs-12">
-                    <input type="text" class="form-control" id="tempatlahir" name="tempatlahir" value="{{ pegawai['tempatlahir'] }}" readonly>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="tanggallahir">Tanggal Lahir :</label>
-                <div class="col-md-8 col-sm-8 col-xs-12">
-                    <input type="text" class="form-control" id="tanggallahir" name="tanggallahir" value="{{ datetime.datetime.strptime(pegawai['tanggallahir'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y') }}" readonly>
+                    <input type="password" class="form-control" id="password" name="password">
                 </div>
             </div>
             <div class="form-group">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="phone">Phone :</label>
                 <div class="col-md-8 col-sm-8 col-xs-12">
-                    <input type="text" class="form-control" id="phone" name="phone" value="{{ pegawai['phone'] }}" readonly>
+                    <input type="text" class="form-control" id="phone" name="phone" value="{{ pegawai['phone'] }}">
                 </div>
             </div>
             <div class="form-group">
                 <label class="control-label col-md-3 col-sm-3 col-xs-12" for="email">Email :</label>
                 <div class="col-md-8 col-sm-8 col-xs-12">
-                    <input type="text" class="form-control" id="email" name="email" value="{{ pegawai['email'] }}" readonly>
+                    <input type="text" class="form-control" id="email" name="email" value="{{ pegawai['email'] }}">
                 </div>
             </div>
+            {% end %}
         </div>
         
         <div class="box-footer text-center">
@@ -80,36 +69,90 @@
         
     {% if count == 0 %}
         <script>
-            /* Initial Form Save Pegawai */
-            $("#formSavePegawai").submit(function () {
-                $.ajax({
-                    type: 'POST',
-                    url: '/administrator/daftarpegawai/pegawai/add',
-                    data: JSON.stringify({
-                        'username': $('[name="usernameid"]').val()
-                    }),
-                    async: true,  
-                    headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
-                    success: (function (result) {
-                        $('#modal-activation').modal('hide');
-                        
-                        $.notify({
-                            title: '<strong><i class="fa fa-info-circle" aria-hidden="true"></i> Info</strong> <br>',
-                            message: result.msg,
-                        }, {
-                            type: result.type,
-                            animate: {
-                                enter: 'animated fadeInRight',
-                                exit: 'animated fadeOutRight'
-                            }
-                        });
-                    }),
-                    error: (function (XMLHttpRequest, textStatus, errorThrown) {
-                        alert("Error: " + errorThrown);
-                    })
-                });
-                $('#modal-activation').modal('hide');
+
+            $("#formSavePegawai").validate({
+                rules: {
+                    password:{
+                        required: true
+                    },
+                    email: {
+                        required: true,
+                        email: true,
+                    },
+                    phone: {
+                        required: true
+                    }
+                },
+                messages: {
+                    password: {
+                        required: 'Password wajib diisi'
+                    },
+                    email: {
+                        required: 'Email wajib diisi.',
+                        email: 'Masukkan alamat email yang valid.',
+                    },
+                    phone: {
+                        required: 'Phone wajib diisi.'
+                    }
+                },
+                errorElement: "small",
+                highlight: function (element, errorClass, validClass) {
+                    var elem = $(element);
+                    elem.closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    var elem = $(element);
+                    elem.closest('.form-group').removeClass('has-error');
+                }, errorPlacement: function (error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    }
+                    else if (element.prop('type') === 'radio' && element.parent('.radio-inline').length) {
+                        error.insertAfter(element.parent().parent());
+                    }
+                    else if (element.prop('type') === 'checkbox' || element.prop('type') === 'radio') {
+                        error.appendTo(element.parent().parent());
+                    }
+                    else {
+                        error.insertAfter(element);
+                    }
+                },
+                submitHandler: function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/administrator/daftarpegawai/pegawai/add',
+                        data: JSON.stringify({
+                            'userid': $('[name="userid"]').val(),
+                            'pegawaiid': $('[name="pegawaiid"]').val(),
+                            'username': $('[name="usernameid"]').val(),
+                            'nama': $('[name="nama"]').val(),
+                            'password': $('[name="password"]').val(),
+                            'email': $('[name="email"]').val(),
+                            'phone': $('[name="phone"]').val(),
+                        }),
+                        async: true,
+                        headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+                        success: (function (result) {
+                            $('#modal-activation').modal('hide');
+                            $.notify({
+                                title: '<strong><i class="fa fa-info-circle" aria-hidden="true"></i> Info</strong> <br>',
+                                message: result.msg,
+                            }, {
+                                type: result.type,
+                                animate: {
+                                    enter: 'animated fadeInRight',
+                                    exit: 'animated fadeOutRight'
+                                }
+                            });
+                            tablePegawai.ajax.reload(null, false);
+                        }),
+                        error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                            alert("Error: " + errorThrown);
+                        })
+                    });
+                }
             });
+
         </script>
     {% end %}
 </div>

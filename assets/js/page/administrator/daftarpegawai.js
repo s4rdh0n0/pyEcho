@@ -2,12 +2,11 @@
     'use strict';
 
     /* Initial Form Filter */
-    $("#formFilter").submit(function (event) {
-        event.preventDefault();
+    $("#formFilter").submit(function () {
         $('#tablePegawai').DataTable().ajax.reload();
     });
 
-    $("#btnResetFilter").click(function (event) {
+    $("#btnResetFilter").click(function () {
         $('#inputPegawaiid').val("")
         $('#tablePegawai').DataTable().ajax.reload();
     });
@@ -54,7 +53,7 @@
                 data: JSON.stringify({
                     username: $('#inputUsername').val(),
                 }),
-                async: false,   
+                async: true,   
                 headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                 beforeSend: function () {
                     $('#userView').empty();
@@ -63,6 +62,7 @@
 
                     if (data.status) {
                         $('#userView').load('/administrator/daftarpegawai/pegawai/view/username=' + data.username);
+                        return false
                     } else {
                         $('#modal-activation').modal('hide');
                         $.notify({
@@ -87,12 +87,6 @@
         }
 
     });
-
-    // NOTE: modal-activation hide
-    $('#modal-activation').on('hide.bs.modal', function () {
-        tablePegawai.ajax.reload(null, false);
-    });
-
     // NOTE: modal-activation show
     $('#modal-activation').on('show.bs.modal', function () {
         $('#inputUsername').val("");
@@ -120,24 +114,19 @@
                     theme: "bootstrap"
                 });
 
-                /* Initial Add Role */
-                $("#formAddRole").submit(function (event) {
-                    event.preventDefault();
+                // Add Role Pegawai
+                $("#formAddRole").submit(function () {
                     $.ajax({
                         type: 'PUT',
                         url: '/administrator/daftarpegawai/role/add',
                         data: JSON.stringify({
-                            userid: $('input[name=userid]').val(),
+                            userid: tablePegawai.row(selected_row).data()['_id'],
                             key: $('#typeRole').val(),
                         }),
-                        async: false,   
+                        async: true,   
                         headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                         success: (function (result) {
-                            if (result.status){
-                                tableRole.row.add({ "key": result.data.key, "description": result.data.description, "createdate": result.data.createdate}).draw();
-                            } else {
-                                tableRole.ajax.reload(null, false);
-                            }
+                            tableRole.ajax.reload();
                         }),
                         error: (function (XMLHttpRequest, textStatus, errorThrown) {
                             alert("Error: " + errorThrown);
@@ -145,7 +134,7 @@
                     });
                 });
 
-                // Role Pegawai
+                // Delete Role Pegawai
                 $('#tableRole tbody').on('click', '#btnDeleteRole', function (event) {
                     var selected_row = $(this).parents('tr');
                     if (selected_row.hasClass('child')) {
@@ -161,13 +150,13 @@
                                 userid: $('input[name=userid]').val(),
                                 key: tableRole.row(selected_row).data()['key']
                             }),
-                            async: false,   
+                            async: true,   
                             headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                             success: (function (data) {
                                 if (data.status) {
                                     tableRole.row(selected_row).remove().draw();
                                 } else {
-                                    tableRole.ajax.reload(null, false);
+                                    tableRole.ajax.reload();
                                 }
                             }),
                             error: (function (XMLHttpRequest, textStatus, errorThrown) {
@@ -186,14 +175,10 @@
                             type: 'POST',
                             url: '/administrator/daftarpegawai/role',
                             data: JSON.stringify({
-                                userid: $('input[name=userid]').val()
+                                userid: tablePegawai.row(selected_row).data()['_id'],
                             }),
                             headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                             success: (function (data) {
-                                // NOTE: print data
-                                // console.log(data)
-
-                                // NOTE: callback response ajax
                                 callback(data);
                             }),
                             error: (function (XMLHttpRequest, textStatus, errorThrown) {
@@ -279,11 +264,6 @@
         }
     });
 
-    
-    $('#tablePegawai').on('processing', function (e, processing) {
-        e.preventDefault();
-        $('#tablePegawai').off('edit');
-    });
 }(jQuery);
 
 /* Initial Loading */
@@ -367,7 +347,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
             }
         },{
             "targets": [5],
-            "width": "3%",
+            "width": "5%",
             "data": 'actived',
             "className": "dt-center text-center",
             "render": function (data) {
@@ -379,7 +359,7 @@ var tablePegawai = $('#tablePegawai').DataTable({
             }
         }, {
             "targets": [6],
-            "width": "3%",
+            "width": "4%",
             "className": "dt-center text-center",
             "render": function (data, type, row) {
                 if (row.actived){

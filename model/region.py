@@ -6,35 +6,27 @@ from model.base import BaseModel
 
 class RegionModel (BaseModel):
 
-    root = 'offices/region'
+    def __init__(self, collection: None, service: None):
+        super().__init__(collection=collection, service=service)
 
-    def __init__(self, officeid="", officetypeid="", host="", token=""):
-        self.officeid = officeid
-        self.officetypeid = officetypeid
-        super().__init__(host=host, token=token)
+    def get_provinsi(self, officeid:str, officetypeid:str):
+        return requests.get('{}/offices/region/provinsi'.format(self.service), params={"officeid":officeid, "officetypeid": officetypeid})
 
-    def get_provinsi(self):
-        param = 'officeid={}&officetypeid={}'.format(self.officeid, self.officetypeid)
-        return requests.get('{}/{}/provinsi?{}'.format(self.host, self.root, param), headers=self.header)
+    def get_kabupaten(self, parent: str, officeid: str, officetypeid: str):
+        return requests.get('{}/offices/region/kabupaten'.format(self.service), params={"provinsiid": parent,"officeid": officeid, "officetypeid": officetypeid})
 
-    def get_kabupaten(self, parent=""):
-        param = 'kabupatenid={}&officeid={}&officetypeid={}'.format(parent, self.officeid, self.officetypeid)
-        return requests.get('{}/{}/kabupaten?{}'.format(self.host, self.root, param), headers=self.header)    
+    def get_kecamatan(self, parent: str, officeid: str, officetypeid: str):
+        return requests.get('{}/offices/region/kecamatan'.format(self.service), params={"kabupatenid": parent, "officeid": officeid, "officetypeid": officetypeid})
 
-    def get_kecamatan(self, parent="", ):
-        param = 'kecamatanid={}&officeid={}&officetypeid={}'.format(parent, self.officeid, self.officetypeid)
-        return requests.get('{}/{}/kecamatan?{}'.format(self.host, self.root, param), headers=self.header)     
+    def get_desa(self, parent: str, officeid: str, officetypeid: str):
+        return requests.get('{}/offices/region/desa'.format(self.service), params={"kecamatanid": parent, "officeid": officeid, "officetypeid": officetypeid})
 
-    def get_desa(self, parent=""):
-        param = 'desaid={}&officeid={}&officetypeid={}'.format(parent, self.officeid, self.officetypeid)
-        return requests.get('{}/{}/desa?{}'.format(self.host, self.root, param), headers=self.header)
-
-    def get_alldesa(self):
+    def all_desa(self, officeid:str):
         param = 'officeid={}'.format(self.officeid)
-        return requests.get('{}/{}/desa/all?{}'.format(self.host, self.root, param), headers=self.header)
+        return requests.get('{}/offices/region/desa/all'.format(self.service), params={"officeid": officeid})
         
     def desa(self, kode=""):
-        data = self.get_alldesa()
+        data = self.all_desa()
         for desa in data.json()['result']:
             if desa['code'] == kode:
                 return desa

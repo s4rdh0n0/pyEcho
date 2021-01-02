@@ -141,29 +141,31 @@ class PegawaiController(BaseController):
         body = tornado.escape.json_decode(self.request.body)
 
         user = UserModel(officeid=cookies['officeid'], host=options.apis, token=cookies['token'])
-        entity = user.entity(username=body['username'])
-        if entity.status_code == 200:
-            count_reponse = user.count(typeid="_id", userid=entity.json()['result']['userid'])
-            schema = user.schema
-            schema['_id'] = entity.json()['result']['userid']
-            schema['officeid'] = cookies['officeid']
-            schema['username'] = body['username']
-            schema['pegawaiid'] = entity.json()['result']['pegawaiid']
-            schema['nama'] = entity.json()['result']['nama']
-            schema['phone'] = entity.json()['result']['phone']
-            schema['usercreate'] = cookies['userid']
-            schema['actived'] = True
+        count_reponse = user.count(typeid="_id", userid=body['userid'])
+        schema = user.schema
 
-            add = user.add(user=schema)
-            if add.status_code == 200:
-                self.write({'status': add.json()['result'], 'type': 'success', 'msg': '{} Actived'.format(schema['nama'])})
-            else:
-                self.write({'status': False, 'type': 'danger', 'msg': '{} Gagal Activation'.format(schema['nama'])})
+        schema['_id'] = body['userid']
+        schema['officeid'] = cookies['officeid']
+        schema['username'] = body['username']
+        schema['password'] = body['password']
+        schema['pegawaiid'] = body['pegawaiid']
+        schema['nama'] = body['nama']
+        schema['phone'] = body['phone']
+        schema['email'] = body['email']
+        schema['usercreate'] = cookies['userid']
+        schema['actived'] = True
+
+        add = user.add(user=schema)
+        if add.status_code == 200:
+            self.write({'status': add.json()['result'], 'type': 'success', 'msg': '{} Actived'.format(schema['nama'])})
+        else:
+            self.write({'status': False, 'type': 'danger', 'msg': '{} Gagal Activation'.format(schema['nama'])})
 
 
 class RoleController(BaseController):
 
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def get(self, userid=""):
         # refresh cookies data
         self.refresh_cookies(cookies=self.get_cookies_user())
@@ -180,6 +182,7 @@ class RoleController(BaseController):
             self.redirect("/login")
 
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def post(self):
         # refresh cookies data
         self.refresh_cookies(cookies=self.get_cookies_user())
@@ -192,6 +195,7 @@ class RoleController(BaseController):
         self.write(user.role(typeid="_id", userid=body['userid']))
 
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def put(self):
         # refresh cookies data
         self.refresh_cookies(cookies=self.get_cookies_user())
@@ -208,7 +212,6 @@ class RoleController(BaseController):
             # convert
             schema = user.role_schema
             schema['key'] = role.json()['result']['code']
-            schema['usercreate'] = cookies['userid']
             schema['description'] = role.json()['result']['description']
 
             response = user.role_add(typeid="_id", userid=body['userid'], role=schema)
@@ -220,6 +223,7 @@ class RoleController(BaseController):
             self.write({"status": False, "msg": "Data sudah ada."})
 
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def delete(self):
         # refresh cookies data
         self.refresh_cookies(cookies=self.get_cookies_user())

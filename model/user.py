@@ -1,8 +1,10 @@
 import requests
+import datetime
 
 # Model
 from model.base import BaseModel
-from model.master import MasterModel
+from model.crud import CRUDModel
+
 
 class UserModel(BaseModel):
     
@@ -11,119 +13,50 @@ class UserModel(BaseModel):
     schema = {
         '_id': None,
         'username': None,
+        'password': None,
         'officeid': None, 
         'pegawaiid': None,
         'nama': None,
+        'email': None,
+        'phone': None,
         'role': [],
-        'createdate': None, 
+        'createdate': None,
+        'usercreate': None,
+        'updatedate': None,
+        'userupdate': None,
         'actived': False,
     }
 
-    role_schema = {
+    schema_role = {
         'key': None,
-        'createdate': None,
-        'usercreate': None,
         'description': None,
+        'startdate': None,
     }
 
-    def __init__(self, officeid="", host="", token=""):
-        self.officeid = officeid
-        super().__init__(host=host, token=token)
+    def __init__(self, collection: None, service: None):
+        super().__init__(collection=collection, service=service)
 
-    def auth(self, username="", password=""):
-        djson = {"username": username, "password": password}
-        return requests.post('{}/{}'.format(self.host, 'auth/login'), json=djson)
-
-    def pagination(self, pegawaiid="", page=0, limit=0):
-        param = 'officeid={}&pegawaiid={}&limit={}&page={}'.format(self.officeid, pegawaiid, limit, page)
-        return requests.get('{}/{}?{}'.format(self.host, self.root, param), headers=self.header)
-    
-    # Convert schema kkp to schema locals
-    def kkpToUser(self, officeid="", kkp={}, actived=False):
-        result = self.schema
-        result['officeid'] = officeid
-        result['pegawaiid'] = kkp['pegawaiid']
-        result['username'] = kkp['username']
-        result['nama'] = kkp['nama']
-        result['actived'] = actived
-
-        return result
-
-    def count(self, typeid="", userid=""):
-        if userid == "" or typeid == "":
-            param = 'officeid=' + self.officeid
+    def auth(self, officeid:str, username:str, password:str):
+        count = CRUDModel(collection=self.collection).count(filter={"officeid": officeid, "username": username, "password": password, "actived": True})
+        if count > 0:
+            return True
         else:
-            param = 'officeid={}&typeid={}&userid={}'.format(self.officeid, typeid, userid)
-            
-        return requests.get('{}/{}/count?{}'.format(self.host, self.root, param), headers=self.header)
+            return False
 
-    def find(self, typeid="", userid=""):
-        param = 'typeid={}&userid={}'.format(typeid, userid)
-        return requests.get('{}/{}/find?{}'.format(self.host, self.root, param), headers=self.header)
+    # Service
+    def kkp(self, officeid:str, username:str):
+        return  requests.get('{}/offices/user'.format(self.service), params={"officeid": officeid, "username": username})
 
-    def entity(self, username=""):
-        param = 'officeid={}&username={}'.format(self.officeid, username)
-        return  requests.get('{}/{}/kkp/entity?{}'.format(self.host, self.root, param), headers=self.header)
+    def kkp_foto(self, pegawaiid=""):
+        return requests.get('{}/offices/user/foto'.format(self.service), params={"pegawaiid": pegawaiid})
 
-    def entityfoto(self, pegawaiid=""):
-        param = 'pegawaiid={}'.format(pegawaiid)
-        return requests.get('{}/{}/foto?{}'.format(self.host, self.root, param), headers=self.header)
 
-    def pegawai(self, username=""):
-        param = 'username={}'.format(username)
-        return requests.get('{}/{}/kkp/pegawai?{}'.format(self.host, self.root, param), headers=self.header)
+    # Plugin
+    def find_role(self, userid:str, role:str):
+        return CRUDModel(collection=self.collection).find(filter={"_id": userid, "role.key": role}, field={"role.$": 1})
 
-    def add(self, user={}):
-        djson = {'officeid': self.officeid,
-                 'user': user}
+    def add_role(self, userid: str):
+        return CRUDModel(collection=self.collection).update(filter={"_id": userid}, schema={"$push": {"role": self.schema_role}})
 
-        return requests.post('{}/{}'.format(self.host, self.root), json=djson, headers=self.header)
-
-    def update(self, user={}):
-        djson = {'officeiid': self.officeid,
-                 'user': user}
-
-        return requests.put('{}/{}'.format(self.host, self.root), json=djson, headers=self.header)
-
-    def delete(self, typeid="", userid=""):
-        djson = {'typeid': typeid,
-                 'userid': userid}
-
-        return requests.delete('{}/{}'.format(self.host, self.root), json=djson, headers=self.header)
-
-    def role(self, typeid="", userid=""):
-        param = 'typeid={}&userid={}'.format(typeid, userid)
-        response = requests.get('{}/{}/role?{}'.format(self.host, self.root, param), headers=self.header)
-        if response.status_code == 200:
-            if response.json()['result'] != None:
-                return {'status': True, 'draw': 0, 'data': response.json()['result'], 'recordsTotal': len(response.json()['result']), 'recordsFiltered': len(response.json()['result'])}
-            else:
-                return {'status': False, 'draw': 0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0}
-        else:
-            return {'status': False, 'draw': 0, 'data': [], 'recordsTotal': 0, 'recordsFiltered': 0}
-
-    def find_role(self, typeid="", userid="", key=""):
-        param = 'typeid={}&userid={}&key={}'.format(typeid, userid, key)
-        return requests.get('{}/{}/role/find?{}'.format(self.host, self.root, param), headers=self.header)
-
-    def role_add(self, typeid="", userid="", role={}):
-        djson = {'typeid': typeid,
-                 'userid': userid,
-                 'role': role}
-
-        return requests.post('{}/{}/role'.format(self.host, self.root), json=djson, headers=self.header)
-
-    def role_update(self, typeid="", userid="", role={}):
-        param = {'typeid': '_id',
-                 'userid': userid,
-                 'role': role}
-        
-        return requests.put('{}/{}/role'.format(self.host, self.root), json=param, headers=self.header)
-
-    def role_delete(self, userid="", key=""):
-        param = {'typeid': '_id',
-                 'userid': userid,
-                 'key': key}
-
-        return requests.delete('{}/{}/role'.format(self.host, self.root), json=param, headers=self.header)
-
+    def delete_role(self, userid: str, role: str):
+        return CRUDModel(collection=self.collection).update(filter={"_id": userid}, schema={"$pull": {"role": {"key": role}}})
