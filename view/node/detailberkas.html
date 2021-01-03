@@ -2,64 +2,22 @@
     <input type="hidden" name="berkasid" value="{{ info['_id'] }}">
     <div class="form-group">
         <label class="control-label col-md-2 col-sm-2 col-xs-12" for="nomorBerkas">Nomor Berkas:</label>
-        <div class="col-md-9 col-md-9 col-sm-9  col-xs-12">
-            <input type="text" name="nomorBerkas" id="nomorBerkas" class="form-control" value="{{ info['nomor']  }} / {{ info['tahun'] }}, {{ office['nama'] }}" readonly>
+        <div class="col-md-4 col-sm-4 col-xs-12">
+            <input type="text" name="nomorBerkas" id="nomorBerkas" class="form-control" value="{{ info['nomor']  }} / {{ info['tahun'] }},  {{ office['nama'].upper() }}" readonly>
         </div>
-    </div>
-    <div class="form-group">
         <label class="control-label col-md-2 col-sm-2 col-xs-12" for="statusBerkas">Status Berkas:</label>
-        <div class="col-md-9 col-sm-9 col-xs-12">
+        <div class="col-md-3 col-sm-3 col-xs-12">
             <input type="text" name="statusBerkas" id="statusBerkas" class="form-control" value="{{ info['kegiatan'] }} , {% if info['status'] == '1' %}PROSES{% elif info['status'] == '0' %}SELESAI {% if info['finnishdate'] != '0001-01-01T00:00:00Z' %}Tanggal.{{ datetime.datetime.strptime(info['finnishdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}{% end %}{% end %}" readonly>
         </div>
     </div>
     <div class="form-group">
         <label class="control-label col-md-2 col-sm-2 col-xs-12" for="prosedurBerkas">Kegiatan:</label>
-        <div class="col-md-9 col-sm-9 col-xs-12">
+        <div class="col-md-4 col-sm-4 col-xs-12">
             <input type="text" name="prosedurBerkas" id="prosedurBerkas" class="form-control" value="{{ info['prosedur'] }}" readonly>
         </div>
-    </div>
-    <div class="form-group">
         <label class="control-label col-md-2 col-sm-2 col-xs-12" for="createBerkas">Tanggal Pendaftaran:</label>
-        <div class="col-md-4 col-sm-4 col-xs-12">
-            <input type="text" name="createBerkas" id="createBerkas" class="form-control" value="{{ datetime.datetime.strptime(info['createdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}" readonly>
-        </div>
-        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="startBerkas">Dijalankan:</label>
         <div class="col-md-3 col-sm-3 col-xs-12">
-            <input type="text" name="startBerkas" id="startBerkas" class="form-control" value="{% if info['startdate'] != '0001-01-01T00:00:00Z' %}{{ datetime.datetime.strptime(info['startdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }} {% end %}" readonly>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="desaAlasHak">Desa:</label>
-        <div class="col-md-4 col-sm-4 col-xs-12">
-            <select id="desaAlasHak" class="select2 form-control" style="width: 100%;">
-                {% for d in desa %}
-                <option value="{{ d['_id'] }}">{{d['kode']}} - {{ d['nama'].upper() }}, {{ d['wilayahinduk']['nama'] }}</option>
-                {% end %}
-            </select>
-        </div>
-        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="alasHak">Alas Hak:</label>
-        <div class="col-md-3 col-sm-3 col-xs-12">
-            <input type="text" name="alasHak" id="alasHak" class="form-control" >
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="pemohonBerkas">Pemohon:</label>
-        <div class="col-md-4 col-sm-4 col-xs-12">
-            <input type="text" name="pemohonBerkas" id="pemohonBerkas" class="form-control" value="{{ info['pemohon'] }}" readonly>
-        </div>
-        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="pemilikBerkas">Pemilik:</label>
-        <div class="col-md-3 col-sm-3 col-xs-12">
-            <input type="text" name="pemilikBerkas" id="pemilikBerkas" class="form-control" value="{% if pemilik == [] %}
-                                                                                                        {{ info['pemohon'] }}
-                                                                                                    {% else %}
-                                                                                                        {% for p in pemilik %}
-                                                                                                            {% if len(pemilik) > 1  %}
-                                                                                                                {{ p['nama'] }}, 
-                                                                                                            {% elif len(pemilik) == 1 %}
-                                                                                                                {{ p['nama'] }}
-                                                                                                            {% end %}
-                                                                                                        {% end %}
-                                                                                                    {% end %}" readonly>
+            <input type="text" name="createBerkas" id="createBerkas" class="form-control" value="{{ datetime.datetime.strptime(info['createdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}  -  {% if info['startdate'] != '0001-01-01T00:00:00Z' %}{{ datetime.datetime.strptime(info['startdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }} {% end %}" readonly>
         </div>
     </div>
     <div class="form-group">
@@ -70,6 +28,49 @@
         <label class="control-label col-md-2 col-sm-2 col-xs-12" for="pegawaiBerkas">Petugas :</label>
         <div class="col-md-3 col-sm-3 col-xs-12">
             <input type="text" name="pegawaiBerkas" id="pegawaiBerkas" class="form-control" value="{{ info['pegawai'] }}" readonly>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="pemohonBerkas">Pemohon/Pemilik:</label>
+        <div class="col-md-4 col-sm-4 col-xs-12">
+            <input type="text" name="pemohonBerkas" id="pemohonBerkas" class="form-control" value="{{ info['pemohon'] }}    {% if pemilik == [] %}
+                                                                                                                             An. {{ info['pemohon'] }}
+                                                                                                                            {% else %}
+                                                                                                                                An. 
+                                                                                                                                {% for p in pemilik %}
+                                                                                                                                    {% if len(pemilik) > 1  %}
+                                                                                                                                        {{ p['nama'] }}, 
+                                                                                                                                    {% elif len(pemilik) == 1 %}
+                                                                                                                                        {{ p['nama'] }}
+                                                                                                                                    {% end %}
+                                                                                                                                {% end %}
+                                                                                                                            {% end %}" " readonly>
+        </div>
+        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="statusRegister">Status Register:</label>
+        <div class="col-md-3 col-sm-3 col-xs-12">
+            <select id="statusRegister" class="select2 form-control" style="width: 100%;">
+                <option value=""></option>
+                {% for d in desa %}
+                <option value="{{ d['_id'] }}">{{d['kode']}} - {{ d['nama'].upper() }}, {{ d['wilayahinduk']['nama'] }}</option>
+                {% end %}
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="desaAlasHak">Desa:</label>
+        <div class="col-md-4 col-sm-4 col-xs-12">
+            <select id="desaAlasHak" class="select2 form-control" style="width: 100%;">
+                <option value=""></option>
+                {% for d in desa %}
+                <option value="{{ d['_id'] }}">{{d['kode']}} - {{ d['nama'].upper() }}, {{ d['wilayahinduk']['nama'] }}</option>
+                {% end %}
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="alasHak">Alas Hak:</label>
+        <div class="col-md-4 col-sm-4 col-xs-12">
+            <input type="text" name="alasHak" id="alasHak" class="form-control">
         </div>
     </div>
     <div class="form-group">
@@ -197,13 +198,15 @@
 </form>
 
 <script>
-    $("#typeAlasHak").select2({
-        placeholder: "Pilih alas hak",
-        theme: "bootstrap"
+    $("#statusRegister").select2({
+        placeholder: "Pilih status register",
+        theme: "bootstrap",
+        allowClear: true
     });
 
     $("#desaAlasHak").select2({
         placeholder: "Pilih desa",
-        theme: "bootstrap"
+        theme: "bootstrap",
+        allowClear: true
     });
 </script>

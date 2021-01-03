@@ -1,7 +1,7 @@
 + function ($) {
     'use strict';
 
-    /* Initial Cari Berkas */
+    // NOTE: Cari Berkas
     $('#formCariBerkas').validate({
         rules: {
             nomor: {
@@ -57,7 +57,6 @@
                 async: false,
                 headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                 success: (function (result) {
-
                     if (result.status){
                         $('#berkasView').load('/register/berkas/detail/berkasid=' + result.data[0].berkasid, function () {
                             $('.content').waitMe("hide");

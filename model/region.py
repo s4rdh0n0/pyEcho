@@ -22,7 +22,6 @@ class RegionModel (BaseModel):
         return requests.get('{}/offices/region/desa'.format(self.service), params={"kecamatanid": parent, "officeid": officeid, "officetypeid": officetypeid})
 
     def all_desa(self, officeid:str):
-        param = 'officeid={}'.format(self.officeid)
         return requests.get('{}/offices/region/desa/all'.format(self.service), params={"officeid": officeid})
         
     def desa(self, kode=""):

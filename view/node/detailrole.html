@@ -47,7 +47,7 @@
             <input type="hidden" name="userid" value="{{ user['_id'] }}">
             <div class="form-group">
                 <label for="node" class="control-label col-md-3 col-sm-3 col-xs-12"> Role:</label>
-                <div class="col-md-8 col-sm-8 col-xs-12">
+                <div class="col-md-8 col-sm-8 col-xs-12" style="text-align: right;">
                     <select id="typeRole" class="select2 form-control" style="width: 100%;">
                         {% for item in typeregister %}
                         <option value="{{ item['code'] }}">{{ item['description'] }}</option>

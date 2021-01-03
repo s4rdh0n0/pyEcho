@@ -1,0 +1,111 @@
+
+db:
+  server: localhost
+  username: 1228_adminregister
+  password: 1228trenggalek
+  port: 27017
+
+office:
+  - code: 1228
+    kantah: Trenggalek
+  - code: 1211
+    kantah: Trenggalek
+
+user:
+  - kantah: 1228
+    username: s4rdh0n0
+
+master:
+  - code: REGIN
+    type: ROLE
+    description: Register Berkas Masuk
+  - code: REGOUT
+    type: ROLE
+    description: Register Berkas Masuk]
+  - code: SURVEY
+    type: ROLE
+    description: Petugas Survey
+  - code: MAPPING
+    type: ROLE
+    description: Penggambaran dan Pemetaan Bidang Tanah
+  - code: MANAGER
+    type: ROLE
+    description: Koreksi dan Validasi Berkas
+  - code: ADMINISTRATOR
+    type: ROLE
+    description: Pengelola Aplikasi dan Data
+  - code: REGIN
+    type: ROLE
+    description: Register Berkas Keluar
+
+  - code: 1
+    type: OFFICE
+    description: Kantor Pusat
+  - code: 2
+    type: OFFICE
+    description: Kantor Wilayah
+  - code: 3
+    type: OFFICE
+    description: Kantor Daerah
+
+
+  - code: GS
+    type: SURATUKUR
+    description: Gambar Situasi
+  - code: SU
+    type: SURATUKUR
+    description: Surat Ukur
+  - code: PLL
+    type: SURATUKUR
+    description: PLL
+  - code: SUS
+    type: SURATUKUR
+    description: Surat Ukur Sementara
+  - code: GT
+    type: SURATUKUR
+    description: GT
+
+  - code: BT1
+    type: BUKUTANAH
+    description: Hak Milik
+  - code: BT2
+    type: BUKUTANAH
+    description: Hak Guna Usaha
+  - code: BT3
+    type: BUKUTANAH
+    description: PLL
+  - code: BT4
+    type: BUKUTANAH
+    description: Hak Guna Bangunan
+  - code: BT5
+    type: BUKUTANAH
+    description: Hak Pakai
+  - code: BT6
+    type: BUKUTANAH
+    description: Hak Pengelolaan
+  - code: BT7
+    type: BUKUTANAH
+    description: Hak Milik Satuan Rumah Susun
+  - code: BT8
+    type: BUKUTANAH
+    description: Hak Wakaf
+
+  - code: START
+    type: REGISTER
+    description: Register Berkas Masuk
+  - code: PROSES
+    type: REGISTER
+    description: Register Berkas Dalam Proses
+  - code: BATAL
+    type: REGISTER
+    description: Pembatalan Register Berkas
+  - code: TUNDA
+    type: REGISTER
+    description: Penundaan Register Berkas
+  - code: FINNISH
+    type: REGISTER
+    description: Register Berkas Selesai
+
+  - code: REG
+    type: REGISTER
+    description: Counter nomor register berkas

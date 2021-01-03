@@ -23,8 +23,6 @@ define("cookies", default="pyEchoCookies", help="web")
 
 
 
-
-
 class BaseController(tornado.web.RequestHandler):
 	
 	static_file = options.service + '/static/'
@@ -65,4 +63,4 @@ class BaseController(tornado.web.RequestHandler):
 		collection = self.CONNECTION.collection(database="registerdb", name="offices")
 		office = OfficeModel(collection=collection, service=options.service)
 		
-		return office.get(filter={"officeid": cookies['officeid']})
+		return office.get(filter={"_id": cookies['officeid']})
