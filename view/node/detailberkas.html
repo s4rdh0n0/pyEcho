@@ -1,4 +1,6 @@
-<form class="form-horizontal" role="form">
+<form id="formBerkasMasuk" class="form-horizontal" role="form" method="POST">
+    {% module xsrf_form_html() %}
+
     <input type="hidden" name="berkasid" value="{{ info['_id'] }}">
     <div class="form-group">
         <div class="col-md-8 col-sm-8 col-xs-12 col-md-offset-3">
@@ -15,8 +17,7 @@
         </div>
         <label class="control-label col-md-1 col-sm-1 col-xs-12" for="desaAlasHak">Desa:</label>
         <div class="col-md-4 col-sm-4 col-xs-12">
-            <select id="desaAlasHak" class="select2 form-control" style="width: 100%;">
-                <option value=""></option>
+            <select id="desaAlasHak" name="desaAlasHak" class="select2 form-control" style="width: 100%;">
                 {% for d in desa %}
                     <option value="{{ d['_id'] }}">{{d['kode']}} - {{ d['nama'].upper() }}, {{ d['wilayahinduk']['nama'] }}</option>
                 {% end %}
@@ -30,8 +31,7 @@
         </div>
         <label class="control-label col-md-1 col-sm-1 col-xs-12" for="statusRegister">Status Register:</label>
         <div class="col-md-4 col-sm-4 col-xs-12">
-            <select id="statusRegister" class="select2 form-control" style="width: 100%;">
-                <option value=""></option>
+            <select id="statusRegister" name="statusRegister" class="select2 form-control" style="width: 100%;">
                 {% for s in status %}
                     <option value="{{ s['code'] }}"> {{ s['description'] }} </option>
                 {% end %}
@@ -43,7 +43,7 @@
         <div class="col-md-4 col-sm-4 col-xs-12">
             <input type="text" name="prosedurBerkas" id="prosedurBerkas" class="form-control" value="{{ info['prosedur'] }}" readonly>
         </div>
-        <label class="control-label col-md-1 col-sm-1 col-xs-12" for="pemohonBerkas">Pemohon/Pemilik:</label>
+        <label class="control-label col-md-1 col-sm-1 col-xs-12" for="pemohonBerkas">Pemohon:</label>
         <div class="col-md-4 col-sm-4 col-xs-12">
             <input type="text" name="pemohonBerkas" id="pemohonBerkas" class="form-control" value="{{ info['pemohon'] }}   {% if pemilik == [] %}
                                                                                                                            An. {{ info['pemohon'] }}
@@ -60,13 +60,23 @@
         </div>
     </div>
     <div class="form-group">
+        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="statusBerkas">Status:</label>
+        <div class="col-md-4 col-sm-4 col-xs-12">
+            <input type="text" name="statusBerkas" id="statusBerkas" class="form-control" value="{{ info['kegiatan'].upper() }} , {% if info['status'] == '1' %}PROSES{% elif info['status'] == '0' %}SELESAI {% if info['finnishdate'] != '0001-01-01T00:00:00Z' %}  Tgl.{{ datetime.datetime.strptime(info['finnishdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}{% end %}{% end %}" readonly>
+        </div>
+        <label class="control-label col-md-1 col-sm-1 col-xs-12" for="phoneBerkas">Phone:</label>
+        <div class="col-md-4 col-sm-4 col-xs-12">
+            <input type="text" name="phoneBerkas" id="phoneBerkas" class="form-control" placeholder="Nomor telp pemohon">
+        </div>
+    </div>
+    <div class="form-group">
         <label class="control-label col-md-2 col-sm-2 col-xs-12" for="pemilikBerkas">Posisi Berkas:</label>
         <div class="col-md-4 col-sm-4 col-xs-12">
             <input type="text" name="pemilikBerkas" id="pemilikBerkas" class="form-control" value="{{ info['profile'] }} ({{ info['pegawai'] }})" readonly>
         </div>
-        <label class="control-label col-md-1 col-sm-1 col-xs-12" for="statusBerkas">Status Berkas:</label>
+        <label class="control-label col-md-1 col-sm-1 col-xs-12" for="emailBerkas">Email:</label>
         <div class="col-md-4 col-sm-4 col-xs-12">
-            <input type="text" name="statusBerkas" id="statusBerkas" class="form-control" value="{{ info['kegiatan'].upper() }} , {% if info['status'] == '1' %}PROSES{% elif info['status'] == '0' %}SELESAI {% if info['finnishdate'] != '0001-01-01T00:00:00Z' %}  Tgl.{{ datetime.datetime.strptime(info['finnishdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}{% end %}{% end %}" readonly>
+            <input type="text" name="emailBerkas" id="emailBerkas" class="form-control" placeholder="Email pemohon" >
         </div>
     </div>
     <div class="form-group">
@@ -200,15 +210,107 @@
 </form>
 
 <script>
+
+    // NOTE: Simpan Berkas
+    $('#formBerkasMasuk').validate({
+        rules: {
+            desaAlasHak: {
+                required: true,
+            },
+            statusRegister: {
+                required: true,
+            },
+            phoneBerkas: {
+                required: true
+            }
+        },
+        messages: {
+            desaAlasHak: {
+                required: 'Desa wajib diisi.',
+            },
+            statusRegister: {
+                required: 'Status wajib diisi.',
+            },
+            phoneBerkas: {
+                required: 'Nomor telp pemohon wajib diisi.'
+            }
+        },
+        errorElement: "small",
+        highlight: function (element, errorClass, validClass) {
+            var elem = $(element);
+            elem.closest('.col-xs-12').addClass('has-error');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            var elem = $(element);
+            elem.closest('.col-xs-12').removeClass('has-error');
+        }, errorPlacement: function (error, element) {
+            if (element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else if (element.prop('type') === 'radio' && element.parent('.radio-inline').length) {
+                error.insertAfter(element.parent().parent());
+            }
+            else if (element.prop('type') === 'checkbox' || element.prop('type') === 'radio') {
+                error.appendTo(element.parent().parent());
+            } 
+            else if (element.hasClass('select2')) {
+                error.insertAfter(element.next('span'));  // select2
+            }
+            else {
+                error.insertAfter(element);
+            }
+        },
+        submitHandler: function () {
+            $.ajax({
+                type: 'POST',
+                url: '/register/berkas/masuk',
+                data: JSON.stringify({
+                    berkasid: $('[name="berkasid"]').val(),
+                    desaid: $('#desaAlasHak').select2().val(),
+                    status: $('#statusRegister').select2().val(),
+                    phone: $('#phoneBerkas').val(),
+                    email: $('#emailBerkas').val(),
+                    keterangan: $('textarea:input[name=keterangan]').val(),
+                }),
+                async: true,
+                headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+                success: (function (result) {
+                    $.notify({
+                        title: result.title,
+                        message: result.msg,
+                    }, {
+                        type: result.type,
+                        template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+                            '<span data-notify="title">{1}</span>' +
+                            '<span data-notify="message">{2}</span>' +
+                            '</div>',
+                        animate: {
+                            enter: 'animated fadeInRight',
+                            exit: 'animated fadeOutRight'
+                        }
+                    });
+
+                    if (result.status){
+                        $('#nomor').val("");
+                        $('#tahun').val("");
+                        $('#berkasView').load('/node/error/400');
+                    }
+                }),
+                error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("Error: " + errorThrown);
+                })
+            });
+        }
+    });
+
+
     $("#statusRegister").select2({
         placeholder: "Pilih status register",
         theme: "bootstrap",
-        allowClear: true
     });
 
     $("#desaAlasHak").select2({
         placeholder: "Pilih desa",
         theme: "bootstrap",
-        allowClear: true
     });
 </script>

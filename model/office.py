@@ -50,4 +50,4 @@ class OfficeModel(BaseModel):
                        "counter.$.updatedate": datetime.datetime.now()}
         CRUDModel(collection=self.collection).update(filter={"$and": [{"_id": officeid}, {"counter.key": counter}]}, schema={"$set": new_counter})
 
-        return office['counter'][0]
+        return office['counter'][0]['value']

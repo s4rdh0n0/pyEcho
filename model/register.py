@@ -10,41 +10,42 @@ class RegisterModel(BaseModel):
     schema = {
         '_id': None,
         'nomorregister': None,
+        'createregisterdate': None,
+        'finnishregisterdate': None,
         'pegawaiactived': None,
         'nodeactived': None,
         'officeid': None,
-        'officenama': None,
         'officetype': None,
+        'officenama': None,
         'kecamatanid': None,
         'kecamatancode': None,
         'namakecamatan': None,
         'desaid': None,
-        'desacode': None
+        'desacode': None,
         'namadesa': None,
+        'berkasid': None,
         'nomorberkas': None,
         'tahunberkas': None,
-        'spopp': None,
         'prosedur': None,
         'kegiatan': None,
-        'createdate': None,
-        'updatedate': None,
-        'finnishdate': None,
-        'pemohon': [],
+        'phone': None,
+        'email': None,
+        'startdate': None,
+        'pemilik': [],
         'node': [],
-        'document': [],
         'keterangan': None,
         'status': None,
         'actived': False
     }
 
     schema_node = {
-        'nodeid':None,
-        'sender': None,
-        'senderdate': None,
-        'sendermessange': None,
-        'receiver': None,
-        'receiverdate': None,
-        'selesai': False,
+        '_id': None,
+        'node': None,
+        'operator': None,
+        'startdate': None,
+        'senddate': None,
+        'messange': None,
+        'actived': False,
     }
 
     schema_pemilik = {
@@ -62,12 +63,6 @@ class RegisterModel(BaseModel):
         'tempatlahir': None,
         'tanggallahir': None,
         'alamat': None,
-    }
-
-    schema_document = {
-        'documentid': None,
-        'typedocument': None,
-        'nomor': None,
     }
 
     def __init__(self, collection: None, service: None):

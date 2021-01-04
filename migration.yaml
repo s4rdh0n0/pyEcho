@@ -88,19 +88,19 @@ master:
     description: Hak Wakaf
 
   - code: START
-    type: REGISTER
+    type: OPERATION
     description: Register Berkas Masuk
   - code: PROSES
-    type: REGISTER
+    type: OPERATION
     description: Register Berkas Dalam Proses
   - code: BATAL
-    type: REGISTER
+    type: OPERATION
     description: Pembatalan Register Berkas
   - code: TUNDA
-    type: REGISTER
+    type: OPERATION
     description: Penundaan Register Berkas
   - code: FINNISH
-    type: REGISTER
+    type: OPERATION
     description: Register Berkas Selesai
 
   - code: REG
