@@ -66,10 +66,15 @@ def InsertUser():
                 if user.count(filter={"username": d['username']}) == 0:
                     kkp = user.kkp(officeid=d['officeid'], username=d['username']).json()['result']
                     
-                    schema_role = user.schema_role
-                    schema_role['key'] = 'ADMINISTRATOR'
-                    schema_role['description'] = master.get(filter={"type": "ROLE", "code": "ADMINISTRATOR"})['description']
-                    schema_role['startdate'] = datetime.datetime.now()
+                    role_admin = {}
+                    role_admin['key'] = 'ADMINISTRATOR'
+                    role_admin['description'] = master.get(filter={"type": "ROLE", "code": "ADMINISTRATOR"})['description']
+                    role_admin['startdate'] = datetime.datetime.now()
+
+                    role_regin = {}
+                    role_regin['key'] = 'REGIN'
+                    role_regin['description'] = master.get(filter={"type": "ROLE", "code": "REGIN"})['description']
+                    role_regin['startdate'] = datetime.datetime.now()           
 
                     schema = user.schema
                     schema["_id"] = kkp['userid']
@@ -80,7 +85,7 @@ def InsertUser():
                     schema["nama"] = kkp['nama']
                     schema["email"] = d['email']
                     schema["phone"] = kkp['phone']
-                    schema["role"] = [schema_role]
+                    schema["role"] = [role_admin, role_regin]
                     schema["createdate"] = datetime.datetime.now()
                     schema["usercreate"] = kkp['userid']
                     schema["actived"] = True

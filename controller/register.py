@@ -13,6 +13,7 @@ from model.region import RegionModel
 from model.user import UserModel
 from model.berkas import BerkasModel
 from model.region import RegionModel
+from model.master import MasterModel
 
 
 class ComponseController(BaseController):
@@ -23,7 +24,6 @@ class ComponseController(BaseController):
         if useractived != None:
             collection = self.CONNECTION.collection(database="registerdb", name="users")
             if UserModel(collection=collection, service=options.service).find_role(userid=useractived['_id'], role="REGIN") != None and useractived['actived']:
-
                 self.page_data['title'] = 'Compose'
                 self.page_data['description'] = 'Register New Berkas'
                 self.render('page/register/compose.html', page=self.page_data, useractived=useractived)
@@ -64,6 +64,8 @@ class RegisterBerkasViewController(BaseController):
         pemohon = []
         pemilik = []
 
+        col_master = self.CONNECTION.collection(database="registerdb", name="master")
+        master = MasterModel(collection=col_master, service=None)
         region = RegionModel(collection=None, service=options.service)
         berkas = BerkasModel(collection=None, service=options.service)
         infoResponse = berkas.find(berkasid=berkasid)
@@ -73,6 +75,7 @@ class RegisterBerkasViewController(BaseController):
         regionResponse = region.all_desa(officeid=cookies['officeid'])
 
         if infoResponse.status_code == 200 and simponiResponse.status_code == 200 and produkResponse.status_code == 200 and daftarisianResponse.status_code == 200:
+            status = master.select(filter={"type": "REGISTER"})
             desa = regionResponse.json()['result']
             info = infoResponse.json()['result']['infoberkas']
             simponi = simponiResponse.json()['result']
@@ -84,6 +87,6 @@ class RegisterBerkasViewController(BaseController):
                 elif p['typepemilikid'] == 'M':
                     pemilik.append(p)
                     
-            self.render("node/detailberkas.html", office=self.get_office_actived(cookies=cookies), desa=desa, info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)
+            self.render("node/detailberkas.html", office=self.get_office_actived(cookies=cookies), desa=desa, status=status, info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)
         else:
             self.render("page/error/400.html")

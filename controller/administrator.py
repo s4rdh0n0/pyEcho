@@ -119,9 +119,9 @@ class PegawaiController(BaseController):
             if response_entity.json()['result']['profile']['profilepegawai'] == None:
                 self.write({'status': False, 'type': 'warning', 'username': None, 'msg': 'Username tidak terdaftar pada database http://kkp.atrbpn.go.id/ Kantah Trenggalek'})
             else:
-                self.write({'status': True, 'type': 'success', 'username': body['username']})
+                self.write({'status': True, 'type': 'info', 'username': body['username']})
         else:
-            self.write({'status': False, 'type': 'danger', 'username': None, 'msg': 'Error response http://kkp.atrbpn.go.id/'})
+            self.write({'status': False, 'type': 'warning', 'username': None, 'msg': 'Error response http://kkp.atrbpn.go.id/'})
 
     @tornado.web.authenticated
     @tornado.gen.coroutine
@@ -149,7 +149,7 @@ class PegawaiController(BaseController):
             schema['actived'] = True
 
             user.add(schema=schema)
-            self.write({'status': True, 'type': 'success', 'msg': '{} Actived'.format(schema['nama'])})
+            self.write({'status': True, 'type': 'info', 'msg': '{} Actived'.format(schema['nama'])})
 
 class RoleController(BaseController):
 

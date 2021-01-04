@@ -46,51 +46,23 @@
         text-align: center;
     }
 
-
-    .alert-info {
-        background-color: rgba(119, 131, 235, 0.945);
-        /* border-color: rgb(22, 22, 22); */
-        border-radius: 3px;
-        color: rgb(255, 255, 255);
-        padding: 10px;
-    }
-    .alert-info > [data-notify="icon"] {
-        height: 50px;
-        margin-right: 12px;
-    }
-    .alert-info > [data-notify="title"] {
-        color: rgb(255, 255, 255);
-        display: block;
-        font-weight: bold;
-        margin-bottom: 5px;
-        font-size: 130%;
-    }
-    .alert-info > [data-notify="message"] {
-        font-size: 115%;
+    td {
+        position: relative;
     }
 
-    .alert-minimalist {
-        background-color: rgba(236, 171, 51, 0.945);
-        /* border-color: rgb(22, 22, 22); */
-        border-radius: 3px;
-        color: rgb(255, 255, 255);
-        padding: 10px;
-    }
-    .alert-minimalist > [data-notify="icon"] {
-        height: 50px;
-        margin-right: 12px;
-    }
-    .alert-minimalist > [data-notify="title"] {
-        color: rgb(255, 255, 255);
-        display: block;
-        font-weight: bold;
-        margin-bottom: 5px;
-        font-size: 130%;
-    }
-    .alert-minimalist > [data-notify="message"] {
-        font-size: 115%;
+    tr.strikeout td:before {
+        content: " ";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        border-bottom: 1px solid #111;
+        width: 100%;
     }
 
+    tr.strikeout td:after {
+        content: "\00B7";
+        font-size: 1px;
+    }
 </style>
 {% end %}
 
@@ -121,7 +93,8 @@
                         <div class="input-group input-group-md">
                             <input type="text" class="form-control" id="inputPegawaiid" name="inputPegawaiid">
                             <span class="input-group-btn">
-                                <button id="btnFilterPegawaiid" type="submit" class="btn btn-success btn-flat"> <i class="fa fa-filter" aria-hidden="true"></i> </button>
+                                <button id="btnFilterPegawaiid" type="submit" class="btn btn-success btn-flat"> <i
+                                        class="fa fa-filter" aria-hidden="true"></i> </button>
                             </span>
                         </div>
                     </div>
@@ -134,7 +107,8 @@
 
     <div class="box box-solid">
         <div class="box-body">
-            <a class="btn btn-flat btn-success" data-toggle="modal" data-target="#modal-activation"><i class="fa fa-user-plus" aria-hidden="true"></i></a>
+            <a class="btn btn-flat btn-success" data-toggle="modal" data-target="#modal-activation"><i
+                    class="fa fa-user-plus" aria-hidden="true"></i></a>
             <button id="btnResetFilter" type="button" class="btn btn-warning btn-flat"> Reset</button>
             <!-- Table Pegawai -->
             <table id="tablePegawai" class="table table-striped table-bordered responsive" style="width:100%">
@@ -162,9 +136,10 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header" style="text-align:left;">
-            
+
                 <div class="box-tools pull-right">
-                    <button type="button" class="btn close" data-dismiss="modal" aria-label="Close"><i class="fa fa-times"></i>
+                    <button type="button" class="btn close" data-dismiss="modal" aria-label="Close"><i
+                            class="fa fa-times"></i>
                     </button>
                 </div>
                 <h4 class="modal-title">Pendaftaran Pegawai</h4>
@@ -179,7 +154,8 @@
                             <div class="input-group input-group-md">
                                 <input type="text" class="form-control" id="inputUsername" name="inputUsername">
                                 <span class="input-group-btn">
-                                    <button id="btnFilterUsername" type="submit" class="btn btn-info btn-flat"> <i class="fa fa-share-alt" aria-hidden="true"></i> </button>
+                                    <button id="btnFilterUsername" type="submit" class="btn btn-info btn-flat"> <i
+                                            class="fa fa-share-alt" aria-hidden="true"></i> </button>
                                 </span>
                             </div>
                         </div>

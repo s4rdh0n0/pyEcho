@@ -11,6 +11,7 @@ class RegisterModel(BaseModel):
         '_id': None,
         'nomorregister': None,
         'pegawaiactived': None,
+        'nodeactived': None,
         'officeid': None,
         'officenama': None,
         'officetype': None,
@@ -20,18 +21,18 @@ class RegisterModel(BaseModel):
         'desaid': None,
         'desacode': None
         'namadesa': None,
-        'typealashak': None,
-        'nomoralashak': None,
         'nomorberkas': None,
         'tahunberkas': None,
         'spopp': None,
         'prosedur': None,
         'kegiatan': None,
         'createdate': None,
+        'updatedate': None,
         'finnishdate': None,
         'pemohon': [],
         'node': [],
         'document': [],
+        'keterangan': None,
         'status': None,
         'actived': False
     }
@@ -63,15 +64,9 @@ class RegisterModel(BaseModel):
         'alamat': None,
     }
 
-    schema_alashak = {
-        'typealashakid': None,
-        'alashakid': None,
-        'nomor': None,
-    }
-
     schema_document = {
-        'typedocumentid': None,
         'documentid': None,
+        'typedocument': None,
         'nomor': None,
     }
 
