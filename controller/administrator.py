@@ -162,7 +162,7 @@ class RoleController(BaseController):
         master_collection = self.CONNECTION.collection(database="registerdb", name="master")
 
         ruser = UserModel(collection=user_collection, service=options.service).get(filter={"_id": userid})
-        rtype = MasterModel(collection=master_collection, service=options.service).select(filter={"type": "typerole"})
+        rtype = MasterModel(collection=master_collection, service=options.service).select(filter={"type": "ROLE"})
         self.render('node/detailrole.html', user=ruser, typeregister=rtype)
 
 
@@ -188,7 +188,7 @@ class RoleController(BaseController):
 
         user_collection = self.CONNECTION.collection(database="registerdb", name="users")
         master_collection = self.CONNECTION.collection(database="registerdb", name="master")
-        master = MasterModel(collection=master_collection, service=options.service).get(filter={"type": "typerole", "code": body['key']})
+        master = MasterModel(collection=master_collection, service=options.service).get(filter={"type": "ROLE", "code": body['key']})
 
         if UserModel(collection=user_collection, service=options.service).find_role(userid=body['userid'], role=master['code']) == None:
 

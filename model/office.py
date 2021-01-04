@@ -16,7 +16,6 @@ class OfficeModel(BaseModel):
              'alamat': None,
              'phone': None,
              'email': None,
-             'fax': None,
              'counter': [],
              'actived': False}
 

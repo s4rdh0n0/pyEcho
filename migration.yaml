@@ -6,14 +6,15 @@ db:
   port: 27017
 
 office:
-  - code: 1228
+  - code: '1228'
     kantah: Trenggalek
-  - code: 1211
-    kantah: Trenggalek
+  - code: '1211'
+    kantah: Mojokerto
 
 user:
-  - kantah: 1228
+  - officeid: d8af2d0372b84f6fb33a97847b94cacd
     username: s4rdh0n0
+    email: s4rdh0n0@gmail.com
 
 master:
   - code: REGIN
@@ -21,7 +22,7 @@ master:
     description: Register Berkas Masuk
   - code: REGOUT
     type: ROLE
-    description: Register Berkas Masuk]
+    description: Register Berkas Keluar
   - code: SURVEY
     type: ROLE
     description: Petugas Survey
@@ -34,9 +35,6 @@ master:
   - code: ADMINISTRATOR
     type: ROLE
     description: Pengelola Aplikasi dan Data
-  - code: REGIN
-    type: ROLE
-    description: Register Berkas Keluar
 
   - code: 1
     type: OFFICE
@@ -107,5 +105,5 @@ master:
     description: Register Berkas Selesai
 
   - code: REG
-    type: REGISTER
+    type: COUNTER
     description: Counter nomor register berkas

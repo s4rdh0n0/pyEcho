@@ -205,6 +205,9 @@
                             })
                         })
                     },
+                    "oLanguage": {
+                        "sProcessing": "<b>Sedang proses...</b> <br> harap tunggu"
+                    },
                     'columns': [
                         {
                             "targets": [0],
@@ -255,15 +258,21 @@
         }
     });
 
-    // NOTE: Delete Pegawai
+    // NOTE: Deactivation Pegawai
     $('#tablePegawai tbody').on('click', '#btnDeactivation', function (event) {
         var selected_row = $(this).parents('tr');
         if (selected_row.hasClass('child')) {
             selected_row = selected_row.prev();
         }
         
-        if (tablePegawai.row(selected_row).data()[0] != "") {    
-            var answer = window.confirm(tablePegawai.row(selected_row).data()['nama'].toUpperCase() + " AKAN DINONAKTIFKAN.....?" );
+        if (tablePegawai.row(selected_row).data()[0] != "") {
+            var pesan
+            if (tablePegawai.row(selected_row).data()['actived']){
+                pesan = "AKAN DINONAKTIFKAN.....?"
+            }else{
+                pesan = "AKAN DIAKTIFKAN.....?"
+            }
+            var answer = window.confirm(tablePegawai.row(selected_row).data()['nama'].toUpperCase() + pesan );
             if (answer) {
                 $.ajax({
                     type: 'PUT',
@@ -277,10 +286,11 @@
                         alert("Error: " + errorThrown);
                     })
                 });
-
-                tablePegawai.ajax.reload(false, null);
+                $('#tablePegawai').DataTable().ajax.reload(null, false);
             }
         }
+
+        return false
     });
 
 }(jQuery);
@@ -316,9 +326,9 @@ var tablePegawai = $('#tablePegawai').DataTable({
         })
     }, 'createdRow': function (row, data, dataIndex) {
         if (data['actived']) {
-            $(row).removeClass('bg-teal disabled color-palette');
+            $(row).removeClass('bg-red disabled color-palette');
         }else{
-            $(row).addClass('bg-teal disabled color-palette');
+            $(row).addClass('bg-red disabled color-palette');
         }
     },
     'columns': [
@@ -374,9 +384,9 @@ var tablePegawai = $('#tablePegawai').DataTable({
             "className": "dt-center text-center",
             "render": function (data, type, row) {
                 if (row.actived){
-                    return '<a id="btnDeactivation" class="btn btn-danger btn-flat btn-small"><i class="fa fa-genderless" aria-hidden="true"></i></a>'
+                    return '<a id="btnDeactivation" class="btn btn-danger btn-flat btn-small"><i class="fa fa-unlock-alt" aria-hidden="true"></i></a>'
                 }else{
-                    return ''
+                    return '<a id="btnDeactivation" class="btn btn-warning btn-flat btn-small"><i class="fa fa-unlock" aria-hidden="true"></i></a>'
                 }
             }
         }

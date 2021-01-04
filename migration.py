@@ -5,6 +5,7 @@ import yaml
 
 from model.base import ConnectionModel
 from model.office import OfficeModel
+from model.user import UserModel
 from model.master import MasterModel
 
 
@@ -14,13 +15,80 @@ def InsertOffice():
         for doc in config_docs:
             client = ConnectionModel(username=doc['db']['username'],password=doc['db']['password'],server=doc['db']['server'],port=doc['db']['port'])
             
-            collection = client.collection(database="registerdb", name="offices")
-            office = OfficeModel(collection=collection, service="http://localhost:8000")
+            col_office = client.collection(database="registerdb", name="offices")
+            col_master = client.collection(database="registerdb", name="master")
 
-            for o in office.kkp().json()['result']:
-                if o['code'] == doc['code']
+            office = OfficeModel(collection=col_office, service="http://localhost:8000")
+            master = MasterModel(collection=col_master, service=None)
+            for d in doc['office']:
+                print("=> {}".format(d['kantah']))
+                if office.count(filter={"code": d['code']}) == 0:
+                    for o in office.kkp().json()['result']:
+                        if o['code'] == d['code']:
+                            profile = office.find_kkp(officeid=o['officeid']).json()['result']
+                            counter = master.get(filter={"code": "REG", "type": "COUNTER"})
+
+                            schema_counter = office.schema_counter
+                            schema_counter['key'] = counter['code']
+                            schema_counter['value'] = 1
+                            schema_counter['createdate'] = datetime.datetime.now()
+
+                            schema = office.schema
+                            schema['_id'] = o['officeid']
+                            schema['code'] = o['code']
+                            schema['parent'] = profile['parent']
+                            schema['officetypeid'] = profile['officetypeid']
+                            schema['nama'] = profile['name']
+                            schema['kota'] = profile['city']
+                            schema['alamat'] = profile['address']
+                            schema['phone'] = profile['phone']
+                            schema['email'] = profile['email']
+                            schema['counter'] = [schema_counter]
+                            schema['actived'] = True
+
+                            office.add(schema=schema)
+
+
+
+def InsertUser():
+    with open('migration.yaml') as f:
+        config_docs = yaml.load_all(f, Loader=yaml.FullLoader)
+        for doc in config_docs:
+            client = ConnectionModel(username=doc['db']['username'],password=doc['db']['password'],server=doc['db']['server'],port=doc['db']['port'])
+            
+            col_user = client.collection(database="registerdb", name="users")
+            col_master = client.collection(database="registerdb", name="master")
+
+            master = MasterModel(collection=col_master, service=None)
+            user = UserModel(collection=col_user, service="http://localhost:8000")
+            for d in doc['user']:
+                print("=> {}".format(d['username']))
+                if user.count(filter={"username": d['username']}) == 0:
+                    kkp = user.kkp(officeid=d['officeid'], username=d['username']).json()['result']
                     
-                    office.find_kkp(officeid=o['officeid'])
+                    schema_role = user.schema_role
+                    schema_role['key'] = 'ADMINISTRATOR'
+                    schema_role['description'] = master.get(filter={"type": "ROLE", "code": "ADMINISTRATOR"})['description']
+                    schema_role['startdate'] = datetime.datetime.now()
+
+                    schema = user.schema
+                    schema["_id"] = kkp['userid']
+                    schema["username"] = d['username']
+                    schema["password"] = 'trenggalek1'
+                    schema["officeid"] = d['officeid']
+                    schema["pegawaiid"] = kkp['pegawaiid']
+                    schema["nama"] = kkp['nama']
+                    schema["email"] = d['email']
+                    schema["phone"] = kkp['phone']
+                    schema["role"] = [schema_role]
+                    schema["createdate"] = datetime.datetime.now()
+                    schema["usercreate"] = kkp['userid']
+                    schema["actived"] = True
+
+
+                    user.add(schema=schema)
+
+
 
 
 def InsertMaster():
@@ -48,7 +116,8 @@ def InsertMaster():
 
 
 
+InsertMaster()
 
 InsertOffice()
 
-InsertMaster()
+InsertUser()
