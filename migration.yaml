@@ -1,8 +1,8 @@
 
 db:
   server: localhost
-  username: 1228_adminregister
-  password: 1228trenggalek
+  username: 1228_Trenggalek
+  password: 1228Trenggalek
   port: 27017
 
 office:
@@ -45,7 +45,6 @@ master:
   - code: 3
     type: OFFICE
     description: Kantor Daerah
-
 
   - code: GS
     type: SURATUKUR

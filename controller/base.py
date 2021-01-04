@@ -12,14 +12,19 @@ from model.user import UserModel
 from model.office import OfficeModel
 
 
-# Global variable
+""" Global variable """
+
+# Database
 define("db_host", default="localhost", help="Mongo DB")
 define("db_port", default="27017", help="Mongo DB")
-define("db_user", default="1228_adminregister", help="Mongo DB")
-define("db_password", default="1228trenggalek", help="Mongo DB")
+define("db_user", default="1228_Trenggalek", help="Mongo DB")
+define("db_password", default="1228Trenggalek", help="Mongo DB")
 
+# Service
 define("service", default="http://localhost:8000", help="web service")
-define("cookies", default="pyEchoCookies", help="web")
+
+# Cookies
+define("cookies", default="pyEchoCookies", help="website")
 
 
 
@@ -34,7 +39,6 @@ class BaseController(tornado.web.RequestHandler):
 		'username': None,
 		'pegawaiid': None,
 		'officeid': None,
-		'token': None,
 	}
 
 	page_data = {
