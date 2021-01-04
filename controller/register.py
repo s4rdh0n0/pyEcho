@@ -25,8 +25,7 @@ class ComponseController(BaseController):
     def get(self):
         useractived = self.get_user_actived(cookies=self.get_cookies_user())
         if useractived != None:
-            collection = self.CONNECTION.collection(database="registerdb", name="users")
-            if UserModel(collection=collection, service=options.service).find_role(userid=useractived['_id'], role="REGIN") != None and useractived['actived']:
+            if UserModel(collection=self.CONNECTION.collection(database="registerdb", name="users"), service=options.service).find_role(userid=useractived['_id'], role="REGIN") != None and useractived['actived']:
                 self.page_data['title'] = 'Compose'
                 self.page_data['description'] = 'Register New Berkas'
                 self.render('page/register/compose.html', page=self.page_data, useractived=useractived)
@@ -45,14 +44,10 @@ class ComponseController(BaseController):
         cookies = self.get_cookies_user()
         body = tornado.escape.json_decode(self.request.body)
 
-        col_register = self.CONNECTION.collection(database="registerdb", name="register")
-
-
         berkas = BerkasModel(collection=None, service=options.service)
-        register = RegisterModel(collection=col_register, service=None)
         response = berkas.search(officeid=cookies['officeid'], nomor=body['nomor'], tahun=body['tahun'])
         if response['data']['result'] != None:
-            count = register.count(filter={"berkasid": response['data']['result'][0]['berkasid']})
+            count = RegisterModel(collection=self.CONNECTION.collection(database="registerdb", name="register"), service=None).count(filter={"berkasid": response['data']['result'][0]['berkasid']})
             if count == 0:
                 self.write({'status': True, 'data': response['data']['result']})
             else:
@@ -89,8 +84,7 @@ class RegisterBerkasViewController(BaseController):
         pemohon = []
         pemilik = []
 
-        col_master = self.CONNECTION.collection(database="registerdb", name="master")
-        master = MasterModel(collection=col_master, service=None)
+        master = MasterModel(collection=self.CONNECTION.collection(database="registerdb", name="master"), service=None)
         region = RegionModel(collection=None, service=options.service)
         berkas = BerkasModel(collection=None, service=options.service)
         infoResponse = berkas.find(berkasid=berkasid)
@@ -123,13 +117,10 @@ class RegisterBerkasViewController(BaseController):
         cookies = self.get_cookies_user()
         body = tornado.escape.json_decode(self.request.body)
 
-        col_office = self.CONNECTION.collection(database="registerdb", name="offices")
-        col_register = self.CONNECTION.collection(database="registerdb", name="register")
-
-        offices = OfficeModel(collection=col_office, service=None)
+        offices = OfficeModel(collection=self.CONNECTION.collection(database="registerdb", name="offices"), service=None)
         region = RegionModel(collection=None, service=options.service).all_desa(officeid=cookies['officeid']).json()['result']
         berkas =  BerkasModel(collection=None, service=options.service)
-        register = RegisterModel(collection=col_register, service=None)
+        register = RegisterModel(collection=self.CONNECTION.collection(database="registerdb", name="register"), service=None)
 
         msg = ""
         status = False

@@ -18,6 +18,7 @@
         <label class="control-label col-md-1 col-sm-1 col-xs-12" for="desaAlasHak">Desa:</label>
         <div class="col-md-4 col-sm-4 col-xs-12">
             <select id="desaAlasHak" name="desaAlasHak" class="select2 form-control" style="width: 100%;">
+                <option value=""></option>
                 {% for d in desa %}
                     <option value="{{ d['_id'] }}">{{d['kode']}} - {{ d['nama'].upper() }}, {{ d['wilayahinduk']['nama'] }}</option>
                 {% end %}
@@ -32,6 +33,7 @@
         <label class="control-label col-md-1 col-sm-1 col-xs-12" for="statusRegister">Status Register:</label>
         <div class="col-md-4 col-sm-4 col-xs-12">
             <select id="statusRegister" name="statusRegister" class="select2 form-control" style="width: 100%;">
+                <option value=""></option>
                 {% for s in status %}
                     <option value="{{ s['code'] }}"> {{ s['description'] }} </option>
                 {% end %}
@@ -66,7 +68,7 @@
         </div>
         <label class="control-label col-md-1 col-sm-1 col-xs-12" for="phoneBerkas">Phone:</label>
         <div class="col-md-4 col-sm-4 col-xs-12">
-            <input type="text" name="phoneBerkas" id="phoneBerkas" class="form-control" placeholder="Nomor telp pemohon">
+            <input type="text" name="phoneBerkas" id="phoneBerkas" class="form-control">
         </div>
     </div>
     <div class="form-group">
@@ -76,7 +78,7 @@
         </div>
         <label class="control-label col-md-1 col-sm-1 col-xs-12" for="emailBerkas">Email:</label>
         <div class="col-md-4 col-sm-4 col-xs-12">
-            <input type="text" name="emailBerkas" id="emailBerkas" class="form-control" placeholder="Email pemohon" >
+            <input type="text" name="emailBerkas" id="emailBerkas" class="form-control">
         </div>
     </div>
     <div class="form-group">
@@ -253,14 +255,15 @@
             else if (element.prop('type') === 'checkbox' || element.prop('type') === 'radio') {
                 error.appendTo(element.parent().parent());
             } 
-            else if (element.hasClass('select2')) {
-                error.insertAfter(element.next('span'));  // select2
+            else if (element.hasClass('select2') && element.next('.select2-container').length) {
+                error.insertAfter(element.next('.select2-container'));
             }
             else {
                 error.insertAfter(element);
             }
         },
         submitHandler: function () {
+            run_wait('.content');
             $.ajax({
                 type: 'POST',
                 url: '/register/berkas/masuk',
@@ -275,6 +278,7 @@
                 async: true,
                 headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                 success: (function (result) {
+                    $('.content').waitMe("hide");
                     $.notify({
                         title: result.title,
                         message: result.msg,
@@ -297,6 +301,7 @@
                     }
                 }),
                 error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                    $('.content').waitMe("hide");
                     alert("Error: " + errorThrown);
                 })
             });
@@ -307,10 +312,26 @@
     $("#statusRegister").select2({
         placeholder: "Pilih status register",
         theme: "bootstrap",
+        allowClear: true
     });
 
     $("#desaAlasHak").select2({
         placeholder: "Pilih desa",
         theme: "bootstrap",
+        allowClear: true
     });
+
+    $('.select2').on('change', function () {
+        $(this).valid();
+    });
+
+    /* Initial Loading */
+    function run_wait(element) {
+        $(element).waitMe({
+            effect: 'bounce',
+            text: '<b>Sedang proses...</b> <br> harap tunggu',
+            bg: 'rgba(255,255,255,0.6)',
+            color: '#000'
+        });
+    }
 </script>

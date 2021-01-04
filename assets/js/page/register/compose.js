@@ -43,8 +43,6 @@
                 error.insertAfter(element);
             }
         }, 
-        invalidHandler: function(){
-        },
         submitHandler: function () {
             run_wait('.content');
             $.ajax({
@@ -54,7 +52,7 @@
                     nomor: $('#nomor').val(),
                     tahun: $('#tahun').val(),
                 }),
-                async: false,
+                async: true,
                 headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                 success: (function (result) {
                     if (result.status){
@@ -62,7 +60,7 @@
                             $('.content').waitMe("hide");
                         });
                     }else{
-                        
+                        $('.content').waitMe("hide");
                         $.notify({
                             title: result.title,
                             message: result.msg,
