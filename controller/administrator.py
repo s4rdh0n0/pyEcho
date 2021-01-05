@@ -20,6 +20,7 @@ from model.master import MasterModel
 class DaftarPegawaiViewController(BaseController):
 
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def get(self):
         useractived = self.get_user_actived(cookies=self.get_cookies_user())
         if useractived != None:
@@ -93,6 +94,7 @@ class DaftarPegawaiViewController(BaseController):
 class PegawaiController(BaseController):
 
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def get(self, username=""):
         cookies = self.get_cookies_user()
 

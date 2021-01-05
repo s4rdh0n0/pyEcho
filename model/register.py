@@ -41,10 +41,11 @@ class RegisterModel(BaseModel):
     schema_node = {
         '_id': None,
         'node': None,
+        'sender': None,
+        'sentdate': None,
+        'messange': None,
         'operator': None,
         'startdate': None,
-        'senddate': None,
-        'messange': None,
         'actived': False,
     }
 

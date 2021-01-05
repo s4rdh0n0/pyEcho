@@ -59,6 +59,7 @@ class ComponseController(BaseController):
 class InboxController(BaseController):
 
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def get(self):
         useractived = self.get_user_actived(cookies=self.get_cookies_user())
         if useractived != None:
@@ -77,6 +78,7 @@ class InboxController(BaseController):
 class RegisterBerkasViewController(BaseController):
     
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def get(self, berkasid=""):
         cookies = self.get_cookies_user()
         
@@ -140,8 +142,10 @@ class RegisterBerkasViewController(BaseController):
             node = register.schema_node
             node['_id'] = uuid.uuid4().__str__()
             node['node'] = 'REGIN'
+            node['sender'] = 'SYSTEM'
+            node['sentdate'] = datetime.datetime.now()
+            node['messange'] = 'Register berkas masuk'
             node['operator'] = cookies['userid']
-            node['startdate'] = datetime.datetime.now()
             node['actived'] = False
 
             schema = register.schema
