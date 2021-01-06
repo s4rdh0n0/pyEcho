@@ -1,11 +1,15 @@
 import requests
 import datetime
+from bson import json_util
+import json
 import uuid
+
 
 # Tornado Framework
 import tornado.gen
 import tornado.escape
 from tornado.options import options
+from tornado import gen
 
 # Controller
 from controller.base import BaseController
@@ -18,10 +22,12 @@ from model.berkas import BerkasModel
 from model.region import RegionModel
 from model.master import MasterModel
 from model.register import RegisterModel
+from model.node import NodeModel
 
 class ComponseController(BaseController):
 
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def get(self):
         useractived = self.get_user_actived(cookies=self.get_cookies_user())
         if useractived != None:
@@ -39,6 +45,7 @@ class ComponseController(BaseController):
 
 
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def post(self):
         # client request
         cookies = self.get_cookies_user()
@@ -46,8 +53,8 @@ class ComponseController(BaseController):
 
         berkas = BerkasModel(collection=None, service=options.service)
         response = berkas.search(officeid=cookies['officeid'], nomor=body['nomor'], tahun=body['tahun'])
-        if response['data']['result'] != None:
-            count = RegisterModel(collection=self.CONNECTION.collection(database="registerdb", name="register"), service=None).count(filter={"berkasid": response['data']['result'][0]['berkasid']})
+        if response['data']['count']['Jumlah'] != 0:
+            count = RegisterModel(collection=self.CONNECTION.collection(database="registerdb", name="register"), service=None).count(filter={"_id": response['data']['result'][0]['berkasid']})
             if count == 0:
                 self.write({'status': True, 'data': response['data']['result']})
             else:
@@ -75,8 +82,30 @@ class InboxController(BaseController):
         else:
             self.redirect("/logout")
 
-class RegisterBerkasViewController(BaseController):
     
+    def post(self):
+        useractived = self.get_user_actived(cookies=self.get_cookies_user())
+        if useractived != None:
+            # client request
+            cookies = self.get_cookies_user()
+            body = tornado.escape.json_decode(self.request.body)
+
+            list_response = []
+            count_reponse = 0
+
+            node  = self.CONNECTION.collection(database="registerdb", name="node")
+            register = RegisterModel(collection=self.CONNECTION.collection(database="registerdb", name="register"), node=node, service=None)
+
+
+            count_reponse = register.count(filter={"officeid": cookies['officeid'] ,"pegawaiactived": cookies['userid']})
+            list_response  = register.pagination(filter={"officeid": cookies['officeid'] ,"pegawaiactived": cookies['userid']},page_size=count_reponse, page_num=body['page'] + 1)
+
+            self.write({'status': True, 'draw': body['draw'], 'data': json.dumps(list_response, default=json_util.default), 'recordsTotal': count_reponse, 'recordsFiltered': count_reponse})
+        else:
+            self.redirect("/logout")
+
+class RegisterBerkasViewController(BaseController):
+
     @tornado.web.authenticated
     @tornado.gen.coroutine
     def get(self, berkasid=""):
@@ -88,13 +117,19 @@ class RegisterBerkasViewController(BaseController):
 
         master = MasterModel(collection=self.CONNECTION.collection(database="registerdb", name="master"), service=None)
         region = RegionModel(collection=None, service=options.service)
+        yield gen.sleep(0.1)
         berkas = BerkasModel(collection=None, service=options.service)
+        yield gen.sleep(0.1)
         infoResponse = berkas.find(berkasid=berkasid)
+        yield gen.sleep(0.1)
         simponiResponse = berkas.simponi(berkasid=berkasid)
+        yield gen.sleep(0.1)
         produkResponse = berkas.produk(berkasid=berkasid)
+        yield gen.sleep(0.1)
         daftarisianResponse = berkas.daftarisian(berkasid=berkasid)
+        yield gen.sleep(0.1)
         regionResponse = region.all_desa(officeid=cookies['officeid'])
-
+        yield gen.sleep(0.1)
         if infoResponse.status_code == 200 and simponiResponse.status_code == 200 and produkResponse.status_code == 200 and daftarisianResponse.status_code == 200:
             status = master.select(filter={"type": "OPERATION"})
             desa = regionResponse.json()['result']
@@ -112,25 +147,34 @@ class RegisterBerkasViewController(BaseController):
         else:
             self.render("page/error/400.html")
 
-
+    # REGISTER BERKAS MASUK
     @tornado.web.authenticated
+    @tornado.gen.coroutine
     def post(self):
         # client request
         cookies = self.get_cookies_user()
         body = tornado.escape.json_decode(self.request.body)
 
         offices = OfficeModel(collection=self.CONNECTION.collection(database="registerdb", name="offices"), service=None)
+        yield gen.sleep(0.1)
         region = RegionModel(collection=None, service=options.service).all_desa(officeid=cookies['officeid']).json()['result']
+        yield gen.sleep(0.1)
         berkas =  BerkasModel(collection=None, service=options.service)
+        yield gen.sleep(0.1)
         register = RegisterModel(collection=self.CONNECTION.collection(database="registerdb", name="register"), service=None)
+        yield gen.sleep(0.1)
+        node = NodeModel(collection=self.CONNECTION.collection(database="registerdb", name="node"), service=None)
+        yield gen.sleep(0.1)
 
         msg = ""
         status = False
         tipe = ""
         title = ""
         berkas_entity = berkas.find(berkasid=body['berkasid']).json()['result']
+        di_entity = berkas.daftarisian(berkasid=body['berkasid']).json()['result']
+        doc_entity = berkas.produk(berkasid=body['berkasid']).json()['result']
         
-        if register.count(filter={"berkasid": body['berkasid']}) == 0:
+        if register.count(filter={"_id": body['berkasid']}) == 0:
             desa_entity = {}
             for r in region:
                 if r['_id'] == body['desaid']:
@@ -139,21 +183,22 @@ class RegisterBerkasViewController(BaseController):
 
             office_entity = offices.get(filter={"_id": cookies['officeid']})
 
-            node = register.schema_node
-            node['_id'] = uuid.uuid4().__str__()
-            node['node'] = 'REGIN'
-            node['sender'] = 'SYSTEM'
-            node['sentdate'] = datetime.datetime.now()
-            node['messange'] = 'Register berkas masuk'
-            node['operator'] = cookies['userid']
-            node['actived'] = False
+            schema_node = node.schema
+            schema_node['_id'] =  uuid.uuid4().__str__()
+            yield gen.sleep(0.1)
+            schema_node['register'] = offices.booking(officeid=cookies['officeid'],counter="REG")
+            schema_node['berkasid'] = berkas_entity['infoberkas']['_id']
+            schema_node['type'] = "REGIN"
+            schema_node['operator'] = cookies['userid']
+            schema_node['startdate'] = datetime.datetime.now()
+            schema_node['status'] = False
+            node.add(schema=schema_node)
+            yield gen.sleep(0.1)
 
             schema = register.schema
-            schema['_id'] = uuid.uuid4().__str__()
-            schema['nomorregister'] = offices.booking(officeid=cookies['officeid'], counter="REG")
-            schema['createregisterdate'] = datetime.datetime.now()
+            schema['_id'] = berkas_entity['infoberkas']['_id']
             schema['pegawaiactived'] = cookies['userid']
-            schema['nodeactived'] = node['_id']
+            schema['nodeactived'] = schema_node['_id']
             schema['officeid'] = office_entity['_id']
             schema['officetype'] = office_entity['officetypeid']
             schema['officenama'] = office_entity['nama']
@@ -163,7 +208,6 @@ class RegisterBerkasViewController(BaseController):
             schema['desaid'] = desa_entity['_id']
             schema['desacode'] = desa_entity['kode']
             schema['namadesa'] = desa_entity['nama']
-            schema['berkasid'] = berkas_entity['infoberkas']['_id']
             schema['nomorberkas'] = berkas_entity['infoberkas']['nomor']
             schema['tahunberkas'] = berkas_entity['infoberkas']['tahun']
             schema['prosedur'] = berkas_entity['infoberkas']['prosedur']
@@ -172,16 +216,17 @@ class RegisterBerkasViewController(BaseController):
             schema['email'] = body['email']
             schema['startdate'] = datetime.datetime.strptime(berkas_entity['infoberkas']['startdate'] , '%Y-%m-%dT%H:%M:%S%z')
             schema['pemilik'] = berkas_entity['pemohon']
+            schema['daftarisian'] = di_entity
+            schema['document'] = doc_entity
             schema['status'] = body['status']
-            schema['node'] = [node]
             schema['keterangan'] = body['keterangan']
             schema['actived'] = True
+            register.add(schema=schema)
 
             msg = "Berkas {}/{} berhasil disimpan.".format(schema['nomorberkas'], schema['tahunberkas'])
             status = True
             tipe = "info"
             title = '<strong>Info</strong> <br>'
-            register.add(schema=schema)
         else:
             msg = "Berkas {}/{} sudah terregister sebelumnya.".format(berkas_entity['infoberkas']['nomor'], berkas_entity['infoberkas']['tahun'])
             status = False

@@ -72,15 +72,22 @@
         </div>
 
 
-        <div class="form-horizontal">
+        <div class="form-horizontal" id="formFilterBerkas" method="POST">
+            {% module xsrf_form_html() %}
             <div class="box-body">
                 <div class="form-group">
-                    <label class="control-label col-md-4 col-sm-4 col-xs-12" for="inputPegawaiid">Pegawai ID:</label>
+                    <label class="control-label col-md-4 col-sm-4 col-xs-12" for="nomorBerkas">Nomor Berkas:</label>
+                    <div class="col-md-4 col-sm-4 col-xs-12">
+                        <input type="text" class="form-control" id="nomorBerkas" name="nomorBerkas">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4 col-sm-4 col-xs-12" for="tahunBerkas">Tahun Berkas:</label>
                     <div class="col-md-4 col-sm-4 col-xs-12">
                         <div class="input-group input-group-md">
-                            <input type="text" class="form-control" id="inputPegawaiid" name="inputPegawaiid">
+                            <input type="text" class="form-control" id="tahunBerkas" name="tahunBerkas">
                             <span class="input-group-btn">
-                                <button id="btnFilterPegawaiid" type="submit" class="btn btn-success btn-flat"> <i class="fa fa-filter" aria-hidden="true"></i> </button>
+                                <button id="btnFilterPegawaiid" type="submit" class="btn btn-success btn-flat"> <i class="fa fa-filter" aria-hidden="true"></i> Cari Berkas</button>
                             </span>
                         </div>
                     </div>
@@ -93,19 +100,15 @@
 
     <div class="box box-solid">
         <div class="box-body">
-            <a class="btn btn-flat btn-success" data-toggle="modal" data-target="#modal-activation"><i class="fa fa-user-plus" aria-hidden="true"></i></a>
-            <button id="btnResetFilter" type="button" class="btn btn-warning btn-flat"> Reset</button>
-            <!-- Table Pegawai -->
-            <table id="tablePegawai" class="table table-striped table-bordered responsive" style="width:100%">
+            <!-- Table Berkas -->
+            <table id="tableBerkas" class="table table-striped table-bordered responsive" style="width:100%">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>No</th>
-                        <th>Pegawai ID</th>
-                        <th>Nama</th>
-                        <th>Create Date</th>
-                        <th>Role</th>
-                        <th>Deactived</th>
+                        <th>Nomor Berkas</th>
+                        <th>Tahun Berkas</th>
+                        <th>Start Date</th>
                     </tr>
                 </thead>
                 <tbody style="cursor: pointer;">

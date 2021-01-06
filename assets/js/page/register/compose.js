@@ -56,11 +56,12 @@
                 headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                 success: (function (result) {
                     if (result.status){
-                        $('#berkasView').load('/register/berkas/detail/berkasid=' + result.data[0].berkasid, function () {
+                        $('#berkasView').load('/register/compose/berkasid=' + result.data[0].berkasid, function () {
                             $('.content').waitMe("hide");
                         });
                     }else{
                         $('.content').waitMe("hide");
+
                         $.notify({
                             title: result.title,
                             message: result.msg,
