@@ -49,7 +49,6 @@ def InsertOffice():
                             office.add(schema=schema)
 
 
-
 def InsertUser():
     with open('migration.yaml') as f:
         config_docs = yaml.load_all(f, Loader=yaml.FullLoader)
@@ -74,7 +73,12 @@ def InsertUser():
                     role_regin = {}
                     role_regin['key'] = 'REGIN'
                     role_regin['description'] = master.get(filter={"type": "ROLE", "code": "REGIN"})['description']
-                    role_regin['startdate'] = datetime.datetime.now()           
+                    role_regin['startdate'] = datetime.datetime.now()   
+
+                    role_register = {}
+                    role_register['key'] = 'REGISTER'
+                    role_register['description'] = master.get(filter={"type": "ROLE", "code": "REGISTER"})['description']
+                    role_register['startdate'] = datetime.datetime.now()          
 
                     schema = user.schema
                     schema["_id"] = kkp['userid']
@@ -85,7 +89,7 @@ def InsertUser():
                     schema["nama"] = kkp['nama']
                     schema["email"] = d['email']
                     schema["phone"] = kkp['phone']
-                    schema["role"] = [role_admin, role_regin]
+                    schema["role"] = [role_admin, role_regin, role_register]
                     schema["createdate"] = datetime.datetime.now()
                     schema["usercreate"] = kkp['userid']
                     schema["actived"] = True

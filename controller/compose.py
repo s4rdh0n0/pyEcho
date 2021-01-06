@@ -21,8 +21,7 @@ from model.user import UserModel
 from model.berkas import BerkasModel
 from model.region import RegionModel
 from model.master import MasterModel
-from model.register import RegisterModel
-from model.node import NodeModel
+from model.inbox import InboxModel
 
 class ComponseController(BaseController):
 
@@ -51,18 +50,16 @@ class ComponseController(BaseController):
         cookies = self.get_cookies_user()
         body = tornado.escape.json_decode(self.request.body)
 
-        berkas = BerkasModel(collection=None, service=options.service)
+        berkas = BerkasModel(collection=self.CONNECTION.collection(database="registerdb", name="berkas"), service=options.service)
         response = berkas.search(officeid=cookies['officeid'], nomor=body['nomor'], tahun=body['tahun'])
-        if response['status']:
-            count = RegisterModel(collection=self.CONNECTION.collection(database="registerdb", name="register"), service=None).count(filter={"_id": response['data']['result'][0]['berkasid']})
-            
+        if response['data']['count']['Jumlah'] != 0:
+            count =berkas.count(filter={"berkasid": response['data']['result'][0]['berkasid']})
             if count == 0:
                 self.write({'status': True, 'data': response['data']['result']})
             else:
                 self.write({'status': False, 'title': 'Warning', 'msg': 'Berkas sudah terregister sebelumnya.', 'type': 'minimalist'})
         else:
             self.write({'status': False, 'title': 'Warning', 'msg': 'Nomor berkas tidak ada pada database https://kkp2.atrbpn.go.id/.', 'type': 'minimalist'})
-
 
 
 class ComponseDetailController(BaseController):
@@ -104,6 +101,96 @@ class ComponseDetailController(BaseController):
                 elif p['typepemilikid'] == 'M':
                     pemilik.append(p)
                     
-            self.render("node/detailberkas.html", office=self.get_office_actived(cookies=cookies), desa=desa, status=status, info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)
+            self.render("node/detailcompose.html", office=self.get_office_actived(cookies=cookies), desa=desa, status=status, info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)
         else:
             self.render("page/error/400.html")
+
+
+
+    # REGISTER BERKAS MASUK
+    @tornado.web.authenticated
+    @tornado.gen.coroutine
+    def post(self):
+        # client request
+        cookies = self.get_cookies_user()
+        useractived = self.get_user_actived(cookies=cookies)
+        body = tornado.escape.json_decode(self.request.body)
+
+        offices = OfficeModel(collection=self.CONNECTION.collection(database="registerdb", name="offices"), service=None)
+        yield gen.sleep(0.1)
+        region = RegionModel(collection=None, service=options.service).all_desa(officeid=cookies['officeid']).json()['result']
+        yield gen.sleep(0.1)
+        berkas =  BerkasModel(collection=self.CONNECTION.collection(database="registerdb", name="berkas"), service=options.service)
+        yield gen.sleep(0.1)
+        register = InboxModel(collection=self.CONNECTION.collection(database="registerdb", name="inbox"), service=None)
+        yield gen.sleep(0.1)
+        master = MasterModel(collection=self.CONNECTION.collection(database="registerdb", name="master"), service=None)
+        yield gen.sleep(0.1)
+
+        msg = ""
+        status = False
+        tipe = ""
+        title = ""
+
+        berkas_entity = berkas.find(berkasid=body['berkasid']).json()['result']
+        di_entity = berkas.daftarisian(berkasid=body['berkasid']).json()['result']
+        doc_entity = berkas.produk(berkasid=body['berkasid']).json()['result']
+        
+        if register.count(filter={"_id": body['berkasid']}) == 0:
+            desa_entity = {}
+            for r in region:
+                if r['_id'] == body['desaid']:
+                    desa_entity = r
+                    break
+
+            office_entity = offices.get(filter={"_id": cookies['officeid']})
+
+            schema = dict() 
+            schema['_id'] = uuid.uuid4().__str__()
+            schema['register'] = offices.booking(officeid=cookies['officeid'], counter="REG")
+            schema['berkasid'] = berkas_entity['infoberkas']['_id']
+            schema['officeid'] = office_entity['_id']
+            schema['officetype'] = office_entity['officetypeid']
+            schema['officenama'] = office_entity['nama']
+            schema['kecamatanid'] = desa_entity['wilayahinduk']['wilayahid']
+            schema['kecamatancode'] = desa_entity['wilayahinduk']['kode']
+            schema['namakecamatan'] = desa_entity['wilayahinduk']['nama']
+            schema['desaid'] = desa_entity['_id']
+            schema['desacode'] = desa_entity['kode']
+            schema['namadesa'] = desa_entity['nama']
+            schema['nomorberkas'] = berkas_entity['infoberkas']['nomor']
+            schema['tahunberkas'] = berkas_entity['infoberkas']['tahun']
+            schema['prosedur'] = berkas_entity['infoberkas']['prosedur']
+            schema['kegiatan'] = berkas_entity['infoberkas']['kegiatan']
+            schema['phone'] = body['phone']
+            schema['email'] = body['email']
+            schema['keterangan'] = body['keterangan']
+            schema['status'] = body['status']
+            schema['pemilik'] = berkas_entity['pemohon']
+            schema['daftarisian'] = di_entity
+            schema['document'] = doc_entity
+            berkas.add(schema=schema)
+            yield gen.sleep(0.1)
+ 
+ 
+            schema['sender'] = cookies['userid']
+            schema['sendername'] = useractived['nama']
+            schema['senddate'] = datetime.datetime.now()
+            schema['messsange'] = ""
+            schema['receivedate'] = None
+            schema['receive'] = cookies['userid']
+            schema['receivename'] = useractived['nama']
+            schema['actived'] = False
+            register.add(schema=schema)
+
+            msg = "Berkas {}/{} berhasil disimpan.".format(schema['nomorberkas'], schema['tahunberkas'])
+            status = True
+            tipe = "info"
+            title = '<strong>Info</strong> <br>'
+        else:
+            msg = "Berkas {}/{} sudah terregister sebelumnya.".format(berkas_entity['infoberkas']['nomor'], berkas_entity['infoberkas']['tahun'])
+            status = False
+            tipe = "minimalist"
+            title = '<strong>Warning</strong> <br>'
+
+        self.write({'status': status, 'title': title, 'type': tipe, 'msg': msg})

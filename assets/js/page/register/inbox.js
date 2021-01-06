@@ -1,6 +1,33 @@
 + function ($) {
     'use strict';
 
+
+    $("#btnFilterBerkas").click(function () {
+        $('#tableBerkas').DataTable().ajax.reload(null, false);
+    });
+
+    $("#btnResetFilter").click(function () {
+        $('#nomorBerkas').val("");
+        $('#tahunBerkas').val("");
+        $('#tableBerkas').DataTable().ajax.reload(null, false);
+    });
+
+
+    // NOTE: Deactivation Pegawai
+    $('#tableBerkas tbody').on('click', '#btnNewMessange', function (event) {
+        var selected_row = $(this).parents('tr');
+        if (selected_row.hasClass('child')) {
+            selected_row = selected_row.prev();
+        }
+
+        if (tableBerkas.row(selected_row).data()[0] != "") {
+            $('#modal-messange').modal('show');
+            $('#messange-dialog').load('/register/inbox/registerid=' + tableBerkas.row(selected_row).data()['_id']);
+        }
+
+        return false
+    });
+
 }(jQuery);
 
 /* Initial Loading */
@@ -23,6 +50,8 @@ var tableBerkas = $('#tableBerkas').DataTable({
             type: 'POST',
             url: '/register/inbox',
             data: JSON.stringify({
+                nomor: $('#nomorBerkas').val(),
+                tahun: $('#tahunBerkas').val(),
                 page: $('#tableBerkas').DataTable().page.info()['page'],
                 start: $('#tableBerkas').dataTable().fnSettings()._iDisplayStart,
                 limit: $('#tableBerkas').dataTable().fnSettings()._iDisplayLength,
@@ -42,12 +71,6 @@ var tableBerkas = $('#tableBerkas').DataTable({
                 alert("Error: " + errorThrown);
             })
         })
-    }, 'createdRow': function (row, data, dataIndex) {
-        if (data['actived']) {
-            $(row).removeClass('bg-red disabled color-palette');
-        } else {
-            $(row).addClass('bg-red disabled color-palette');
-        }
     },
     'columns': [
         {
@@ -63,12 +86,12 @@ var tableBerkas = $('#tableBerkas').DataTable({
             }
         }, {
             "targets": [2],
-            "width": "5%",
+            "width": "10%",
             "data": 'nomorberkas',
             "className": "dt-center text-center"
         }, {
             "targets": [3],
-            "width": "5%",
+            "width": "10%",
             "data": 'tahunberkas',
             "className": "dt-center text-center",
             "render": function (data) {
@@ -76,13 +99,30 @@ var tableBerkas = $('#tableBerkas').DataTable({
             }
         }, {
             "targets": [4],
-            "width": "10%",
-            "data": 'startdate',
+            "width": "20%",
+            "data": 'senddate',
             "className": "dt-center text-center",
             "render": function (data) {
                 var date = new Date(data.$date);
                 var month = date.getUTCMonth() + 1;
                 return (date.getUTCDate().toString().length > 1 ? date.getUTCDate() : "0" + date.getUTCDate()) + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCFullYear() + "  " + (date.getUTCHours().toString().length > 1 ? date.getUTCHours() : "0" + date.getUTCHours()) + ":" + (date.getUTCMinutes().toString().length > 1 ? date.getUTCMinutes() : "0" + date.getUTCMinutes()) + ":" + (date.getUTCSeconds().toString().length > 1 ? date.getUTCSeconds() : "0" + date.getUTCSeconds());
+            }
+        }, {
+            "targets": [5],
+            "width": "31%",
+            "data": 'prosedur',
+            "className": "dt-center text-center"
+        }, {
+            "targets": [6],
+            "width": "23%",
+            "data": 'receivename',
+            "className": "dt-center text-center"
+        }, {
+            "targets": [5],
+            "width": "3%",
+            "className": "dt-center text-center",
+            "render": function (data) {
+                return '<a id="btnNewMessange" class="btn btn-primary btn-flat"><i class="fa fa-envelope-o" aria-hidden="true"></i></a>'
             }
         }
     ],

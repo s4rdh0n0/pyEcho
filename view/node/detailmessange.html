@@ -1,0 +1,88 @@
+<div class="modal-content">
+    <div class="modal-header" style="text-align:left;">
+
+        <div class="box-tools pull-right">
+            <button type="button" class="btn close" data-dismiss="modal" aria-label="Close"><i class="fa fa-times"></i>
+            </button>
+        </div>
+        <h4 class="modal-title">{{ info['sendername'] }}</h4>
+        <p>Tanggal. {{ info['senddate'].strftime('%d/%m/%Y, %H:%M:%S') }}</p>
+    </div>
+    <div class="modal-body">
+        <form class="form-horizontal" id="formSendRegister">
+            <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="dikirim">Dikirim:</label>
+                <div class="col-md-8 col-sm-8 col-xs-12">
+                    <select id="dikirim" name="dikirim" class="select2 form-control" style="width: 100%;">
+                        <option value=""></option>
+                        {% for d in users %}
+                            <option value="{{ d['_id'] }}">{{d['nama']}}</option>
+                        {% end %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="messange">Pesan:</label>
+                <div class="col-md-8 col-sm-8 col-xs-12">
+                    <textarea name="messange" id="messange" class="form-control" cols="10" rows="3"></textarea>
+                </div>
+            </div>
+        </form>
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="nomorBerkas">Nomor Berkas :</label>
+                <div class="col-md-8 col-sm-8 col-xs-12">
+                    <input type="text" class="form-control" id="nomorBerkas" name="nomorBerkas" value="{{ info['nomorberkas'] }}/{{ info['tahunberkas'] }}, {{ info['officenama'] }}" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="region">Region :</label>
+                <div class="col-md-8 col-sm-8 col-xs-12">
+                    <input type="text" class="form-control" id="region" name="region" value="Ds/Kel.{{ info['namadesa'] }}, Kec.{{ info['namakecamatan'] }}" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="kegiatan">Kegiatan :</label>
+                <div class="col-md-8 col-sm-8 col-xs-12">
+                    <input type="text" class="form-control" id="kegiatan" name="kegiatan" value="{{ info['prosedur'] }}" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="pemohon">Pemohon :</label>
+                <div class="col-md-8 col-sm-8 col-xs-12">
+                    <input type="text" class="form-control" id="pemohon" name="pemohon" value="{% for p in info['pemilik'] %}
+                                                                                                    {% if len(info['pemilik']) > 1  %}
+                                                                                                        {% if p['typepemilikid'] == 'P'  %}
+                                                                                                            {{ p['nama'] + ' An. '}}
+                                                                                                        {% elif p['typepemilikid'] == 'M' %}
+                                                                                                            {{ p['nama'] + ', '}}
+                                                                                                        {% end %}
+                                                                                                    {% elif len(info['pemilik']) == 1 %}
+                                                                                                        {% if p['typepemilikid'] == 'P' %}
+                                                                                                            {{ p['nama'] }}
+                                                                                                        {% elif p['typepemilikid'] == 'M' %}
+                                                                                                            {{ p['nama'] }}
+                                                                                                        {% end %}
+                                                                                                    {% end %}
+                                                                                                 {% end %}" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="catatanpengirim">Catatan Pengirim:</label>
+                <div class="col-md-8 col-sm-8 col-xs-12">
+                    <textarea name="catatanpengirim" id="catatanpengirim" class="form-control" cols="10" rows="3" readonly>{{ info['messange'] }}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+    </div>
+</div>
+
+<script>
+    $("#dikirim").select2({
+        placeholder: "Pilih karyawan",
+        theme: "bootstrap",
+        allowClear: true
+    });
+</script>

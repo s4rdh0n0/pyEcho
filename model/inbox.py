@@ -7,33 +7,7 @@ class InboxModel(BaseModel):
 
     root = 'offices/register'
 
-    schema = {
-        '_id': None,
-        'officeid': None,
-        'officetype': None,
-        'officenama': None,
-        'kecamatanid': None,
-        'kecamatancode': None,
-        'namakecamatan': None,
-        'desaid': None,
-        'desacode': None,
-        'namadesa': None,
-        'nomorberkas': None,
-        'tahunberkas': None,
-        'prosedur': None,
-        'kegiatan': None,
-        'phone': None,
-        'email': None,
-        'startdate': None,
-        'pemilik': [],
-        'daftarisian': [],
-        'document': [],
-        'keterangan': None,
-        'pegawaiactived': None,
-        'nodeactived': None,
-        'status': None,
-        'actived': False
-    }
+    schema = {}
 
     def __init__(self, collection: None, service: None):
         super().__init__(collection=collection, service=service)

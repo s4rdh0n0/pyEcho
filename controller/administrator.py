@@ -54,11 +54,11 @@ class DaftarPegawaiViewController(BaseController):
 
         if body['pegawaiid'] != "":
             count_reponse = user.count(filter={"$and": [{'officeid': cookies['officeid']} ,{"pegawaiid": str(body['pegawaiid'])}]})
-            list_response = user.pagination(filter={"$and": [{'officeid': cookies['officeid']}, {"pegawaiid": str(body['pegawaiid'])}]}, page_size=count_reponse, page_num=body['page'] + 1)
+            list_response = user.pagination(filter={"$and": [{'officeid': cookies['officeid']}, {"pegawaiid": str(body['pegawaiid'])}]}, page_size=body['limit'], page_num=body['page'] + 1)
 
         else:
             count_reponse = user.count(filter={"officeid": cookies['officeid']})
-            list_response = user.pagination(filter={'officeid': cookies['officeid']}, page_size=count_reponse, page_num=body['page'] + 1)
+            list_response = user.pagination(filter={'officeid': cookies['officeid']}, page_size=body['limit'], page_num=body['page'] + 1)
             
         
         self.write({'status': True, 'draw': body['draw'], 'data': json.dumps(list_response, default=json_util.default), 'recordsTotal': count_reponse, 'recordsFiltered': count_reponse})

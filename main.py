@@ -13,8 +13,8 @@ from tornado.log import app_log, gen_log, access_log, LogFormatter
 from controller.auth import SignInController, SignOutController, NotFoundController
 from controller.error import NodeNotFoundController
 from controller.dashboard import DashboardController
-from controller.register import RegisterBerkasViewController, InboxController
 from controller.compose import ComponseController, ComponseDetailController
+from controller.inbox import InboxController, InboxDetailController
 from controller.administrator import DaftarPegawaiViewController, PegawaiController, RoleController
 
 
@@ -28,12 +28,10 @@ class Application(tornado.web.Application):
 
 
                 (r"/register/compose", ComponseController),
+                (r"/register/compose/save", ComponseDetailController),
                 (r"/register/compose/berkasid=([A-Za-z0-9\ -@.]+)", ComponseDetailController),
-
-                
                 (r"/register/inbox", InboxController),
-                (r"/register/berkas/masuk", RegisterBerkasViewController),
-                (r"/register/berkas/detail/berkasid=([A-Za-z0-9\ -@.]+)", RegisterBerkasViewController),
+                (r"/register/inbox/registerid=([A-Za-z0-9\ -@.]+)", InboxDetailController),
 
                 (r"/administrator/daftarpegawai", DaftarPegawaiViewController),
                 (r"/administrator/daftarpegawai/pegawai/view/username=([A-Za-z0-9\ -@.]+)", PegawaiController),

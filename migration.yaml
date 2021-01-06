@@ -23,15 +23,9 @@ master:
   - code: REGOUT
     type: ROLE
     description: Register Berkas Keluar
-  - code: SURVEY
+  - code: REGISTER
     type: ROLE
-    description: Petugas Survey
-  - code: MAPPING
-    type: ROLE
-    description: Penggambaran dan Pemetaan Bidang Tanah
-  - code: MANAGER
-    type: ROLE
-    description: Koreksi dan Validasi Berkas
+    description: Petugas Register
   - code: ADMINISTRATOR
     type: ROLE
     description: Pengelola Aplikasi dan Data
@@ -87,9 +81,6 @@ master:
     type: BUKUTANAH
     description: Hak Wakaf
 
-  - code: START
-    type: OPERATION
-    description: Register Berkas Masuk
   - code: PROSES
     type: OPERATION
     description: Register Berkas Dalam Proses
