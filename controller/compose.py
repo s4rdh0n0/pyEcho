@@ -165,14 +165,16 @@ class ComponseDetailController(BaseController):
             schema['phone'] = body['phone']
             schema['email'] = body['email']
             schema['keterangan'] = body['keterangan']
-            schema['status'] = body['status']
             schema['pemilik'] = berkas_entity['pemohon']
             schema['daftarisian'] = di_entity
             schema['document'] = doc_entity
+            schema['status'] = body['status']
             berkas.add(schema=schema)
             yield gen.sleep(0.1)
- 
- 
+
+            del schema["pemilik"]
+            del schema["daftarisian"]
+            del schema["document"]
             schema['sender'] = cookies['userid']
             schema['sendername'] = useractived['nama']
             schema['senddate'] = datetime.datetime.now()
@@ -180,7 +182,7 @@ class ComponseDetailController(BaseController):
             schema['receivedate'] = None
             schema['receive'] = cookies['userid']
             schema['receivename'] = useractived['nama']
-            schema['actived'] = False
+            schema['actived'] = True
             register.add(schema=schema)
 
             msg = "Berkas {}/{} berhasil disimpan.".format(schema['nomorberkas'], schema['tahunberkas'])

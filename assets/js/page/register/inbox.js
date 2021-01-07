@@ -1,7 +1,6 @@
 + function ($) {
     'use strict';
 
-
     $("#btnFilterBerkas").click(function () {
         $('#tableBerkas').DataTable().ajax.reload(null, false);
     });
@@ -13,7 +12,22 @@
     });
 
 
-    // NOTE: Deactivation Pegawai
+    // NOTE: Info Berkas
+    $('#tableBerkas tbody').on('click', '#btnInfo', function (event) {
+        var selected_row = $(this).parents('tr');
+        if (selected_row.hasClass('child')) {
+            selected_row = selected_row.prev();
+        }
+
+        if (tableBerkas.row(selected_row).data()[0] != "") {
+            $('#modal-messange').modal('show');
+            $('#messange-dialog').load('/register/inbox/info/registerid=' + tableBerkas.row(selected_row).data()['_id']);
+        }
+
+        return false
+    });
+
+    // NOTE: New Messange
     $('#tableBerkas tbody').on('click', '#btnNewMessange', function (event) {
         var selected_row = $(this).parents('tr');
         if (selected_row.hasClass('child')) {
@@ -123,6 +137,13 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "className": "dt-center text-center",
             "render": function (data) {
                 return '<a id="btnNewMessange" class="btn btn-primary btn-flat"><i class="fa fa-envelope-o" aria-hidden="true"></i></a>'
+            }
+        }, {
+            "targets": [5],
+            "width": "3%",
+            "className": "dt-center text-center",
+            "render": function (data) {
+                return '<a id="btnInfo" class="btn btn-default btn-flat"><i class="fa fa-info-circle" aria-hidden="true"></i></a>'
             }
         }
     ],
