@@ -96,7 +96,6 @@
 
     });
 
-
     // NOTE: modal-activation show
     $('#modal-activation').on('show.bs.modal', function () {
         $('#userView').empty();

@@ -11,6 +11,11 @@
         $('#tableBerkas').DataTable().ajax.reload(null, false);
     });
 
+    // NOTE:modal messange hide
+    $('#modal-messange').on('hide.bs.modal', function () {
+        $('#messange-dialog').empty();
+    });
+
 
     // NOTE: Info Berkas
     $('#tableBerkas tbody').on('click', '#btnInfo', function (event) {
@@ -113,7 +118,7 @@ var tableBerkas = $('#tableBerkas').DataTable({
             }
         }, {
             "targets": [4],
-            "width": "20%",
+            "width": "10%",
             "data": 'senddate',
             "className": "dt-center text-center",
             "render": function (data) {
@@ -121,25 +126,30 @@ var tableBerkas = $('#tableBerkas').DataTable({
                 var month = date.getUTCMonth() + 1;
                 return (date.getUTCDate().toString().length > 1 ? date.getUTCDate() : "0" + date.getUTCDate()) + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCFullYear() + "  " + (date.getUTCHours().toString().length > 1 ? date.getUTCHours() : "0" + date.getUTCHours()) + ":" + (date.getUTCMinutes().toString().length > 1 ? date.getUTCMinutes() : "0" + date.getUTCMinutes()) + ":" + (date.getUTCSeconds().toString().length > 1 ? date.getUTCSeconds() : "0" + date.getUTCSeconds());
             }
-        }, {
-            "targets": [5],
-            "width": "31%",
+        },{
+            "targets": [6],
+            "width": "15%",
+            "data": 'sendername',
+            "className": "dt-center text-center"
+        },{
+            "targets": [7],
+            "width": "26%",
             "data": 'prosedur',
             "className": "dt-center text-center"
         }, {
-            "targets": [6],
-            "width": "23%",
+            "targets": [8],
+            "width": "20%",
             "data": 'receivename',
             "className": "dt-center text-center"
         }, {
-            "targets": [5],
+            "targets": [9],
             "width": "3%",
             "className": "dt-center text-center",
             "render": function (data) {
                 return '<a id="btnNewMessange" class="btn btn-primary btn-flat"><i class="fa fa-envelope-o" aria-hidden="true"></i></a>'
             }
         }, {
-            "targets": [5],
+            "targets": [10],
             "width": "3%",
             "className": "dt-center text-center",
             "render": function (data) {

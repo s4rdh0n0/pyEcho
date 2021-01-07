@@ -98,7 +98,8 @@ class InboxInfoDetailController(BaseController):
         pemilik = []
 
         inbox = InboxModel(collection=self.CONNECTION.collection(database="registerdb", name="inbox"), service=None)
-        berkasid = inbox.get(filter={"_id": registerid})['berkasid']
+        inboxResponse = inbox.get(filter={"_id": registerid})
+        berkasid = inboxResponse['berkasid']
         yield gen.sleep(0.1)
         berkas = BerkasModel(collection=None, service=options.service)
         infoResponse = berkas.find(berkasid=berkasid)
@@ -120,6 +121,6 @@ class InboxInfoDetailController(BaseController):
                 elif p['typepemilikid'] == 'M':
                     pemilik.append(p)
                     
-            self.render("node/detailberkas.html", office=self.get_office_actived(cookies=cookies), info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)
+            self.render("node/detailberkas.html", office=self.get_office_actived(cookies=cookies), inbox=inboxResponse, info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)
         else:
             self.render("page/error/400.html")
