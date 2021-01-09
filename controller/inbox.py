@@ -85,7 +85,33 @@ class InboxDetailController(BaseController):
         self.render('node/detailmessange.html', info=inbox, users=users)
 
 
-class InboxInfoDetailController(BaseController):
+    @tornado.web.authenticated
+    @tornado.gen.coroutine
+    def post(self):
+        cookies = self.get_cookies_user()
+        body = tornado.escape.json_decode(self.request.body)
+
+        inbox = InboxModel(collection=self.CONNECTION.collection(database="registerdb", name="inbox"), service=None).get(filter={"_id": body['registerid']})
+        inbox['actived'] = False
+        InboxModel(collection=self.CONNECTION.collection(database="registerdb", name="inbox"), service=None).update(filter={"_id": body['registerid']}, schema=inbox)
+
+        user = UserModel(collection=self.CONNECTION.collection(database="registerdb", name="users"), service=options.service)
+
+        inbox['_id'] = uuid.uuid4().__str__()
+        inbox['sender'] = cookies['userid']
+        inbox['sendername'] = self.get_user_actived(cookies=cookies)['nama']
+        inbox['senddate'] = datetime.datetime.now()
+        inbox['messsange'] = body['messsange']
+        inbox['receivedate'] = None
+        inbox['receive'] = body['receive']
+        inbox['receivename'] = user.get(filter={"_id": body['receive']})['nama']
+        inbox['actived'] = True
+        InboxModel(collection=self.CONNECTION.collection(database="registerdb", name="inbox"), service=None).add(schema=inbox)
+
+        self.write({'status': True, 'title': '<strong>Info</strong> <br>', 'type': 'info', 'msg': "Berkas {}/{} berhasil disimpan.".format(inbox['nomorberkas'], inbox['tahunberkas'])})
+
+
+class InboxInfoBerkasController(BaseController):
 
 
     @tornado.web.authenticated
@@ -97,8 +123,7 @@ class InboxInfoDetailController(BaseController):
         pemohon = []
         pemilik = []
 
-        inbox = InboxModel(collection=self.CONNECTION.collection(database="registerdb", name="inbox"), service=None)
-        inboxResponse = inbox.get(filter={"_id": registerid})
+        inboxResponse = InboxModel(collection=self.CONNECTION.collection(database="registerdb", name="inbox"), service=None).get(filter={"_id": registerid})
         berkasid = inboxResponse['berkasid']
         yield gen.sleep(0.1)
         berkas = BerkasModel(collection=None, service=options.service)

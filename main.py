@@ -14,7 +14,7 @@ from controller.auth import SignInController, SignOutController, NotFoundControl
 from controller.error import NodeNotFoundController
 from controller.dashboard import DashboardController
 from controller.compose import ComponseController, ComponseDetailController
-from controller.inbox import InboxController, InboxDetailController, InboxInfoDetailController
+from controller.inbox import InboxController, InboxDetailController, InboxInfoBerkasController
 from controller.administrator import DaftarPegawaiViewController, PegawaiController, RoleController
 
 
@@ -31,8 +31,9 @@ class Application(tornado.web.Application):
                 (r"/register/compose/save", ComponseDetailController),
                 (r"/register/compose/berkasid=([A-Za-z0-9\ -@.]+)", ComponseDetailController),
                 (r"/register/inbox", InboxController),
+                (r"/register/inbox/send", InboxDetailController),
                 (r"/register/inbox/registerid=([A-Za-z0-9\ -@.]+)", InboxDetailController),
-                (r"/register/inbox/info/registerid=([A-Za-z0-9\ -@.]+)", InboxInfoDetailController),
+                (r"/register/inbox/info/registerid=([A-Za-z0-9\ -@.]+)", InboxInfoBerkasController),
 
                 (r"/administrator/daftarpegawai", DaftarPegawaiViewController),
                 (r"/administrator/daftarpegawai/pegawai/view/username=([A-Za-z0-9\ -@.]+)", PegawaiController),

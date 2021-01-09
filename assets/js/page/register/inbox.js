@@ -1,21 +1,25 @@
 + function ($) {
     'use strict';
 
-    $("#btnFilterBerkas").click(function () {
+    $("#btnFindBerkas").click(function () {
         $('#tableBerkas').DataTable().ajax.reload(null, false);
     });
 
+    // NOTE: Reset table
     $("#btnResetFilter").click(function () {
         $('#nomorBerkas').val("");
         $('#tahunBerkas').val("");
         $('#tableBerkas').DataTable().ajax.reload(null, false);
     });
 
-    // NOTE:modal messange hide
+    // NOTE: modal messange hide
     $('#modal-messange').on('hide.bs.modal', function () {
         $('#messange-dialog').empty();
     });
 
+    $('.select2').on('change', function () {
+        $(this).valid();
+    });
 
     // NOTE: Info Berkas
     $('#tableBerkas tbody').on('click', '#btnInfo', function (event) {
@@ -46,8 +50,11 @@
 
         return false
     });
+    
 
+    
 }(jQuery);
+
 
 /* Initial Loading */
 function run_wait(element) {
@@ -59,7 +66,6 @@ function run_wait(element) {
     });
 }
 
-
 /* Initial Table Berkas */
 var tableBerkas = $('#tableBerkas').DataTable({
     'processing': true,
@@ -69,6 +75,8 @@ var tableBerkas = $('#tableBerkas').DataTable({
             type: 'POST',
             url: '/register/inbox',
             data: JSON.stringify({
+
+                // NOTE: Query table berkas
                 nomor: $('#nomorBerkas').val(),
                 tahun: $('#tahunBerkas').val(),
                 page: $('#tableBerkas').DataTable().page.info()['page'],
@@ -134,12 +142,12 @@ var tableBerkas = $('#tableBerkas').DataTable({
         },{
             "targets": [7],
             "width": "26%",
-            "data": 'prosedur',
+            "data": 'kegiatan',
             "className": "dt-center text-center"
         }, {
             "targets": [8],
             "width": "20%",
-            "data": 'receivename',
+            "data": 'prosedur',
             "className": "dt-center text-center"
         }, {
             "targets": [9],

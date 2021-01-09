@@ -15,9 +15,9 @@
         <div class="col-md-4 col-sm-4 col-xs-12">
             <input type="text" name="nomorBerkas" id="nomorBerkas" class="form-control" value="{{ info['nomor']  }} / {{ info['tahun'] }},  {{ office['nama'].upper() }}" readonly>
         </div>
-        <label class="control-label col-md-1 col-sm-1 col-xs-12" for="desaAlasHak">Desa:</label>
+        <label class="control-label col-md-1 col-sm-1 col-xs-12" for="desaBerkas">Desa:</label>
         <div class="col-md-4 col-sm-4 col-xs-12">
-            <select id="desaAlasHak" name="desaAlasHak" class="select2 form-control" style="width: 100%;">
+            <select id="desaBerkas" name="desaBerkas" class="select2 form-control" style="width: 100%;">
                 <option value=""></option>
                 {% for d in desa %}
                     <option value="{{ d['_id'] }}">{{d['kode']}} - {{ d['nama'].upper() }}, {{ d['wilayahinduk']['nama'] }}</option>
@@ -72,9 +72,9 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="pemilikBerkas">Posisi Berkas:</label>
+        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="posisiBerkas">Posisi Berkas:</label>
         <div class="col-md-4 col-sm-4 col-xs-12">
-            <input type="text" name="pemilikBerkas" id="pemilikBerkas" class="form-control" value="{{ info['profile'] }} ({{ info['pegawai'] }})" readonly>
+            <input type="text" name="posisiBerkas" id="posisiBerkas" class="form-control" value="{{ info['profile'] }} ({{ info['pegawai'] }})" readonly>
         </div>
         <label class="control-label col-md-1 col-sm-1 col-xs-12" for="emailBerkas">Email:</label>
         <div class="col-md-4 col-sm-4 col-xs-12">
@@ -218,7 +218,7 @@
     // NOTE: Simpan Berkas
     $('#formBerkasMasuk').validate({
         rules: {
-            desaAlasHak: {
+            desaBerkas: {
                 required: true,
             },
             statusRegister: {
@@ -229,7 +229,7 @@
             }
         },
         messages: {
-            desaAlasHak: {
+            desaBerkas: {
                 required: 'Desa wajib diisi.',
             },
             statusRegister: {
@@ -271,7 +271,7 @@
                 url: '/register/compose/save',
                 data: JSON.stringify({
                     berkasid: $('[name="berkasid"]').val(),
-                    desaid: $('#desaAlasHak').select2().val(),
+                    desaid: $('#desaBerkas').select2().val(),
                     status: $('#statusRegister').select2().val(),
                     phone: $('#phoneBerkas').val(),
                     email: $('#emailBerkas').val(),
@@ -317,7 +317,7 @@
         allowClear: true
     });
 
-    $("#desaAlasHak").select2({
+    $("#desaBerkas").select2({
         placeholder: "Pilih desa",
         theme: "bootstrap",
         allowClear: true

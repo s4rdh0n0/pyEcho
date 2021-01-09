@@ -50,6 +50,50 @@
         position: relative;
     }
 
+    .alert-info {
+        background-color: rgba(119, 131, 235, 0.945);
+        /* border-color: rgb(22, 22, 22); */
+        border-radius: 3px;
+        color: rgb(255, 255, 255);
+        padding: 10px;
+    }
+    .alert-info > [data-notify="icon"] {
+        height: 50px;
+        margin-right: 12px;
+    }
+    .alert-info > [data-notify="title"] {
+        color: rgb(255, 255, 255);
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 130%;
+    }
+    .alert-info > [data-notify="message"] {
+        font-size: 115%;
+    }
+
+
+    .alert-minimalist {
+        background-color: rgba(236, 171, 51, 0.945);
+        /* border-color: rgb(22, 22, 22); */
+        border-radius: 3px;
+        color: rgb(255, 255, 255);
+        padding: 10px;
+    }
+    .alert-minimalist > [data-notify="icon"] {
+        height: 50px;
+        margin-right: 12px;
+    }
+    .alert-minimalist > [data-notify="title"] {
+        color: rgb(255, 255, 255);
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 130%;
+    }
+    .alert-minimalist > [data-notify="message"] {
+        font-size: 115%;
+    }
 </style>
 {% end %}
 
@@ -68,10 +112,10 @@
 <section class="content">
     <div class="box box-solid">
         <div class="box-header with-border text-center">
-            <h3 class="box-title">Pencarian Register</h3>
+            <h3 class="box-title">Pencarian Berkas</h3>
         </div>
 
-        <div class="form-horizontal" id="formFilterBerkas" method="POST">
+        <div class="form-horizontal" id="formFindBerkas" method="POST">
             {% module xsrf_form_html() %}
             <div class="box-body">
                 <div class="form-group">
@@ -86,7 +130,7 @@
                         <div class="input-group input-group-md">
                             <input type="text" class="form-control" id="tahunBerkas" name="tahunBerkas">
                             <span class="input-group-btn">
-                                <button id="btnFilterBerkas" type="submit" class="btn btn-success btn-flat"> <i class="fa fa-filter" aria-hidden="true"></i> Cari Berkas</button>
+                                <button id="btnFindBerkas" type="submit" class="btn btn-success btn-flat"> <i class="fa fa-filter" aria-hidden="true"></i> Cari Berkas</button>
                             </span>
                         </div>
                     </div>

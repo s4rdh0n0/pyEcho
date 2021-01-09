@@ -5,10 +5,6 @@ from model.base import BaseModel
 
 class InboxModel(BaseModel):
 
-    root = 'offices/register'
-
-    schema = {}
-
     def __init__(self, collection: None, service: None):
         super().__init__(collection=collection, service=service)
 

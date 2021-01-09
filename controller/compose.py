@@ -53,7 +53,7 @@ class ComponseController(BaseController):
         berkas = BerkasModel(collection=self.CONNECTION.collection(database="registerdb", name="berkas"), service=options.service)
         response = berkas.search(officeid=cookies['officeid'], nomor=body['nomor'], tahun=body['tahun'])
         if response['data']['count']['Jumlah'] != 0:
-            count =berkas.count(filter={"berkasid": response['data']['result'][0]['berkasid']})
+            count =berkas.count(filter={"_id": response['data']['result'][0]['berkasid']})
             if count == 0:
                 self.write({'status': True, 'data': response['data']['result']})
             else:
@@ -146,9 +146,8 @@ class ComponseDetailController(BaseController):
             office_entity = offices.get(filter={"_id": cookies['officeid']})
 
             schema = dict() 
-            schema['_id'] = uuid.uuid4().__str__()
+            schema['_id'] = berkas_entity['infoberkas']['_id']
             schema['register'] = offices.booking(officeid=cookies['officeid'], counter="REG")
-            schema['berkasid'] = berkas_entity['infoberkas']['_id']
             schema['officeid'] = office_entity['_id']
             schema['officetype'] = office_entity['officetypeid']
             schema['officenama'] = office_entity['nama']
@@ -175,6 +174,8 @@ class ComponseDetailController(BaseController):
             del schema["pemilik"]
             del schema["daftarisian"]
             del schema["document"]
+            schema['_id'] = uuid.uuid4().__str__()
+            schema['berkasid'] = berkas_entity['infoberkas']['_id']
             schema['sender'] = cookies['userid']
             schema['sendername'] = useractived['nama']
             schema['senddate'] = datetime.datetime.now()

@@ -9,11 +9,13 @@
         <p>{{ info['nomorberkas'] }}/{{ info['tahunberkas'] }}, Tanggal. {{ info['senddate'].strftime('%d/%m/%Y, %H:%M:%S') }}</p>
     </div>
     <div class="modal-body">
-        <form class="form-horizontal" id="formSendRegister">
+        <form class="form-horizontal" id="formSendRegister" method="POST">
+            {% module xsrf_form_html() %}
+            <input type="hidden" name="registerid" value="{{ info['_id'] }}">
             <div class="form-group">
-                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="dikirim">Dikirim:</label>
-                <div class="col-md-8 col-sm-8 col-xs-12">
-                    <select id="dikirim" name="dikirim" class="select2 form-control" style="width: 100%;">
+                <label class="control-label col-md-2 col-sm-2 col-xs-12" for="receive">Dikirim:</label>
+                <div class="col-md-9 col-sm-9 col-xs-12">
+                    <select id="receive" name="receive" class="select2 form-control" style="width: 100%;">
                         <option value=""></option>
                         {% for d in users %}
                             <option value="{{ d['_id'] }}">{{d['nama']}}</option>
@@ -22,9 +24,16 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="control-label col-md-3 col-sm-3 col-xs-12" for="messange">Pesan:</label>
-                <div class="col-md-8 col-sm-8 col-xs-12">
-                    <textarea name="messange" id="messange" class="form-control" cols="10" rows="10"></textarea>
+                <label class="control-label col-md-2 col-sm-2 col-xs-12" for="messsange">Pesan:</label>
+                <div class="col-md-9 col-sm-9 col-xs-12">
+                    <textarea name="messsange" id="messsange" class="form-control" cols="10" rows="10"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-8 col-sm-8 col-xs-12 col-md-offset-3">
+                    <div class="pull-right">
+                        <button type="submit" id="btnSendBerkas" name="btnSendBerkas" class="btn btn-success btn-flat"><i class="fa fa-paper-plane" aria-hidden="true"></i> Kirim</button>
+                    </div>
                 </div>
             </div>
         </form>
@@ -35,7 +44,88 @@
 </div>
 
 <script>
-    $("#dikirim").select2({
+    $('#formSendRegister').validate({
+        rules: {
+            receive: {
+                required: true,
+            }
+        },
+        messages: {
+            receive: {
+                required: 'Karyawan tidak boleh kosong.',
+            }
+        },
+        errorElement: "small",
+        highlight: function (element, errorClass, validClass) {
+            var elem = $(element);
+            elem.closest('.col-xs-12').addClass('has-error');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            var elem = $(element);
+            elem.closest('.col-xs-12').removeClass('has-error');
+        }, errorPlacement: function (error, element) {
+            if (element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else if (element.prop('type') === 'radio' && element.parent('.radio-inline').length) {
+                error.insertAfter(element.parent().parent());
+            }
+            else if (element.prop('type') === 'checkbox' || element.prop('type') === 'radio') {
+                error.appendTo(element.parent().parent());
+            }
+            else if (element.hasClass('select2') && element.next('.select2-container').length) {
+                error.insertAfter(element.next('.select2-container'));
+            }
+            else {
+                error.insertAfter(element);
+            }
+        },
+        submitHandler: function () {
+            $.ajax({
+                type: 'POST',
+                url: '/register/inbox/send',
+                data: JSON.stringify({
+                    registerid: $('[name="registerid"]').val(),
+                    receive: $('#receive').val(),
+                    messsange: $('#messsange').val()
+                }),
+                async: true,
+                headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+                beforeSend: function () {
+
+                },
+                success: (function (data) {
+
+                    if (data.status) {
+                        $('#modal-messange').modal('hide');
+
+                        $.notify({
+                            title: data.title,
+                            message: data.msg,
+                        }, {
+                            type: data.type,
+                            template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+                                '<span data-notify="title">{1}</span>' +
+                                '<span data-notify="message">{2}</span>' +
+                                '</div>',
+                            animate: {
+                                enter: 'animated fadeInRight',
+                                exit: 'animated fadeOutRight'
+                            }
+                        });
+                        $('#tableBerkas').DataTable().ajax.reload(null, false);
+                    }
+
+                }),
+                error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("Error: " + errorThrown);
+                })
+            });
+        }
+    });
+
+
+    $("#receive").select2({
         placeholder: "Pilih karyawan",
         theme: "bootstrap",
         allowClear: true
