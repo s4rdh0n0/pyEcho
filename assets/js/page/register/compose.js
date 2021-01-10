@@ -77,9 +77,7 @@
                             }
                         });
 
-                        $('#berkasView').load('/node/error/400', function () {
-                            $('.content').waitMe("hide");
-                        });
+                        $('#berkasView').load('/node/error/400');
                     }
 
                 }),

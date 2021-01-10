@@ -21,7 +21,8 @@ from model.user import UserModel
 from model.berkas import BerkasModel
 from model.region import RegionModel
 from model.master import MasterModel
-from model.inbox import InboxModel
+from model.register import RegisterModel
+
 
 class ComponseController(BaseController):
 
@@ -122,7 +123,7 @@ class ComponseDetailController(BaseController):
         yield gen.sleep(0.1)
         berkas =  BerkasModel(collection=self.CONNECTION.collection(database="registerdb", name="berkas"), service=options.service)
         yield gen.sleep(0.1)
-        register = InboxModel(collection=self.CONNECTION.collection(database="registerdb", name="inbox"), service=None)
+        register = RegisterModel(collection=self.CONNECTION.collection(database="registerdb", name="register"), service=None)
         yield gen.sleep(0.1)
         master = MasterModel(collection=self.CONNECTION.collection(database="registerdb", name="master"), service=None)
         yield gen.sleep(0.1)
@@ -163,7 +164,6 @@ class ComponseDetailController(BaseController):
             schema['kegiatan'] = berkas_entity['infoberkas']['kegiatan']
             schema['phone'] = body['phone']
             schema['email'] = body['email']
-            schema['keterangan'] = body['keterangan']
             schema['pemilik'] = berkas_entity['pemohon']
             schema['daftarisian'] = di_entity
             schema['document'] = doc_entity
@@ -186,7 +186,7 @@ class ComponseDetailController(BaseController):
             schema['actived'] = True
             register.add(schema=schema)
 
-            msg = "Berkas {}/{} berhasil disimpan.".format(schema['nomorberkas'], schema['tahunberkas'])
+            msg = "Berkas {}/{} berhasil terregister.".format(schema['nomorberkas'], schema['tahunberkas'])
             status = True
             tipe = "info"
             title = '<strong>Info</strong> <br>'

@@ -5,13 +5,11 @@
             <button type="button" class="btn close" data-dismiss="modal" aria-label="Close"><i class="fa fa-times"></i>
             </button>
         </div>
-        <h4 class="modal-title">{{ info['sendername'] }}</h4>
-        <p>{{ info['nomorberkas'] }}/{{ info['tahunberkas'] }}, Tanggal. {{ info['senddate'].strftime('%d/%m/%Y, %H:%M:%S') }}</p>
+        <h4 class="modal-title"><i class="fa fa-envelope-o" aria-hidden="true"></i> New Register</h4>
     </div>
     <div class="modal-body">
         <form class="form-horizontal" id="formSendRegister" method="POST">
             {% module xsrf_form_html() %}
-            <input type="hidden" name="registerid" value="{{ info['_id'] }}">
             <div class="form-group">
                 <label class="control-label col-md-2 col-sm-2 col-xs-12" for="receive">Dikirim:</label>
                 <div class="col-md-9 col-sm-9 col-xs-12">
@@ -45,7 +43,7 @@
 
 <script>
     $('#formSendRegister').validate({
-        rules: {
+        messages: {
             receive: {
                 required: true,
             }
@@ -113,7 +111,10 @@
                                 exit: 'animated fadeOutRight'
                             }
                         });
-                        $('#tableBerkas').DataTable().ajax.reload(null, false);
+                        $('.nav-tabs a[href="#tabPencarian"]').tab('show');
+                        $('#tabDetail').load('/node/error/400', function () {
+                            $('#tableBerkas').DataTable().ajax.reload(null, false);
+                        });
                     }
 
                 }),

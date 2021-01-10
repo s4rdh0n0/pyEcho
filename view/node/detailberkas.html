@@ -1,186 +1,196 @@
-
-<div class="modal-content">
-    <div class="modal-header" style="text-align:left;">
-        <div class="box-tools pull-right">
-            <button type="button" class="btn close" data-dismiss="modal" aria-label="Close"><i class="fa fa-times"></i>
-            </button>
-        </div>
-        <h4 class="modal-title">Info Berkas</h4>
+<div class="invoice" id="print-area">
+    <div class="no-print">
+        <button class="btn btn-default no-print" id="btnPrintRegister"><i class="fa fa-print"></i> Print</button>
+        <button class="btn btn-success no-print" id="btnKembali"><i class="fa fa-undo"></i> Kembali</button>
+        <button class="btn btn-primary no-print pull-right" id="btnNewMessange"><i class="fa fa-envelope-o" aria-hidden="true"></i> Messange</button>
     </div>
-    <div class="modal-body">
-        <div id="formBerkasMasuk" class="form-horizontal">
-            <div class="form-group">
-                <label class="control-label col-md-2 col-sm-2 col-xs-12" for="nomorBerkas">Berkas:</label>
-                <div class="col-md-9 col-sm-9 col-xs-12">
-                    <input type="text" name="nomorBerkas" id="nomorBerkas" class="form-control" value="{{ info['nomor']  }} / {{ info['tahun'] }},  {{ office['nama'].upper() }}" readonly>
-                </div>
+    <br>
+    <div class="invoice-info">
+        <h5 class="page-header">
+            <i class="fa fa-globe"></i> {{ office['nama'].upper() }}
+        </h5>
+        <div class="row">
+            <input type="hidden" name="registerid" id="registerid" value="{{ inbox['_id'] }}">
+            <div class="col-sm-3 invoice-col">
+                <strong>Pengirim :</strong> <address>{{ inbox['sendername'] }}</address>
+                <strong>Tanggal Kirim :</strong> <address>{{ inbox['senddate'].strftime('%d/%m/%Y, %H:%M:%S') }}</address>
+                <strong>Register :</strong> <address>{{ inbox['register'] }}</address>
             </div>
-            <div class="form-group">
-                <label class="control-label col-md-2 col-sm-2 col-xs-12" for="prosedurBerkas">Kegiatan:</label>
-                <div class="col-md-9 col-sm-9 col-xs-12">
-                    <input type="text" name="prosedurBerkas" id="prosedurBerkas" class="form-control" value="{{ info['prosedur'] }}" readonly>
-                </div>
+            <div class="col-sm-3 invoice-col">
+                <strong>Region :</strong> <address>{{ 'KEC.' + inbox['namakecamatan'] }},{{ '  DS/KEL.' + inbox['namadesa'] }}</address>
+                <strong>Tanggal Diterima :</strong> <address>{{ inbox['receivedate'].strftime('%d/%m/%Y, %H:%M:%S') }}</address>
+                <strong>Pesan :</strong> <address>{{ inbox['messsange'] }}</address>
             </div>
-            <div class="form-group">
-                <label class="control-label col-md-2 col-sm-2 col-xs-12" for="createBerkas">Pendaftaran:</label>
-                <div class="col-md-9 col-sm-9 col-xs-12">
-                    <input type="text" name="createBerkas" id="createBerkas" class="form-control" value="Tgl.{{ datetime.datetime.strptime(info['createdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}  -  Tgl.{% if info['startdate'] != '0001-01-01T00:00:00Z' %}{{ datetime.datetime.strptime(info['startdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }} {% end %}" readonly>
-                </div>
+            <div class="col-sm-3 invoice-col">
+                <strong>Berkas :</strong> <address>{{ info['nomor'] }} / {{ info['tahun'] }}</address> 
+                <strong>Pendaftaran :</strong> <address>{{ datetime.datetime.strptime(info['createdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}  -  Tgl.{% if info['startdate'] != '0001-01-01T00:00:00Z' %}{{ datetime.datetime.strptime(info['startdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }} {% end %}</address>    
+                <strong>Kegiatan :</strong> <address>{{ info['kegiatan'] }}, {{ '  ' + info['prosedur'] }}</address>
+                <strong>Status :</strong> <address>{% if info['status'] == '1' %}PROSES{% elif info['status'] == '0' %}SELESAI, {% if info['finnishdate'] != '0001-01-01T00:00:00Z' %}  Tgl.{{ datetime.datetime.strptime(info['finnishdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}{% end %}{% end %}</address>  
             </div>
-            <div class="form-group">
-                <label class="control-label col-md-2 col-sm-2 col-xs-12" for="pemohonBerkas">Pemohon:</label>
-                <div class="col-md-9 col-sm-9 col-xs-12">
-                    <input type="text" name="pemohonBerkas" id="pemohonBerkas" class="form-control" value="{{ info['pemohon'] }}   {% if pemilik == [] %}
-                                                                                                                                An. {{ info['pemohon'] }}
-                                                                                                                                {% else %}
-                                                                                                                                    An. 
-                                                                                                                                    {% for p in pemilik %}
-                                                                                                                                        {% if len(pemilik) > 1  %}
-                                                                                                                                            {{ p['nama'] }}, 
-                                                                                                                                        {% elif len(pemilik) == 1 %}
-                                                                                                                                            {{ p['nama'] }}
-                                                                                                                                        {% end %}
-                                                                                                                                    {% end %}
-                                                                                                                                {% end %}" " readonly>
-                </div>
+            <div class="col-sm-3 invoice-col">
+                <strong>Pemohon :</strong> <address>{{ info['pemohon'] }}   {% if pemilik == [] %}
+                                                                            An. {{ info['pemohon'] }}
+                                                                            {% else %}
+                                                                                An. 
+                                                                                {% for p in pemilik %}
+                                                                                    {% if len(pemilik) > 1  %}
+                                                                                        {{ p['nama'] }}, 
+                                                                                    {% elif len(pemilik) == 1 %}
+                                                                                        {{ p['nama'] }}
+                                                                                    {% end %}
+                                                                                {% end %}
+                                                                            {% end %}</address>
+                <strong>Posisi (KKP) :</strong> <address>{{ info['profile'] }} ({{ info['pegawai'] }})</address>
+                <strong>Phone:</strong> <address>{{ inbox['phone'] }}</address>
+                <strong>Email:</strong> <address>{{ inbox['email'] }}</address>
             </div>
-            <div class="form-group">
-                <label class="control-label col-md-2 col-sm-2 col-xs-12" for="phoneBerkas">Phone:</label>
-                <div class="col-md-9 col-sm-9 col-xs-12">
-                    <input type="text" name="phoneBerkas" id="phoneBerkas" class="form-control" value="{{ inbox['phone'] }}" readonly>
-                </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-12">
+                <h5> <strong>KODE BILLING:</strong> </h5>
             </div>
-            <div class="form-group">
-                <label class="control-label col-md-2 col-sm-2 col-xs-12" for="emailBerkas">Email:</label>
-                <div class="col-md-9 col-sm-9 col-xs-12">
-                    <input type="text" name="emailBerkas" id="emailBerkas" class="form-control" value="{{ inbox['email'] }}" readonly>
-                </div>
+            <div class="col-sm-12 table-responsive">
+                <table class="table no-margin">
+                    <tbody>
+                        <tr>
+                            <th class="text-center">Kode Billing</th>
+                            <th class="text-center">Biaya</th>
+                            <th class="text-center">NTPN</th>
+                            <th class="text-center">Tanggal Kadaluarsa</th>
+                            <th class="text-center">Tanggal Bayar</th>
+                        </tr>
+                        {% if simponi != None %}
+                            {% for s in simponi %}
+                            <tr>
+                                <td class="text-center">{{ s['kodebilling'] }}</td>
+                                <td class="text-center">{{ s['biaya'] }}</td>
+                                <td class="text-center">{{ s['ntpn'] }}</td>
+                                <td class="text-center">{{ s['expiredate'] }}</td>
+                                {% if s['buydate'] != "" %}
+                                <td class="text-center">{{ datetime.datetime.strptime(s['buydate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d-%m-%Y, %H:%M:%S') }}</td>
+                                {% end%}
+                            </tr>
+                            {% end %}
+                        {% end %}
+                    </tbody>
+                </table>
             </div>
-            <div class="form-group">
-                <label class="control-label col-md-2 col-sm-2 col-xs-12" for="posisiBerkas">Posisi:</label>
-                <div class="col-md-9 col-sm-9 col-xs-12">
-                    <input type="text" name="posisiBerkas" id="posisiBerkas" class="form-control" value="{{ info['profile'] }} ({{ info['pegawai'] }})" readonly>
-                </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-12">
+                <h5> <strong>DAFTAR ISIAN:</strong> </h5>
             </div>
-            <div class="form-group">
-                <label class="control-label col-md-2 col-sm-2 col-xs-12">Simponi:</label>
-                <div class="col-md-9 col-sm-9 col-xs-12">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped">
-                            <tbody>
-                                <tr>
-                                    <th class="text-center">Kode Billing</th>
-                                    <th class="text-center">Biaya</th>
-                                    <th class="text-center">NTPN</th>
-                                    <th class="text-center">Tanggal Kadaluarsa</th>
-                                    <th class="text-center">Tanggal Bayar</th>
-                                </tr>
-                                {% if simponi != None %}
-                                    {% for s in simponi %}
-                                    <tr>
-                                        <td class="text-center">{{ s['kodebilling'] }}</td>
-                                        <td class="text-center">{{ s['biaya'] }}</td>
-                                        <td class="text-center">{{ s['ntpn'] }}</td>
-                                        <td class="text-center">{{ s['expiredate'] }}</td>
-                                        {% if s['buydate'] != "" %}
-                                        <td class="text-center">{{ datetime.datetime.strptime(s['buydate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d-%m-%Y, %H:%M:%S') }}</td>
-                                        {% end%}
-                                    </tr>
-                                    {% end %}
+            <div class="col-sm-12  table-responsive">
+                <table class="table no-margin">
+                    <tbody>
+                        <tr>
+                            <th class="text-center">Daftar Isian</th>
+                            <th class="text-center">Nomor</th>
+                            <th class="text-center">Tanggal</th>
+                        </tr>
+                        {% if daftarisian != None %}
+                            {% for d in daftarisian %}
+                            <tr>
+                                <td class="text-center">{{ d['typediid'] }}</td>
+                                <td class="text-center">{{ d['description'].split("-")[1].split(" No.")[1] }}</td>
+                                <td class="text-center">{{ d['description'].split("-")[1].split(", ")[0].split("Tgl.")[1] }}
+                                </td>
+                            </tr>
+                            {% end %}
+                        {% end %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-12">
+                <h5> <strong>DOKUMEN OUTPUT:</strong> </h5>
+            </div>
+            <div class="col-sm-12 table-responsive">
+                <table class="table no-margin">
+                    <tbody>
+                        <tr>
+                            <th style="display:none"></th>
+                            <th style="display:none"></th>
+                            <th class="text-center">Produk</th>
+                            <th class="text-center">Nomor</th>
+                            <th class="text-center">Desa</th>
+                        </tr>
+                        {% if produk != None %}
+                            {% for p in produk %}
+                            <tr>
+                                {% if p['type'] == 'STP' %}
+                                <td style="display:none">{{ p['documentid'] }}</td>
+                                <td style="display:none">{{ p['type'] }}</td>
+                                <td class="text-center">Surat Tugas Pengukuran</td>
+                                <td class="text-center">{{ p['nomor'] }}</td>
+                                <td class="text-center">{{ p['wilayah'] }}</td>
+                                {% elif p['type'] == 'PERSIL' %}
+                                <td style="display:none">{{ p['documentid'] }}</td>
+                                <td style="display:none">{{ p['type'] }}</td>
+                                <td class="text-center">NIB</td>
+                                <td class="text-center">{{ p['nomor'] }}</td>
+                                <td class="text-center">{{ p['wilayah'] }}</td>
+                                {% elif p['type'] == 'GU' %}
+                                <td style="display:none">{{ p['documentid'] }}</td>
+                                <td style="display:none">{{ p['type'] }}</td>
+                                <td class="text-center">GAMBAR UKUR</td>
+                                <td class="text-center">{{ p['nomor'] }}</td>
+                                <td class="text-center">{{ p['wilayah'] }}</td>
+                                {% elif p['type'] == 'SU' %}
+                                <td style="display:none">{{ p['documentid'] }}</td>
+                                <td style="display:none">{{ p['type'] }}</td>
+                                <td class="text-center">SURAT UKUR</td>
+                                <td class="text-center">{{ p['nomor'] }}</td>
+                                <td class="text-center">{{ p['wilayah'] }}</td>
+                                {% elif p['type'] == 'HAK' %}
+                                <td style="display:none">{{ p['documentid'] }}</td>
+                                <td style="display:none">{{ p['type'] }}</td>
+                                <td class="text-center">Buku Tanah</td>
+                                <td class="text-center">{{ p['nomor'] }}</td>
+                                <td class="text-center">{{ p['wilayah'] }}</td>
                                 {% end %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="control-label col-md-2 col-sm-2 col-xs-12">DI:</label>
-                <div class="col-md-9 col-sm-9 col-xs-12">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped">
-                            <tbody>
-                                <tr>
-                                    <th class="text-center">Daftar Isian</th>
-                                    <th class="text-center">Nomor</th>
-                                    <th class="text-center">Tanggal</th>
-                                </tr>
-                                {% if daftarisian != None %}
-                                    {% for d in daftarisian %}
-                                    <tr>
-                                        <td class="text-center">{{ d['typediid'] }}</td>
-                                        <td class="text-center">{{ d['description'].split("-")[1].split(" No.")[1] }}</td>
-                                        <td class="text-center">{{ d['description'].split("-")[1].split(", ")[0].split("Tgl.")[1] }}
-                                        </td>
-                                    </tr>
-                                    {% end %}
-                                {% end %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="control-label col-md-2 col-sm-2 col-xs-12">Produk:</label>
-                <div class="col-md-9 col-sm-9 col-xs-12">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped">
-                            <tbody>
-                                <tr>
-                                    <th style="display:none"></th>
-                                    <th style="display:none"></th>
-                                    <th class="text-center">Produk</th>
-                                    <th class="text-center">Nomor</th>
-                                    <th class="text-center">Desa</th>
-                                </tr>
-                                {% if produk != None %}
-                                    {% for p in produk %}
-                                    <tr>
-                                        {% if p['type'] == 'STP' %}
-                                        <td style="display:none">{{ p['documentid'] }}</td>
-                                        <td style="display:none">{{ p['type'] }}</td>
-                                        <td class="text-center">Surat Tugas Pengukuran</td>
-                                        <td class="text-center">{{ p['nomor'] }}</td>
-                                        <td class="text-center">{{ p['wilayah'] }}</td>
-                                        {% elif p['type'] == 'PERSIL' %}
-                                        <td style="display:none">{{ p['documentid'] }}</td>
-                                        <td style="display:none">{{ p['type'] }}</td>
-                                        <td class="text-center">NIB</td>
-                                        <td class="text-center">{{ p['nomor'] }}</td>
-                                        <td class="text-center">{{ p['wilayah'] }}</td>
-                                        {% elif p['type'] == 'GU' %}
-                                        <td style="display:none">{{ p['documentid'] }}</td>
-                                        <td style="display:none">{{ p['type'] }}</td>
-                                        <td class="text-center">GAMBAR UKUR</td>
-                                        <td class="text-center">{{ p['nomor'] }}</td>
-                                        <td class="text-center">{{ p['wilayah'] }}</td>
-                                        {% elif p['type'] == 'SU' %}
-                                        <td style="display:none">{{ p['documentid'] }}</td>
-                                        <td style="display:none">{{ p['type'] }}</td>
-                                        <td class="text-center">SURAT UKUR</td>
-                                        <td class="text-center">{{ p['nomor'] }}</td>
-                                        <td class="text-center">{{ p['wilayah'] }}</td>
-                                        {% elif p['type'] == 'HAK' %}
-                                        <td style="display:none">{{ p['documentid'] }}</td>
-                                        <td style="display:none">{{ p['type'] }}</td>
-                                        <td class="text-center">Buku Tanah</td>
-                                        <td class="text-center">{{ p['nomor'] }}</td>
-                                        <td class="text-center">{{ p['wilayah'] }}</td>
-                                        {% end %}
-                                    </tr>
-                                    {% end %}
-                                {% end %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                            </tr>
+                            {% end %}
+                        {% end %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-
-
 </div>
 
-
 <script>
+    $("#btnNewMessange").click(function () {
+        $('#modal-messange').modal('show');
+        $('#messange-dialog').load('/register/inbox/registerid=' + $('input[name=registerid]').val() + '&type=newmessange');
+    });
 
+    $("#btnKembali").click(function () {
+        $('.nav-tabs a[href="#tabPencarian"]').tab('show');
+        $('#tabDetail').load('/node/error/400', function () {
+            $('.content').waitMe("hide");
+        });
+    });
+
+    $("#btnPrintRegister").click(function () {
+        $("#print-area").print({
+            globalStyles: true,
+            mediaPrint: false,
+            stylesheet: true,
+            noPrintSelector: ".no-print",
+            iframe: true,
+            append: null,
+            prepend: null,
+            manuallyCopyFormValues: true,
+            deferred: $.Deferred(),
+            timeout: 750,
+            title: "Inbox Register Data",
+            doctype: '<!doctype html>'
+        });
+        return false;
+    });
 </script>

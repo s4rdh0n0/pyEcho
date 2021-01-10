@@ -38,7 +38,6 @@ class DaftarPegawaiViewController(BaseController):
         else:
             self.redirect("/logout")
 
-    # Load Data.
     @tornado.web.authenticated
     @tornado.gen.coroutine
     def post(self):
@@ -47,8 +46,7 @@ class DaftarPegawaiViewController(BaseController):
         # client request
         body = tornado.escape.json_decode(self.request.body)
 
-        collection = self.CONNECTION.collection(database="registerdb", name="users")
-        user = UserModel(collection=collection, service=options.service)
+        user = UserModel(collection=self.CONNECTION.collection(database="registerdb", name="users"), service=options.service)
         list_response = []
         count_reponse = 0
 

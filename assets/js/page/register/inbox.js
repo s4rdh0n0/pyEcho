@@ -12,11 +12,6 @@
         $('#tableBerkas').DataTable().ajax.reload(null, false);
     });
 
-    // NOTE: modal messange hide
-    $('#modal-messange').on('hide.bs.modal', function () {
-        $('#messange-dialog').empty();
-    });
-
     $('.select2').on('change', function () {
         $(this).valid();
     });
@@ -29,30 +24,15 @@
         }
 
         if (tableBerkas.row(selected_row).data()[0] != "") {
-            $('#modal-messange').modal('show');
-            $('#messange-dialog').load('/register/inbox/info/registerid=' + tableBerkas.row(selected_row).data()['_id']);
+            run_wait('.content');
+            $('.nav-tabs a[href="#tabDetail"]').tab('show'); 
+            $('#tabDetail').load('/register/inbox/registerid=' + tableBerkas.row(selected_row).data()['_id'] + '&type=inforegister', function () {
+                $('.content').waitMe("hide");
+            });
         }
 
         return false
     });
-
-    // NOTE: New Messange
-    $('#tableBerkas tbody').on('click', '#btnNewMessange', function (event) {
-        var selected_row = $(this).parents('tr');
-        if (selected_row.hasClass('child')) {
-            selected_row = selected_row.prev();
-        }
-
-        if (tableBerkas.row(selected_row).data()[0] != "") {
-            $('#modal-messange').modal('show');
-            $('#messange-dialog').load('/register/inbox/registerid=' + tableBerkas.row(selected_row).data()['_id']);
-        }
-
-        return false
-    });
-    
-
-    
 }(jQuery);
 
 
@@ -151,14 +131,7 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "className": "dt-center text-center"
         }, {
             "targets": [9],
-            "width": "3%",
-            "className": "dt-center text-center",
-            "render": function (data) {
-                return '<a id="btnNewMessange" class="btn btn-primary btn-flat"><i class="fa fa-envelope-o" aria-hidden="true"></i></a>'
-            }
-        }, {
-            "targets": [10],
-            "width": "3%",
+            "width": "6%",
             "className": "dt-center text-center",
             "render": function (data) {
                 return '<a id="btnInfo" class="btn btn-default btn-flat"><i class="fa fa-info-circle" aria-hidden="true"></i></a>'
