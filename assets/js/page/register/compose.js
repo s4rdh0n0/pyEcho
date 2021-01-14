@@ -16,9 +16,11 @@
         messages: {
             nomor: {
                 required: 'Nomor berkas wajib diisi.',
+                digits: 'Nomor berkas wajib angka'
             },
             tahun: {
                 required: 'Tahun berkas wajib diisi.',
+                digits: 'Tahun berkas wajib angka'
             }
         },
         errorElement: "small",

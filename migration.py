@@ -15,8 +15,8 @@ def InsertOffice():
         for doc in config_docs:
             client = ConnectionModel(username=doc['db']['username'],password=doc['db']['password'],server=doc['db']['server'],port=doc['db']['port'])
             
-            col_office = client.collection(database="registerdb", name="offices")
-            col_master = client.collection(database="registerdb", name="master")
+            col_office = client.collection(database="1228_trenggalek", name="offices")
+            col_master = client.collection(database="1228_trenggalek", name="master")
 
             office = OfficeModel(collection=col_office, service="http://localhost:8000")
             master = MasterModel(collection=col_master, service=None)
@@ -55,8 +55,8 @@ def InsertUser():
         for doc in config_docs:
             client = ConnectionModel(username=doc['db']['username'],password=doc['db']['password'],server=doc['db']['server'],port=doc['db']['port'])
             
-            col_user = client.collection(database="registerdb", name="users")
-            col_master = client.collection(database="registerdb", name="master")
+            col_user = client.collection(database="1228_trenggalek", name="users")
+            col_master = client.collection(database="1228_trenggalek", name="master")
 
             master = MasterModel(collection=col_master, service=None)
             user = UserModel(collection=col_user, service="http://localhost:8000")
@@ -106,7 +106,7 @@ def InsertMaster():
         for doc in config_docs:
             client = ConnectionModel(username=doc['db']['username'],password=doc['db']['password'],server=doc['db']['server'],port=doc['db']['port'])
             
-            collection = client.collection(database="registerdb", name="master")
+            collection = client.collection(database="1228_trenggalek", name="master")
             role = MasterModel(collection=collection, service=None)
             for m in doc['master']:
                 schema = role.schema

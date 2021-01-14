@@ -28,7 +28,7 @@ class SignInController(BaseController):
 	def post(self):
 		body = tornado.escape.json_decode(self.request.body)
 		try:
-			collection = self.CONNECTION.collection(database="registerdb", name="users")
+			collection = self.CONNECTION.collection(database="1228_trenggalek", name="users")
 			user = UserModel(collection=collection, service=options.service)
 			responseAUTH = user.auth(username= body['username'], password= body['password'])
 			if responseAUTH:

@@ -107,7 +107,7 @@
         <br>
         <div class="row">
             <div class="col-sm-12">
-                <h5> <strong>DOKUMEN OUTPUT:</strong> </h5>
+                <h5> <strong>DOKUMEN:</strong> </h5>
             </div>
             <div class="col-sm-12 table-responsive">
                 <table class="table no-margin">
@@ -178,19 +178,8 @@
 
     $("#btnPrintRegister").click(function () {
         $("#print-area").print({
-            globalStyles: true,
-            mediaPrint: false,
-            stylesheet: true,
             noPrintSelector: ".no-print",
-            iframe: true,
-            append: null,
-            prepend: null,
-            manuallyCopyFormValues: true,
-            deferred: $.Deferred(),
-            timeout: 750,
             title: "Inbox Register Data",
-            doctype: '<!doctype html>'
         });
-        return false;
     });
 </script>

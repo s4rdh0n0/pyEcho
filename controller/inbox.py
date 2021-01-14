@@ -23,8 +23,6 @@ from model.region import RegionModel
 from model.master import MasterModel
 from model.register import RegisterModel
 
-
-
 class InboxController(BaseController):
 
     @tornado.web.authenticated
@@ -32,7 +30,7 @@ class InboxController(BaseController):
     def get(self):
         useractived = self.get_user_actived(cookies=self.get_cookies_user())
         if useractived != None:
-            if UserModel(collection=self.CONNECTION.collection(database="registerdb", name="users"), service=options.service).find_role(userid=useractived['_id'], role="REGISTER") != None and useractived['actived']:
+            if UserModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="users"), service=options.service).find_role(userid=useractived['_id'], role="REGISTER") != None and useractived['actived']:
                 self.page_data['title'] = 'Inbox'
                 self.page_data['description'] = 'Inbox Register Berkas'
                 self.render('page/register/inbox.html', page=self.page_data, useractived=useractived)
@@ -55,7 +53,7 @@ class InboxController(BaseController):
             list_response = []
             count_reponse = 0
 
-            inbox = RegisterModel(collection=self.CONNECTION.collection(database="registerdb", name="register"), service=None)
+            inbox = RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None)
             if body['nomor']  == "" and body['tahun'] == "":
                 count_reponse = inbox.count(filter={"officeid": cookies['officeid'] ,"receive": cookies['userid'] ,"status": "PROSES" ,"actived": True})
                 list_response  = inbox.pagination(filter={"officeid": cookies['officeid'] ,"receive": cookies['userid'],"status": "PROSES" ,"actived": True}, page_size=body['limit'], page_num=body['page'] + 1)
@@ -82,19 +80,19 @@ class InboxDetailController(BaseController):
         cookies = self.get_cookies_user()
 
         if type == 'newmessange':
-            users = UserModel(collection=self.CONNECTION.collection(database="registerdb", name="users"), service=None).select(filter={"officeid": cookies['officeid'], "actived": True})
-            self.render('node/detailmessange.html', users=users)
+            users = UserModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="users"), service=None).select(filter={"officeid": cookies['officeid'], "actived": True})
+            self.render('node/detailmessange.html', users=users, useractived=cookies['userid'])
         elif type == 'inforegister':
             info = {}
             pemohon = []
             pemilik = []
 
-            updateReceiveDate = RegisterModel(collection=self.CONNECTION.collection(database="registerdb", name="register"), service=None).get(filter={"_id": registerid})
+            updateReceiveDate = RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None).get(filter={"_id": registerid})
             if updateReceiveDate['receivedate'] == None:
                 updateReceiveDate['receivedate'] = datetime.datetime.now()
-                RegisterModel(collection=self.CONNECTION.collection(database="registerdb", name="register"), service=None).update(filter={"_id": registerid}, schema=updateReceiveDate)
+                RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None).update(filter={"_id": registerid}, schema=updateReceiveDate)
 
-            inboxResponse = RegisterModel(collection=self.CONNECTION.collection(database="registerdb", name="register"), service=None).get(filter={"_id": registerid})
+            inboxResponse = RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None).get(filter={"_id": registerid})
             berkasid = inboxResponse['berkasid']
             yield gen.sleep(0.1)
             berkas = BerkasModel(collection=None, service=options.service)
@@ -128,12 +126,12 @@ class InboxDetailController(BaseController):
         cookies = self.get_cookies_user()
         body = tornado.escape.json_decode(self.request.body)
 
-        inbox = RegisterModel(collection=self.CONNECTION.collection(database="registerdb", name="register"), service=None).get(filter={"_id": body['registerid']})
+        inbox = RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None).get(filter={"_id": body['registerid']})
+        inbox['status'] = 'FINNISH'
         inbox['actived'] = False
-        RegisterModel(collection=self.CONNECTION.collection(database="registerdb", name="register"), service=None).update(filter={"_id": body['registerid']}, schema=inbox)
+        RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None).update(filter={"_id": body['registerid']}, schema=inbox)
 
-        user = UserModel(collection=self.CONNECTION.collection(database="registerdb", name="users"), service=options.service)
-
+        user = UserModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="users"), service=options.service)
         inbox['_id'] = uuid.uuid4().__str__()
         inbox['sender'] = cookies['userid']
         inbox['sendername'] = self.get_user_actived(cookies=cookies)['nama']
@@ -142,8 +140,26 @@ class InboxDetailController(BaseController):
         inbox['receivedate'] = None
         inbox['receive'] = body['receive']
         inbox['receivename'] = user.get(filter={"_id": body['receive']})['nama']
+        inbox['status'] = 'PROSES'
         inbox['actived'] = True
-        RegisterModel(collection=self.CONNECTION.collection(database="registerdb", name="register"), service=None).add(schema=inbox)
+        RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None).add(schema=inbox)
+
+        berkas =  BerkasModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="berkas"), service=options.service)
+        infoResponse = berkas.find(berkasid=inbox['berkasid'])
+        yield gen.sleep(0.1)
+        pemilik = []
+        for p in infoResponse.json()['result']['pemohon']:
+            if p['typepemilikid'] == 'P':
+                pemilik.append(p)
+            elif p['typepemilikid'] == 'M':
+                pemilik.append(p)
+
+        yield gen.sleep(0.1)        
+        produkResponse = berkas.produk(berkasid=inbox['berkasid'])
+        yield gen.sleep(0.1)
+        daftarisianResponse = berkas.daftarisian(berkasid=inbox['berkasid'])
+        yield gen.sleep(0.1)
+        berkas.update(filter={"_id": inbox['berkasid']},schema={"pemilik": pemilik, "daftarisian": daftarisianResponse.json()['result'], "document": produkResponse.json()['result']})
 
         self.write({'status': True, 'title': '<strong>Info</strong> <br>', 'type': 'info', 'msg': "Berkas {}/{} berhasil dikirim kepada {}.".format(inbox['nomorberkas'], inbox['tahunberkas'], inbox['receivename'])})
 
@@ -159,7 +175,7 @@ class InfoInboxController(BaseController):
         pemohon = []
         pemilik = []
 
-        inboxResponse = RegisterModel(collection=self.CONNECTION.collection(database="registerdb", name="register"), service=None).get(filter={"_id": registerid})
+        inboxResponse = RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None).get(filter={"_id": registerid})
         berkasid = inboxResponse['berkasid']
         yield gen.sleep(0.1)
         berkas = BerkasModel(collection=None, service=options.service)

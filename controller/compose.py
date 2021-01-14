@@ -1,4 +1,3 @@
-import requests
 import datetime
 from bson import json_util
 import json
@@ -31,9 +30,9 @@ class ComponseController(BaseController):
     def get(self):
         useractived = self.get_user_actived(cookies=self.get_cookies_user())
         if useractived != None:
-            if UserModel(collection=self.CONNECTION.collection(database="registerdb", name="users"), service=options.service).find_role(userid=useractived['_id'], role="REGIN") != None and useractived['actived']:
+            if UserModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="users"), service=options.service).find_role(userid=useractived['_id'], role="REGIN") != None and useractived['actived']:
                 self.page_data['title'] = 'Compose'
-                self.page_data['description'] = 'Register New Berkas'
+                self.page_data['description'] = 'Register Berkas Masuk'
                 self.render('page/register/compose.html', page=self.page_data, useractived=useractived)
 
             else:
@@ -47,13 +46,14 @@ class ComponseController(BaseController):
     @tornado.web.authenticated
     @tornado.gen.coroutine
     def post(self):
-        # client request
         cookies = self.get_cookies_user()
         body = tornado.escape.json_decode(self.request.body)
 
-        berkas = BerkasModel(collection=self.CONNECTION.collection(database="registerdb", name="berkas"), service=options.service)
+        berkas = BerkasModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="berkas"), service=options.service)
+        yield gen.sleep(0.1)
         response = berkas.search(officeid=cookies['officeid'], nomor=body['nomor'], tahun=body['tahun'])
         if response['data']['count']['Jumlah'] != 0:
+            yield gen.sleep(0.1)
             count =berkas.count(filter={"_id": response['data']['result'][0]['berkasid']})
             if count == 0:
                 self.write({'status': True, 'data': response['data']['result']})
@@ -74,7 +74,7 @@ class ComponseDetailController(BaseController):
         pemohon = []
         pemilik = []
 
-        master = MasterModel(collection=self.CONNECTION.collection(database="registerdb", name="master"), service=None)
+        master = MasterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="master"), service=None)
         region = RegionModel(collection=None, service=options.service)
         yield gen.sleep(0.1)
         berkas = BerkasModel(collection=None, service=options.service)
@@ -91,6 +91,7 @@ class ComponseDetailController(BaseController):
         yield gen.sleep(0.1)
         if infoResponse.status_code == 200 and simponiResponse.status_code == 200 and produkResponse.status_code == 200 and daftarisianResponse.status_code == 200:
             status = master.select(filter={"type": "OPERATION"})
+            yield gen.sleep(0.1)
             desa = regionResponse.json()['result']
             info = infoResponse.json()['result']['infoberkas']
             simponi = simponiResponse.json()['result']
@@ -117,16 +118,11 @@ class ComponseDetailController(BaseController):
         useractived = self.get_user_actived(cookies=cookies)
         body = tornado.escape.json_decode(self.request.body)
 
-        offices = OfficeModel(collection=self.CONNECTION.collection(database="registerdb", name="offices"), service=None)
-        yield gen.sleep(0.1)
-        region = RegionModel(collection=None, service=options.service).all_desa(officeid=cookies['officeid']).json()['result']
-        yield gen.sleep(0.1)
-        berkas =  BerkasModel(collection=self.CONNECTION.collection(database="registerdb", name="berkas"), service=options.service)
-        yield gen.sleep(0.1)
-        register = RegisterModel(collection=self.CONNECTION.collection(database="registerdb", name="register"), service=None)
-        yield gen.sleep(0.1)
-        master = MasterModel(collection=self.CONNECTION.collection(database="registerdb", name="master"), service=None)
-        yield gen.sleep(0.1)
+        offices = OfficeModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="offices"), service=None)
+        region = RegionModel(collection=None, service=options.service)
+        berkas =  BerkasModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="berkas"), service=options.service)
+        register = RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None)
+        master = MasterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="master"), service=None)
 
         msg = ""
         status = False
@@ -134,18 +130,23 @@ class ComponseDetailController(BaseController):
         title = ""
 
         berkas_entity = berkas.find(berkasid=body['berkasid']).json()['result']
+        yield gen.sleep(0.1)
         di_entity = berkas.daftarisian(berkasid=body['berkasid']).json()['result']
+        yield gen.sleep(0.1)
         doc_entity = berkas.produk(berkasid=body['berkasid']).json()['result']
+        yield gen.sleep(0.1)
+        region_entity = region.all_desa(officeid=cookies['officeid']).json()['result']
         
-        if register.count(filter={"_id": body['berkasid']}) == 0:
+        if berkas.count(filter={"_id": body['berkasid']}) == 0:
             desa_entity = {}
-            for r in region:
+            for r in region_entity:
                 if r['_id'] == body['desaid']:
                     desa_entity = r
                     break
 
             office_entity = offices.get(filter={"_id": cookies['officeid']})
 
+            # Insert berkas
             schema = dict() 
             schema['_id'] = berkas_entity['infoberkas']['_id']
             schema['register'] = offices.booking(officeid=cookies['officeid'], counter="REG")
@@ -169,7 +170,6 @@ class ComponseDetailController(BaseController):
             schema['document'] = doc_entity
             schema['status'] = body['status']
             berkas.add(schema=schema)
-            yield gen.sleep(0.1)
 
             del schema["pemilik"]
             del schema["daftarisian"]

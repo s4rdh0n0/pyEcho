@@ -12,10 +12,6 @@
         $('#tableBerkas').DataTable().ajax.reload(null, false);
     });
 
-    $('.select2').on('change', function () {
-        $(this).valid();
-    });
-
     // NOTE: Info Berkas
     $('#tableBerkas tbody').on('click', '#btnInfo', function (event) {
         var selected_row = $(this).parents('tr');
@@ -24,10 +20,10 @@
         }
 
         if (tableBerkas.row(selected_row).data()[0] != "") {
-            run_wait('.content');
+            run_wait('#tabDetail');
             $('.nav-tabs a[href="#tabDetail"]').tab('show'); 
             $('#tabDetail').load('/register/inbox/registerid=' + tableBerkas.row(selected_row).data()['_id'] + '&type=inforegister', function () {
-                $('.content').waitMe("hide");
+                $('#tabDetail').waitMe("hide");
             });
         }
 

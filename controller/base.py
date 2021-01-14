@@ -54,17 +54,17 @@ class BaseController(tornado.web.RequestHandler):
 		return self.get_secure_cookie(options.cookies)
 
 	def get_user_actived(self, cookies={}):
-		collection = self.CONNECTION.collection(database="registerdb", name="users")
+		collection = self.CONNECTION.collection(database="1228_trenggalek", name="users")
 		user = UserModel(collection=collection, service=options.service)
 		return user.get(filter={"username": cookies['username']})
 
 	def get_user_role(self, cookies:{}, key:str):
-		collection = self.CONNECTION.collection(database="registerdb", name="users")
+		collection = self.CONNECTION.collection(database="1228_trenggalek", name="users")
 		user = UserModel(collection=collection, service=options.service)
 		return user.find_role(usersid=cookies['userid'], role=key)
 
 	def get_office_actived(self, cookies={}):
-		collection = self.CONNECTION.collection(database="registerdb", name="offices")
+		collection = self.CONNECTION.collection(database="1228_trenggalek", name="offices")
 		office = OfficeModel(collection=collection, service=options.service)
 		
 		return office.get(filter={"_id": cookies['officeid']})

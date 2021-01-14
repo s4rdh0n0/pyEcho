@@ -54,8 +54,8 @@ class InboxController(BaseController):
             list_response = []
             count_reponse = 0
 
-            node  = self.CONNECTION.collection(database="registerdb", name="node")
-            register = InboxModel(collection=self.CONNECTION.collection(database="registerdb", name="inbox"), node=node, service=None)
+            node  = self.CONNECTION.collection(database="1228_trenggalek", name="node")
+            register = InboxModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="inbox"), node=node, service=None)
 
 
             count_reponse = register.count(filter={"officeid": cookies['officeid'] ,"pegawaiactived": cookies['userid']})
