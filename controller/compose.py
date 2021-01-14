@@ -58,9 +58,9 @@ class ComponseController(BaseController):
             if count == 0:
                 self.write({'status': True, 'data': response['data']['result']})
             else:
-                self.write({'status': False, 'title': 'Warning', 'msg': 'Berkas sudah terregister sebelumnya.', 'type': 'minimalist'})
+                self.write({'status': False, 'title': 'Warning', 'msg': 'Nomor berkas {}/{} sudah terregister sebelumnya.'.format(body['nomor'], body['tahun']), 'type': 'minimalist'})
         else:
-            self.write({'status': False, 'title': 'Warning', 'msg': 'Nomor berkas tidak ada pada database https://kkp2.atrbpn.go.id/.', 'type': 'minimalist'})
+            self.write({'status': False, 'title': 'Warning', 'msg': 'Nomor berkas {}/{} tidak ada pada database https://kkp2.atrbpn.go.id/.'.format(body['nomor'], body['tahun']), 'type': 'minimalist'})
 
 
 class ComponseDetailController(BaseController):
@@ -76,7 +76,6 @@ class ComponseDetailController(BaseController):
 
         master = MasterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="master"), service=None)
         region = RegionModel(collection=None, service=options.service)
-        yield gen.sleep(0.1)
         berkas = BerkasModel(collection=None, service=options.service)
         yield gen.sleep(0.1)
         infoResponse = berkas.find(berkasid=berkasid)
@@ -147,46 +146,48 @@ class ComponseDetailController(BaseController):
             office_entity = offices.get(filter={"_id": cookies['officeid']})
 
             # Insert berkas
-            schema = dict() 
-            schema['_id'] = berkas_entity['infoberkas']['_id']
-            schema['register'] = offices.booking(officeid=cookies['officeid'], counter="REG")
-            schema['officeid'] = office_entity['_id']
-            schema['officetype'] = office_entity['officetypeid']
-            schema['officenama'] = office_entity['nama']
-            schema['kecamatanid'] = desa_entity['wilayahinduk']['wilayahid']
-            schema['kecamatancode'] = desa_entity['wilayahinduk']['kode']
-            schema['namakecamatan'] = desa_entity['wilayahinduk']['nama']
-            schema['desaid'] = desa_entity['_id']
-            schema['desacode'] = desa_entity['kode']
-            schema['namadesa'] = desa_entity['nama']
-            schema['nomorberkas'] = berkas_entity['infoberkas']['nomor']
-            schema['tahunberkas'] = berkas_entity['infoberkas']['tahun']
-            schema['prosedur'] = berkas_entity['infoberkas']['prosedur']
-            schema['kegiatan'] = berkas_entity['infoberkas']['kegiatan']
-            schema['phone'] = body['phone']
-            schema['email'] = body['email']
-            schema['pemilik'] = berkas_entity['pemohon']
-            schema['daftarisian'] = di_entity
-            schema['document'] = doc_entity
-            schema['status'] = body['status']
-            berkas.add(schema=schema)
+            schema_berkas = dict() 
+            schema_berkas['_id'] = berkas_entity['infoberkas']['_id']
+            schema_berkas['officeid'] = office_entity['_id']
+            schema_berkas['officetype'] = office_entity['officetypeid']
+            schema_berkas['officenama'] = office_entity['nama']
+            schema_berkas['kecamatanid'] = desa_entity['wilayahinduk']['wilayahid']
+            schema_berkas['kecamatancode'] = desa_entity['wilayahinduk']['kode']
+            schema_berkas['namakecamatan'] = desa_entity['wilayahinduk']['nama']
+            schema_berkas['desaid'] = desa_entity['_id']
+            schema_berkas['desacode'] = desa_entity['kode']
+            schema_berkas['namadesa'] = desa_entity['nama']
+            schema_berkas['nomorberkas'] = berkas_entity['infoberkas']['nomor']
+            schema_berkas['tahunberkas'] = berkas_entity['infoberkas']['tahun']
+            schema_berkas['prosedur'] = berkas_entity['infoberkas']['prosedur']
+            schema_berkas['kegiatan'] = berkas_entity['infoberkas']['kegiatan']
+            schema_berkas['phone'] = body['phone']
+            schema_berkas['email'] = body['email']
+            schema_berkas['pemilik'] = berkas_entity['pemohon']
+            schema_berkas['daftarisian'] = di_entity
+            schema_berkas['document'] = doc_entity
+            schema_berkas['status'] = body['status']
+            berkas.add(schema=schema_berkas)
 
-            del schema["pemilik"]
-            del schema["daftarisian"]
-            del schema["document"]
-            schema['_id'] = uuid.uuid4().__str__()
-            schema['berkasid'] = berkas_entity['infoberkas']['_id']
-            schema['sender'] = cookies['userid']
-            schema['sendername'] = useractived['nama']
-            schema['senddate'] = datetime.datetime.now()
-            schema['messsange'] = ""
-            schema['receivedate'] = None
-            schema['receive'] = cookies['userid']
-            schema['receivename'] = useractived['nama']
-            schema['actived'] = True
-            register.add(schema=schema)
+            schema_node = dict()
+            schema_node['_id'] = uuid.uuid4().__str__()
+            schema_node['register'] = offices.booking(officeid=cookies['officeid'], counter="REG")
+            schema_node['officeid'] = schema_berkas['officeid']
+            schema_node['berkasid'] = berkas_entity['infoberkas']['_id']
+            schema_node['nomorberkas'] = schema_berkas['nomorberkas']
+            schema_node['tahunberkas'] = schema_berkas['tahunberkas']
+            schema_node['sender'] = cookies['userid']
+            schema_node['sendername'] = useractived['nama']
+            schema_node['senddate'] = datetime.datetime.now()
+            schema_node['messsange'] = "Register berkas {}/{}. Tanggal. {}".format(berkas_entity['infoberkas']['nomor'], berkas_entity['infoberkas']['tahun'], schema_node['senddate'].strftime('%d-%m-%Y, %H:%M:%S'))
+            schema_node['receivedate'] = None
+            schema_node['receive'] = cookies['userid']
+            schema_node['receivename'] = useractived['nama']
+            schema_node['status'] = body['status']
+            schema_node['actived'] = True
+            register.add(schema=schema_node)
 
-            msg = "Berkas {}/{} berhasil terregister.".format(schema['nomorberkas'], schema['tahunberkas'])
+            msg = "Berkas {}/{} berhasil terregister.".format(schema_berkas['nomorberkas'], schema_berkas['tahunberkas'])
             status = True
             tipe = "info"
             title = '<strong>Info</strong> <br>'

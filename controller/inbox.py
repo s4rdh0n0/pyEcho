@@ -1,4 +1,3 @@
-import requests
 import datetime
 from bson import json_util
 import json
@@ -32,7 +31,7 @@ class InboxController(BaseController):
         if useractived != None:
             if UserModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="users"), service=options.service).find_role(userid=useractived['_id'], role="REGISTER") != None and useractived['actived']:
                 self.page_data['title'] = 'Inbox'
-                self.page_data['description'] = 'Inbox Register Berkas'
+                self.page_data['description'] = 'Daftar Berkas Masuk'
                 self.render('page/register/inbox.html', page=self.page_data, useractived=useractived)
 
             else:
@@ -67,7 +66,12 @@ class InboxController(BaseController):
                 count_reponse = inbox.count(filter={"officeid": cookies['officeid'] ,"receive": cookies['userid'] ,"nomorberkas": body['nomor'] ,"tahunberkas": body['tahun'] ,"status": "PROSES" ,"actived": True})
                 list_response  = inbox.pagination(filter={"officeid": cookies['officeid'] ,"receive": cookies['userid'] ,"nomorberkas": body['nomor'] ,"tahunberkas": body['tahun'] ,"status": "PROSES" ,"actived": True}, page_size=body['limit'], page_num=body['page'] + 1)
 
-            self.write({'status': True, 'draw': body['draw'], 'data': json.dumps(list_response, default=json_util.default), 'recordsTotal': count_reponse, 'recordsFiltered': count_reponse})
+            result = []
+            for x in list_response:
+                x['berkas'] = BerkasModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="berkas"), service=None).get(filter={'_id': x['berkasid']})
+                result.append(x)
+
+            self.write({'status': True, 'draw': body['draw'], 'data': json.dumps(result, default=json_util.default), 'recordsTotal': count_reponse, 'recordsFiltered': count_reponse})
         else:
             self.redirect("/logout")
 
@@ -93,16 +97,15 @@ class InboxDetailController(BaseController):
                 RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None).update(filter={"_id": registerid}, schema=updateReceiveDate)
 
             inboxResponse = RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None).get(filter={"_id": registerid})
-            berkasid = inboxResponse['berkasid']
             yield gen.sleep(0.1)
-            berkas = BerkasModel(collection=None, service=options.service)
-            infoResponse = berkas.find(berkasid=berkasid)
+            berkas = BerkasModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=options.service)
+            infoResponse = berkas.find(berkasid=inboxResponse['berkasid'])
             yield gen.sleep(0.1)
-            simponiResponse = berkas.simponi(berkasid=berkasid)
+            simponiResponse = berkas.simponi(berkasid=inboxResponse['berkasid'])
             yield gen.sleep(0.1)
-            produkResponse = berkas.produk(berkasid=berkasid)
+            produkResponse = berkas.produk(berkasid=inboxResponse['berkasid'])
             yield gen.sleep(0.1)
-            daftarisianResponse = berkas.daftarisian(berkasid=berkasid)
+            daftarisianResponse = berkas.daftarisian(berkasid=inboxResponse['berkasid'])
             yield gen.sleep(0.1)
             if infoResponse.status_code == 200 and simponiResponse.status_code == 200 and produkResponse.status_code == 200 and daftarisianResponse.status_code == 200:
                 info = infoResponse.json()['result']['infoberkas']
@@ -176,16 +179,19 @@ class InfoInboxController(BaseController):
         pemilik = []
 
         inboxResponse = RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None).get(filter={"_id": registerid})
-        berkasid = inboxResponse['berkasid']
         yield gen.sleep(0.1)
-        berkas = BerkasModel(collection=None, service=options.service)
-        infoResponse = berkas.find(berkasid=berkasid)
+        berkas = BerkasModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="berkas"), service=options.service)
         yield gen.sleep(0.1)
-        simponiResponse = berkas.simponi(berkasid=berkasid)
+        registerResponse = berkas.get(filter={"_id": inboxResponse['berkasid']})
+        print(registerResponse)
         yield gen.sleep(0.1)
-        produkResponse = berkas.produk(berkasid=berkasid)
+        infoResponse = berkas.find(berkasid=inboxResponse['berkasid'])
         yield gen.sleep(0.1)
-        daftarisianResponse = berkas.daftarisian(berkasid=berkasid)
+        simponiResponse = berkas.simponi(berkasid=inboxResponse['berkasid'])
+        yield gen.sleep(0.1)
+        produkResponse = berkas.produk(berkasid=inboxResponse['berkasid'])
+        yield gen.sleep(0.1)
+        daftarisianResponse = berkas.daftarisian(berkasid=inboxResponse['berkasid'])
         yield gen.sleep(0.1)
         if infoResponse.status_code == 200 and simponiResponse.status_code == 200 and produkResponse.status_code == 200 and daftarisianResponse.status_code == 200:
             info = infoResponse.json()['result']['infoberkas']

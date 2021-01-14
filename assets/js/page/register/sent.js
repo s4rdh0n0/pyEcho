@@ -21,7 +21,7 @@
 
         if (tableBerkas.row(selected_row).data()[0] != "") {
             run_wait('#tabDetail');
-            $('.nav-tabs a[href="#tabDetail"]').tab('show'); 
+            $('.nav-tabs a[href="#tabDetail"]').tab('show');
             $('#tabDetail').load('/register/inbox/registerid=' + tableBerkas.row(selected_row).data()['_id'] + '&type=inforegister', function () {
                 $('#tabDetail').waitMe("hide");
             });
@@ -49,7 +49,7 @@ var tableBerkas = $('#tableBerkas').DataTable({
     'ajax': function (data, callback) {
         $.ajax({
             type: 'POST',
-            url: '/register/inbox',
+            url: '/register/sent',
             data: JSON.stringify({
 
                 // NOTE: Query table berkas
@@ -110,12 +110,12 @@ var tableBerkas = $('#tableBerkas').DataTable({
                 var month = date.getUTCMonth() + 1;
                 return (date.getUTCDate().toString().length > 1 ? date.getUTCDate() : "0" + date.getUTCDate()) + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCFullYear() + "  " + (date.getUTCHours().toString().length > 1 ? date.getUTCHours() : "0" + date.getUTCHours()) + ":" + (date.getUTCMinutes().toString().length > 1 ? date.getUTCMinutes() : "0" + date.getUTCMinutes()) + ":" + (date.getUTCSeconds().toString().length > 1 ? date.getUTCSeconds() : "0" + date.getUTCSeconds());
             }
-        },{
+        }, {
             "targets": [6],
             "width": "15%",
             "data": 'sendername',
             "className": "dt-center text-center"
-        },{
+        }, {
             "targets": [7],
             "width": "26%",
             "data": 'berkas.kegiatan',
