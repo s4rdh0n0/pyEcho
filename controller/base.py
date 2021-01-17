@@ -68,3 +68,12 @@ class BaseController(tornado.web.RequestHandler):
 		office = OfficeModel(collection=collection, service=options.service)
 		
 		return office.get(filter={"_id": cookies['officeid']}, session=session)
+
+
+class BaseAuthController(BaseController):
+
+	def initialize(self):
+		self.connection = self.CONNECTION
+		with self.connection.client.start_session() as session:
+			self.useractived = self.get_user_actived(cookies=self.get_cookies_user(), session=session)
+

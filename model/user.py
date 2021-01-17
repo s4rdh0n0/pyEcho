@@ -7,28 +7,6 @@ from model.crud import CRUDModel
 
 
 class UserModel(BaseModel):
-    schema = {
-        '_id': None,
-        'username': None,
-        'password': None,
-        'officeid': None, 
-        'pegawaiid': None,
-        'nama': None,
-        'email': None,
-        'phone': None,
-        'role': [],
-        'createdate': None,
-        'usercreate': None,
-        'updatedate': None,
-        'userupdate': None,
-        'actived': False,
-    }
-
-    schema_role = {
-        'key': None,
-        'description': None,
-        'startdate': None,
-    }
 
     def __init__(self, collection: None, service: None):
         super().__init__(collection=collection, service=service)

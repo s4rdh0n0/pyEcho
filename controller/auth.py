@@ -1,8 +1,6 @@
 import json
-import requests
 
 # Tornado Framework
-import tornado.gen
 import tornado.web
 import tornado.escape
 from tornado.options import options
@@ -22,9 +20,11 @@ class SignInController(BaseController):
 		'msg': 'Username or password not valid.',
 	}
 
+	# View login
 	def get(self):
-		self.render('page/auth/login.html', static_file=self.static_file)
+		self.render('page/auth/login.html')
 
+	# Validation user
 	def post(self):
 		body = tornado.escape.json_decode(self.request.body)
 		_connection = self.CONNECTION

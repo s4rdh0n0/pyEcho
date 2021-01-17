@@ -23,25 +23,50 @@ from model.master import MasterModel
 from model.register import RegisterModel
 
 
+class BerkasKKPController(BaseController):
+
+    @tornado.web.authenticated
+    def get(self):
+        _connection = self.CONNECTION
+        with _connection.client.start_session() as session:
+            try:
+                useractived = self.get_user_actived(cookies=self.get_cookies_user(), session=session)
+                if useractived['actived']:
+                    if UserModel(collection=_connection.collection(database="pyDatabase", name="users"), service=options.service).find_role(userid=useractived['_id'], role="REGIN", session=session) != None and useractived['actived']:
+                        self.page_data['title'] = 'Berkas'
+                        self.page_data['description'] = 'Daftar Berkas KKP'
+                        self.render('page/kkp/daftarberkas.html', page=self.page_data, useractived=useractived)
+                    else:
+                        self.page_data['title'] = '403'
+                        self.page_data['description'] = 'Access denied'
+                        self.render("page/error/403.html", page=self.page_data,  useractived=useractived)
+                else:
+                    self.redirect("/logout")
+            except Exception as e:
+                self.redirect("/logout")
+
 class ComponseController(BaseController):
 
     @tornado.web.authenticated
     @tornado.gen.coroutine
     def get(self):
-        useractived = self.get_user_actived(cookies=self.get_cookies_user())
-        if useractived != None:
-            if UserModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="users"), service=options.service).find_role(userid=useractived['_id'], role="REGIN") != None and useractived['actived']:
-                self.page_data['title'] = 'Compose'
-                self.page_data['description'] = 'Register Berkas Masuk'
-                self.render('page/register/compose.html', page=self.page_data, useractived=useractived)
-
-            else:
-                self.page_data['title'] = '403'
-                self.page_data['description'] = 'Access denied'
-                self.render("page/error/403.html", page=self.page_data,  useractived=useractived)
-        else:
-            self.redirect("/logout")
-
+        _connection = self.CONNECTION
+        with _connection.client.start_session() as session:
+            try:
+                useractived = self.get_user_actived(cookies=self.get_cookies_user(), session=session)
+                if useractived['actived']:
+                    if UserModel(collection=_connection.collection(database="pyDatabase", name="users"), service=options.service).find_role(userid=useractived['_id'], role="REGIN") != None and useractived['actived']:
+                        self.page_data['title'] = 'Compose'
+                        self.page_data['description'] = 'Register Berkas Masuk'
+                        self.render('page/register/compose.html', page=self.page_data, useractived=useractived)
+                    else:
+                        self.page_data['title'] = '403'
+                        self.page_data['description'] = 'Access denied'
+                        self.render("page/error/403.html", page=self.page_data,  useractived=useractived)
+                else:
+                    self.redirect("/logout")
+            except Exception as e:
+                self.redirect("/logout")
 
     @tornado.web.authenticated
     @tornado.gen.coroutine
