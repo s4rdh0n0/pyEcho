@@ -53,18 +53,18 @@ class BaseController(tornado.web.RequestHandler):
 	def get_current_user(self):
 		return self.get_secure_cookie(options.cookies)
 
-	def get_user_actived(self, cookies={}):
-		collection = self.CONNECTION.collection(database="1228_trenggalek", name="users")
+	def get_user_actived(self, cookies: dict(), session:None):
+		collection = self.CONNECTION.collection(database="pyDatabase", name="users")
 		user = UserModel(collection=collection, service=options.service)
-		return user.get(filter={"username": cookies['username']})
+		return user.get(filter={"username": cookies['username']}, session=session)
 
-	def get_user_role(self, cookies:{}, key:str):
-		collection = self.CONNECTION.collection(database="1228_trenggalek", name="users")
+	def get_user_role(self, cookies:dict(), key:str, session:None):
+		collection = self.CONNECTION.collection(database="pyDatabase", name="users")
 		user = UserModel(collection=collection, service=options.service)
-		return user.find_role(usersid=cookies['userid'], role=key)
+		return user.find_role(usersid=cookies['userid'], role=key, session=session)
 
-	def get_office_actived(self, cookies={}):
-		collection = self.CONNECTION.collection(database="1228_trenggalek", name="offices")
+	def get_office_actived(self, cookies:dict(), session:None):
+		collection = self.CONNECTION.collection(database="pyDatabase", name="offices")
 		office = OfficeModel(collection=collection, service=options.service)
 		
-		return office.get(filter={"_id": cookies['officeid']})
+		return office.get(filter={"_id": cookies['officeid']}, session=session)

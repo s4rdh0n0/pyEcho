@@ -17,19 +17,6 @@ user:
     email: s4rdh0n0@gmail.com
 
 master:
-  - code: REGIN
-    type: ROLE
-    description: Register Berkas Masuk
-  - code: REGOUT
-    type: ROLE
-    description: Register Berkas Keluar
-  - code: REGISTER
-    type: ROLE
-    description: Petugas Register
-  - code: ADMINISTRATOR
-    type: ROLE
-    description: Pengelola Aplikasi dan Data
-
   - code: 1
     type: OFFICE
     description: Kantor Pusat
@@ -94,6 +81,27 @@ master:
     type: OPERATION
     description: Register Berkas Selesai
 
+  - code: REGIN
+    type: JOB
+    description: Petugas pelaksana register berkas masuk
+  - code: REGOUT
+    type: JOB
+    description: Petugas pelaksana register berkas keluar
+  - code: SURVEY
+    type: JOB
+    description: Pengukuran bidang tanah
+  - code: DRAWING
+    type: JOB
+    description: Penggambaran dan Pemetaan bidang tanah
+  - code: VALIDATOR
+    type: JOB
+    description: Koreksi dan validasi data
+  - code: ADMINISTRATOR
+    type: JOB
+    description: Pengelola aplikasi dan data
+
+
+    
   - code: REG
     type: COUNTER
     description: Counter nomor register berkas

@@ -27,30 +27,30 @@ class SignInController(BaseController):
 
 	def post(self):
 		body = tornado.escape.json_decode(self.request.body)
-		try:
-			collection = self.CONNECTION.collection(database="1228_trenggalek", name="users")
-			user = UserModel(collection=collection, service=options.service)
-			responseAUTH = user.auth(username= body['username'], password= body['password'])
-			if responseAUTH:
-				result = user.get(filter={"username": body['username'], "password": body['password']})
-
-				self.result_validation['status'] = True
-				self.result_validation['url'] = self.get_query_argument('next', u'/')
-				self.result_validation['type'] = 'success'
-				self.result_validation['msg'] = None
-				self.save_cookies(result)
-
-			else:
+		_connection = self.CONNECTION
+		with _connection.client.start_session() as session:
+			try:
+				user = UserModel(collection=_connection.collection(database="pyDatabase", name="users"), service=options.service)
+				responseAUTH = user.auth(username= body['username'], password= body['password'], session=session)
+				if responseAUTH:
+					result = user.get(filter={"username": body['username'], "password": body['password']}, session=session)
+					self.result_validation['status'] = True
+					self.result_validation['url'] = self.get_query_argument('next', u'/')
+					self.result_validation['type'] = 'success'
+					self.result_validation['msg'] = None
+					self.save_cookies(result)
+				else:
+					self.result_validation['status'] = False
+					self.result_validation['url'] = None
+					self.result_validation['type'] = 'warning'
+					self.result_validation['msg'] = 'Gagal login. Nama pengguna atau kata sandi yang anda masukkan salah.'
+			except Exception as e:
 				self.result_validation['status'] = False
 				self.result_validation['url'] = None
 				self.result_validation['type'] = 'warning'
-				self.result_validation['msg'] = 'Gagal login. Nama pengguna atau kata sandi yang anda masukkan salah.'
-
-
-		except Exception as e:
-			self.write(e)
-		finally:
-			self.write(self.result_validation)
+				self.result_validation['msg'] = e
+			finally:
+				self.write(self.result_validation)
 
 	def save_cookies(self, userdatabase={}):
 		self.cookies_data['userid'] = userdatabase['_id']

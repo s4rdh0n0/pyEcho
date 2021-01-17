@@ -172,6 +172,7 @@ class ComponseDetailController(BaseController):
             schema_node = dict()
             schema_node['_id'] = uuid.uuid4().__str__()
             schema_node['register'] = offices.booking(officeid=cookies['officeid'], counter="REG")
+            schema_node['job'] = 'REGIN'
             schema_node['officeid'] = schema_berkas['officeid']
             schema_node['berkasid'] = berkas_entity['infoberkas']['_id']
             schema_node['nomorberkas'] = schema_berkas['nomorberkas']

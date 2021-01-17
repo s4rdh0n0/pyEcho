@@ -100,8 +100,13 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "render": function (data) {
                 return data.toUpperCase();
             }
-        }, {
+        },{
             "targets": [4],
+            "width": "10%",
+            "data": 'sendername',
+            "className": "dt-center text-center"
+        }, {
+            "targets": [5],
             "width": "10%",
             "data": 'senddate',
             "className": "dt-center text-center",
@@ -110,27 +115,24 @@ var tableBerkas = $('#tableBerkas').DataTable({
                 var month = date.getUTCMonth() + 1;
                 return (date.getUTCDate().toString().length > 1 ? date.getUTCDate() : "0" + date.getUTCDate()) + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCFullYear() + "  " + (date.getUTCHours().toString().length > 1 ? date.getUTCHours() : "0" + date.getUTCHours()) + ":" + (date.getUTCMinutes().toString().length > 1 ? date.getUTCMinutes() : "0" + date.getUTCMinutes()) + ":" + (date.getUTCSeconds().toString().length > 1 ? date.getUTCSeconds() : "0" + date.getUTCSeconds());
             }
-        }, {
+        },{
             "targets": [6],
-            "width": "15%",
-            "data": 'sendername',
+            "width": "10%",
+            "data": 'receivename',
             "className": "dt-center text-center"
-        }, {
+        },{
             "targets": [7],
-            "width": "26%",
-            "data": 'berkas.kegiatan',
-            "className": "dt-center text-center"
-        }, {
-            "targets": [8],
-            "width": "20%",
-            "data": 'berkas.prosedur',
-            "className": "dt-center text-center"
-        }, {
-            "targets": [9],
-            "width": "6%",
+            "width": "10%",
+            "data": 'receivedate',
             "className": "dt-center text-center",
             "render": function (data) {
-                return '<a id="btnInfo" class="btn btn-default btn-flat"><i class="fa fa-info-circle" aria-hidden="true"></i></a>'
+                if(data != undefined){
+                    var date = new Date(data.$date);
+                    var month = date.getUTCMonth() + 1;
+                    return (date.getUTCDate().toString().length > 1 ? date.getUTCDate() : "0" + date.getUTCDate()) + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCFullYear() + "  " + (date.getUTCHours().toString().length > 1 ? date.getUTCHours() : "0" + date.getUTCHours()) + ":" + (date.getUTCMinutes().toString().length > 1 ? date.getUTCMinutes() : "0" + date.getUTCMinutes()) + ":" + (date.getUTCSeconds().toString().length > 1 ? date.getUTCSeconds() : "0" + date.getUTCSeconds());
+                }else{
+                    return ""
+                }
             }
         }
     ],

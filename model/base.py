@@ -12,29 +12,28 @@ class BaseModel():
         self.collection = collection
         self.service = service
 
-    # Standart
     def pagination(self, page_size: int, page_num: int):
         return CRUDModel(collection=self.collection).pagination(page_size=page_size, page_num=page_num)
 
-    def add(self, schema: {}):
-        return CRUDModel(collection=self.collection).insert(schema=schema)
+    def add(self, schema: {}, session: None):
+        return CRUDModel(collection=self.collection).insert(schema=schema, session=session)
 
-    def update(self, filter: {}, schema: {}):
-        return CRUDModel(collection=self.collection).update(filter=filter, schema={"$set": schema})
+    def update(self, filter: {}, schema: {}, session: None):
+        return CRUDModel(collection=self.collection).update(filter=filter, schema={"$set": schema}, session=session)
 
-    def delete(self, filter: {}):
-        return CRUDModel(collection=self.collection).delete(filter=filter)
-
-
-    def select(self, filter: {}):
-        return CRUDModel(collection=self.collection).select(filter=filter)
+    def delete(self, filter: {}, session: None):
+        return CRUDModel(collection=self.collection).delete(filter=filter, session=session)
 
 
-    def get(self, filter: {}):
-        return CRUDModel(collection=self.collection).find(filter=filter, field={})
+    def select(self, filter: {}, session: None):
+        return CRUDModel(collection=self.collection).select(filter=filter, session=session)
 
-    def count(self, filter: {}):
-        return CRUDModel(collection=self.collection).count(filter=filter)
+
+    def get(self, filter: {}, session: None):
+        return CRUDModel(collection=self.collection).find(filter=filter, field={}, session=session)
+
+    def count(self, filter: {}, session: None):
+        return CRUDModel(collection=self.collection).count(filter=filter, session=session)
 
 class ConnectionModel():
     """

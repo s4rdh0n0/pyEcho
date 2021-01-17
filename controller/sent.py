@@ -54,17 +54,17 @@ class SentController(BaseController):
 
             inbox = RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None)
             if body['nomor']  == "" and body['tahun'] == "":
-                count_reponse = inbox.count(filter={"officeid": cookies['officeid'] ,"sender": cookies['userid'] ,"status": "FINNISH" ,"actived": False})
-                list_response  = inbox.pagination(filter={"officeid": cookies['officeid'] ,"sender": cookies['userid'],"status": "FINNISH" ,"actived": False}, page_size=body['limit'], page_num=body['page'] + 1)
+                count_reponse = inbox.count(filter={"officeid": cookies['officeid'] ,"sender": cookies['userid'] })
+                list_response  = inbox.pagination(filter={"officeid": cookies['officeid'] ,"sender": cookies['userid']}, page_size=body['limit'], page_num=body['page'] + 1)
             elif body['nomor']  != "" and body['tahun'] == "":
-                count_reponse = inbox.count(filter={"officeid": cookies['officeid'] ,"sender": cookies['userid'] ,"nomorberkas": body['nomor'] ,"status": "FINNISH" ,"actived": False})
-                list_response  = inbox.pagination(filter={"officeid": cookies['officeid'] ,"sender": cookies['userid'] ,"nomorberkas": body['nomor'] ,"status": "FINNISH" ,"actived": False}, page_size=body['limit'], page_num=body['page'] + 1)               
+                count_reponse = inbox.count(filter={"officeid": cookies['officeid'] ,"sender": cookies['userid'] ,"nomorberkas": body['nomor'] })
+                list_response  = inbox.pagination(filter={"officeid": cookies['officeid'] ,"sender": cookies['userid'] ,"nomorberkas": body['nomor'] }, page_size=body['limit'], page_num=body['page'] + 1)               
             elif body['nomor']  == "" and body['tahun']  != "":
-                count_reponse = inbox.count(filter={"officeid": cookies['officeid'] ,"sender": cookies['userid'] , "tahunberkas": body['tahun'] ,"status": "FINNISH" ,"actived": False})
-                list_response  = inbox.pagination(filter={"officeid": cookies['officeid'] ,"sender": cookies['userid'] ,"tahunberkas": body['tahun'] ,"status": "FINNISH" ,"actived": False}, page_size=body['limit'], page_num=body['page'] + 1)
+                count_reponse = inbox.count(filter={"officeid": cookies['officeid'] ,"sender": cookies['userid'] , "tahunberkas": body['tahun'] })
+                list_response  = inbox.pagination(filter={"officeid": cookies['officeid'] ,"sender": cookies['userid'] ,"tahunberkas": body['tahun'] }, page_size=body['limit'], page_num=body['page'] + 1)
             else:
-                count_reponse = inbox.count(filter={"officeid": cookies['officeid'] ,"sender": cookies['userid'] ,"nomorberkas": body['nomor'] ,"tahunberkas": body['tahun'] ,"status": "FINNISH" ,"actived": False})
-                list_response  = inbox.pagination(filter={"officeid": cookies['officeid'] ,"sender": cookies['userid'] ,"nomorberkas": body['nomor'] ,"tahunberkas": body['tahun'] ,"status": "FINNISH" ,"actived": False}, page_size=body['limit'], page_num=body['page'] + 1)
+                count_reponse = inbox.count(filter={"officeid": cookies['officeid'] ,"sender": cookies['userid'] ,"nomorberkas": body['nomor'] ,"tahunberkas": body['tahun'] })
+                list_response  = inbox.pagination(filter={"officeid": cookies['officeid'] ,"sender": cookies['userid'] ,"nomorberkas": body['nomor'] ,"tahunberkas": body['tahun'] }, page_size=body['limit'], page_num=body['page'] + 1)
 
             result = []
             for x in list_response:
