@@ -15,25 +15,25 @@ class BaseModel():
     def pagination(self, page_size: int, page_num: int):
         return CRUDModel(collection=self.collection).pagination(page_size=page_size, page_num=page_num)
 
-    def add(self, schema: {}, session: None):
-        return CRUDModel(collection=self.collection).insert(schema=schema, session=session)
+    def add(self, schema: {}):
+        return CRUDModel(collection=self.collection).insert(schema=schema)
 
-    def update(self, filter: {}, schema: {}, session: None):
-        return CRUDModel(collection=self.collection).update(filter=filter, schema={"$set": schema}, session=session)
+    def update(self, filter: {}, schema: {}):
+        return CRUDModel(collection=self.collection).update(filter=filter, schema={"$set": schema})
 
-    def delete(self, filter: {}, session: None):
-        return CRUDModel(collection=self.collection).delete(filter=filter, session=session)
-
-
-    def select(self, filter: {}, session: None):
-        return CRUDModel(collection=self.collection).select(filter=filter, session=session)
+    def delete(self, filter: {}):
+        return CRUDModel(collection=self.collection).delete(filter=filter)
 
 
-    def get(self, filter: {}, session: None):
-        return CRUDModel(collection=self.collection).find(filter=filter, field={}, session=session)
+    def select(self, filter: {}):
+        return CRUDModel(collection=self.collection).select(filter=filter)
 
-    def count(self, filter: {}, session: None):
-        return CRUDModel(collection=self.collection).count(filter=filter, session=session)
+
+    def get(self, filter: {}):
+        return CRUDModel(collection=self.collection).find(filter=filter, field={})
+
+    def count(self, filter: {}):
+        return CRUDModel(collection=self.collection).count(filter=filter)
 
 class ConnectionModel():
     """
@@ -45,7 +45,8 @@ class ConnectionModel():
         self.password = password
         self.server = server
         self.port = port
-        self.client = pymongo.MongoClient('mongodb://{}:{}@{}:{}/'.format(username, password, server, port))
+
+        self.client = pymongo.MongoClient('mongodb://{}:{}@{}:{}'.format(username, password, server, port))
 
     def collection(self, database:str, name:str):
         db = self.client[database]

@@ -2,7 +2,7 @@
 db:
   server: localhost
   username: 1228_Trenggalek
-  password: 1228Trenggalek
+  password: 1228trenggalek
   port: 27017
 
 office:

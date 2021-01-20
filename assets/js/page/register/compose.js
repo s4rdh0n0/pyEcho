@@ -1,8 +1,8 @@
 + function ($) {
     'use strict';
 
-    // NOTE: Cari Berkas
     $('#formCariBerkas').validate({
+        
         rules: {
             nomor: {
                 required: true,
@@ -58,7 +58,7 @@
                 headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                 success: (function (result) {
                     if (result.status){
-                        $('#berkasView').load('/register/compose/berkasid=' + result.data[0].berkasid, function () {
+                        $('#berkasView').load('/kkp/berkas/berkasid=' + result.data[0].berkasid, function () {
                             $('.content').waitMe("hide");
                         });
                     }else{
@@ -70,16 +70,16 @@
                         }, {
                             type: result.type,
                             template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
-                                '<span data-notify="title">{1}</span>' +
-                                '<span data-notify="message">{2}</span>' +
-                                '</div>',
+                                    '<span data-notify="title">{1}</span>' +
+                                    '<span data-notify="message">{2}</span>' +
+                                    '</div>',
                             animate: {
                                 enter: 'animated fadeInRight',
                                 exit: 'animated fadeOutRight'
                             }
                         });
 
-                        $('#berkasView').load('/node/error/400');
+                        $('#berkasView').empty()
                     }
 
                 }),
@@ -93,7 +93,6 @@
 
 }(jQuery);
 
-/* Initial Loading */
 function run_wait(element) {
     $(element).waitMe({
         effect: 'bounce',

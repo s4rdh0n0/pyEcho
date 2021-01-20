@@ -8,24 +8,24 @@ class CRUDModel():
     def __init__(self, collection:None):
         self.collection = collection
 
-    def select(self, filter:{}, session: None):
-        return self.collection.find(filter, session=session)
+    def select(self, filter:{}):
+        return self.collection.find(filter)
 
-    def find(self, filter: {}, field: {}, session: None):
+    def find(self, filter: {}, field: {}):
         if field == {}:
-            return self.collection.find_one(filter, session=session)
+            return self.collection.find_one(filter)
         else:
-            return self.collection.find_one(filter, field, session=session)
+            return self.collection.find_one(filter, field)
 
-    def count(self, filter: {}, session: None):
-        return self.collection.count(filter, session=session)
+    def count(self, filter: {}):
+        return self.collection.count(filter)
 
-    def insert(self, schema: {}, session: None):
-        return self.collection.insert_one(schema, session=session)
+    def insert(self, schema: {}):
+        return self.collection.insert_one(schema)
 
-    def update(self, filter: {}, schema: {}, session: None):
-        return self.collection.update_one(filter, schema, session=session)
+    def update(self, filter: {}, schema: {}):
+        return self.collection.update_one(filter, schema)
 
-    def delete(self, filter: {}, session: None):
-        return self.collection.delete_one(filter, session=session)
+    def delete(self, filter: {}):
+        return self.collection.delete_one(filter)
 

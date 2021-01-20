@@ -1,180 +1,203 @@
-<div class="invoice" id="print-area">
-    <div class="no-print">
-        <button class="btn btn-default no-print" id="btnPrintRegister"><i class="fa fa-print"></i> Print</button>
-        <button class="btn btn-success no-print" id="btnKembali"><i class="fa fa-undo"></i> Kembali</button>
-        <button class="btn btn-primary no-print pull-right" id="btnNewMessange"><i class="fa fa-envelope-o" aria-hidden="true"></i> Kirim Berkas</button>
+<div class="invoice">
+    <div class="invoice-info">
+        <input type="hidden" name="berkasid" value="{{ info['_id'] }}">
+        <button type="button" id="btnSimpan" name="btnSimpan" class="btn btn-primary btn-md btn-flat"><i class="fa fa-floppy-o" aria-hidden="true"></i> Register Berkas</button>
     </div>
     <br>
     <div class="invoice-info">
-        <h5 class="page-header">
-            <i class="fa fa-globe"></i> {{ office['nama'].upper() }}
-        </h5>
         <div class="row">
-            <input type="hidden" name="registerid" id="registerid" value="{{ inbox['_id'] }}">
             <div class="col-sm-4 invoice-col">
-                <strong>Pengirim :</strong> <address>{{ inbox['sendername'] }} <br> Tanggal. {{ inbox['senddate'].strftime('%d/%m/%Y, %H:%M:%S') }}</address>
-                <strong>Nomor Register :</strong> <address>{{ inbox['register'] }}</address>
-                <strong>Tanggal Diterima :</strong> <address>{{ inbox['receivedate'].strftime('%d/%m/%Y, %H:%M:%S') }}</address>
-                <strong>Pesan :</strong> <address>{{ inbox['messsange'] }}</address>
+                <strong>Kantor :</strong> <address>{{ office['nama'].upper() }}</address>
+                <strong>Nomor Berkas :</strong> <address>{{ info['nomor'] }} / {{ info['tahun'] }}</address>
+                <strong>Tanggal Pendaftaran :</strong> <address>{{ datetime.datetime.strptime(info['createdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}</address>
             </div>
             <div class="col-sm-4 invoice-col">
-                <strong>Nomor Berkas :</strong> <address>{{ info['nomor'] }} / {{ info['tahun'] }}</address> 
-                <strong>Pendaftaran :</strong> <address>{{ datetime.datetime.strptime(info['createdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}  -  Tgl.{% if info['startdate'] != '0001-01-01T00:00:00Z' %}{{ datetime.datetime.strptime(info['startdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }} {% end %}</address>    
-                <strong>Kegiatan :</strong> <address>{{ '  ' + info['prosedur'] }}</address>
-                <strong>Pemohon :</strong> <address>{{ info['pemohon'] }}   {% if pemilik == [] %}
-                                                                            An. {{ info['pemohon'] }}
-                                                                            {% else %}
-                                                                                An. 
-                                                                                {% for p in pemilik %}
-                                                                                    {% if len(pemilik) > 1  %}
-                                                                                        {{ p['nama'] }}, 
-                                                                                    {% elif len(pemilik) == 1 %}
-                                                                                        {{ p['nama'] }}
-                                                                                    {% end %}
-                                                                                {% end %}
-                                                                            {% end %}</address>
-            </div>
-            <div class="col-sm-4 invoice-col">
+                <strong>Kegiatan :</strong> <address>{{ info['prosedur'] }}</address>
+                <strong>Pemohon Berkas :</strong> <address>{{ info['pemohon'] }} </address>
                 <strong>Posisi Berkas :</strong> <address>{{ info['profile'] }}</address>
+            </div>
+            <div class="col-sm-4 invoice-col">
                 <strong>Petugas Terakhir :</strong> <address>{{ info['pegawai'] }}</address>
-                <strong>Status :</strong> <address>{{ info['kegiatan'].upper() }} <br> {% if info['status'] == '1' %} PROSES {% elif info['status'] == '0' %}SELESAI {% if info['finnishdate'] != '0001-01-01T00:00:00Z' %}  Tgl.{{ datetime.datetime.strptime(info['finnishdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}{% end %}{% end %}</address>  
+                <strong>Status :</strong> <address>{{ info['kegiatan'].upper() }} , {% if info['status'] == '1' %}PROSES{% elif info['status'] == '0' %}SELESAI {% if info['finnishdate'] != '0001-01-01T00:00:00Z' %}  Tgl.{{ datetime.datetime.strptime(info['finnishdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}{% end %}{% end %}</address>
             </div>
         </div>
-        <br>
         <div class="row">
             <div class="col-sm-12">
                 <h5> <strong>KODE BILLING:</strong> </h5>
             </div>
-            <div class="col-sm-12 table-responsive">
-                <table class="table no-margin">
-                    <tbody>
-                        <tr>
-                            <th class="text-center">Kode Billing</th>
-                            <th class="text-center">Biaya</th>
-                            <th class="text-center">NTPN</th>
-                            <th class="text-center">Tanggal Kadaluarsa</th>
-                            <th class="text-center">Tanggal Bayar</th>
-                        </tr>
-                        {% if simponi != None %}
-                            {% for s in simponi %}
+            <div class="col-sm-12 invoice-col">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <tbody>
                             <tr>
-                                <td class="text-center">{{ s['kodebilling'] }}</td>
-                                <td class="text-center">{{ s['biaya'] }}</td>
-                                <td class="text-center">{{ s['ntpn'] }}</td>
-                                <td class="text-center">{{ s['expiredate'] }}</td>
-                                {% if s['buydate'] != "" %}
-                                <td class="text-center">{{ datetime.datetime.strptime(s['buydate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d-%m-%Y, %H:%M:%S') }}</td>
-                                {% end%}
+                                <th class="text-center">Kode Billing</th>
+                                <th class="text-center">Biaya</th>
+                                <th class="text-center">NTPN</th>
+                                <th class="text-center">Tanggal Kadaluarsa</th>
+                                <th class="text-center">Tanggal Bayar</th>
                             </tr>
+                            {% if simponi != None %}
+                                {% for s in simponi %}
+                                <tr>
+                                    <td class="text-center">{{ s['kodebilling'] }}</td>
+                                    <td class="text-center">{{ s['biaya'] }}</td>
+                                    <td class="text-center">{{ s['ntpn'] }}</td>
+                                    <td class="text-center">{{ s['expiredate'] }}</td>
+                                    {% if s['buydate'] != "" %}
+                                    <td class="text-center">{{ datetime.datetime.strptime(s['buydate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d-%m-%Y, %H:%M:%S') }}</td>
+                                    {% end%}
+                                </tr>
+                                {% end %}
                             {% end %}
-                        {% end %}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-        <br>
         <div class="row">
             <div class="col-sm-12">
                 <h5> <strong>DAFTAR ISIAN:</strong> </h5>
             </div>
-            <div class="col-sm-12  table-responsive">
-                <table class="table no-margin">
-                    <tbody>
-                        <tr>
-                            <th class="text-center">Daftar Isian</th>
-                            <th class="text-center">Nomor</th>
-                            <th class="text-center">Tanggal</th>
-                        </tr>
-                        {% if daftarisian != None %}
-                            {% for d in daftarisian %}
+            <div class="col-sm-12 invoice-col">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <tbody>
                             <tr>
-                                <td class="text-center">{{ d['typediid'] }}</td>
-                                <td class="text-center">{{ d['description'].split("-")[1].split(" No.")[1] }}</td>
-                                <td class="text-center">{{ d['description'].split("-")[1].split(", ")[0].split("Tgl.")[1] }}
-                                </td>
+                                <th class="text-center">Daftar Isian</th>
+                                <th class="text-center">Nomor</th>
+                                <th class="text-center">Tanggal</th>
                             </tr>
+                            {% if daftarisian != None %}
+                                {% for d in daftarisian %}
+                                <tr>
+                                    <td class="text-center">{{ d['typediid'] }}</td>
+                                    <td class="text-center">{{ d['description'].split("-")[1].split(" No.")[1] }}</td>
+                                    <td class="text-center">{{ d['description'].split("-")[1].split(", ")[0].split("Tgl. ")[1] }}
+                                    </td>
+                                </tr>
+                                {% end %}
                             {% end %}
-                        {% end %}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-        <br>
         <div class="row">
             <div class="col-sm-12">
-                <h5> <strong>DOKUMEN:</strong> </h5>
+                <h5> <strong>PRODUK:</strong> </h5>
             </div>
-            <div class="col-sm-12 table-responsive">
-                <table class="table no-margin">
-                    <tbody>
-                        <tr>
-                            <th style="display:none"></th>
-                            <th style="display:none"></th>
-                            <th class="text-center">Produk</th>
-                            <th class="text-center">Nomor</th>
-                            <th class="text-center">Desa</th>
-                        </tr>
-                        {% if produk != None %}
-                            {% for p in produk %}
+            <div class="col-sm-12 invoice-col">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <tbody>
                             <tr>
-                                {% if p['type'] == 'STP' %}
-                                <td style="display:none">{{ p['documentid'] }}</td>
-                                <td style="display:none">{{ p['type'] }}</td>
-                                <td class="text-center">Surat Tugas Pengukuran</td>
-                                <td class="text-center">{{ p['nomor'] }}</td>
-                                <td class="text-center">{{ p['wilayah'] }}</td>
-                                {% elif p['type'] == 'PERSIL' %}
-                                <td style="display:none">{{ p['documentid'] }}</td>
-                                <td style="display:none">{{ p['type'] }}</td>
-                                <td class="text-center">NIB</td>
-                                <td class="text-center">{{ p['nomor'] }}</td>
-                                <td class="text-center">{{ p['wilayah'] }}</td>
-                                {% elif p['type'] == 'GU' %}
-                                <td style="display:none">{{ p['documentid'] }}</td>
-                                <td style="display:none">{{ p['type'] }}</td>
-                                <td class="text-center">GAMBAR UKUR</td>
-                                <td class="text-center">{{ p['nomor'] }}</td>
-                                <td class="text-center">{{ p['wilayah'] }}</td>
-                                {% elif p['type'] == 'SU' %}
-                                <td style="display:none">{{ p['documentid'] }}</td>
-                                <td style="display:none">{{ p['type'] }}</td>
-                                <td class="text-center">SURAT UKUR</td>
-                                <td class="text-center">{{ p['nomor'] }}</td>
-                                <td class="text-center">{{ p['wilayah'] }}</td>
-                                {% elif p['type'] == 'HAK' %}
-                                <td style="display:none">{{ p['documentid'] }}</td>
-                                <td style="display:none">{{ p['type'] }}</td>
-                                <td class="text-center">Buku Tanah</td>
-                                <td class="text-center">{{ p['nomor'] }}</td>
-                                <td class="text-center">{{ p['wilayah'] }}</td>
-                                {% end %}
+                                <th style="display:none"></th>
+                                <th style="display:none"></th>
+                                <th class="text-center">Produk</th>
+                                <th class="text-center">Nomor</th>
+                                <th class="text-center">Desa</th>
                             </tr>
+                            {% if produk != None %}
+                                {% for p in produk %}
+                                <tr>
+                                    {% if p['type'] == 'STP' %}
+                                    <td style="display:none">{{ p['documentid'] }}</td>
+                                    <td style="display:none">{{ p['type'] }}</td>
+                                    <td class="text-center">Surat Tugas Pengukuran</td>
+                                    <td class="text-center">{{ p['nomor'] }}</td>
+                                    <td class="text-center">{{ p['wilayah'] }}</td>
+                                    </td>
+                                    {% elif p['type'] == 'PERSIL' %}
+                                    <td style="display:none">{{ p['documentid'] }}</td>
+                                    <td style="display:none">{{ p['type'] }}</td>
+                                    <td class="text-center">NIB</td>
+                                    <td class="text-center">{{ p['nomor'] }}</td>
+                                    <td class="text-center">{{ p['wilayah'] }}</td>
+                                    </td>
+                                    {% elif p['type'] == 'GU' %}
+                                    <td style="display:none">{{ p['documentid'] }}</td>
+                                    <td style="display:none">{{ p['type'] }}</td>
+                                    <td class="text-center">GAMBAR UKUR</td>
+                                    <td class="text-center">{{ p['nomor'] }}</td>
+                                    <td class="text-center">{{ p['wilayah'] }}</td>
+                                    </td>
+                                    {% elif p['type'] == 'SU' %}
+                                    <td style="display:none">{{ p['documentid'] }}</td>
+                                    <td style="display:none">{{ p['type'] }}</td>
+                                    <td class="text-center">SURAT UKUR</td>
+                                    <td class="text-center">{{ p['nomor'] }}</td>
+                                    <td class="text-center">{{ p['wilayah'] }}</td>
+                                    </td>
+                                    {% elif p['type'] == 'HAK' %}
+                                    <td style="display:none">{{ p['documentid'] }}</td>
+                                    <td style="display:none">{{ p['type'] }}</td>
+                                    <td class="text-center">Buku Tanah</td>
+                                    <td class="text-center">{{ p['nomor'] }}</td>
+                                    <td class="text-center">{{ p['wilayah'] }}</td>
+                                    </td>
+                                    {% end %}
+                                </tr>
+                                {% end %}
                             {% end %}
-                        {% end %}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 <script>
-    $("#btnNewMessange").click(function () {
-        $('#modal-messange').modal('show');
-        $('#messange-dialog').load('/register/inbox/registerid=' + $('input[name=registerid]').val() + '&type=newmessange');
-    });
+    $("#btnSimpan").click(function() {
 
-    $("#btnKembali").click(function () {
-        $('.nav-tabs a[href="#tabPencarian"]').tab('show');
-        $('#tabDetail').load('/node/error/400', function () {
-            $('.content').waitMe("hide");
+        bootbox.confirm({
+            message: "Apakah anda yakin ingin menyipan berkas ini ?",
+            buttons: {
+                cancel: {
+                    label: '<i class="fa fa-times"></i> Cancel'
+                },
+                confirm: {
+                    label: '<i class="fa fa-check"></i> Confirm'
+                }
+            },
+            callback: function (result) {
+                if (result){
+                    $.ajax({
+                        type: 'POST',
+                        url: '/kkp/berkas/save',
+                        data: JSON.stringify({
+                            berkasid: $('input:hidden[name=berkasid]').val(),
+                        }),
+                        async: true,
+                        headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+                        success: (function (result) {
+            
+                            $.notify({
+                                title: result.title,
+                                message: result.msg,
+                            }, {
+                                type: result.type,
+                                template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+                                    '<span data-notify="title">{1}</span>' +
+                                    '<span data-notify="message">{2}</span>' +
+                                    '</div>',
+                                animate: {
+                                    enter: 'animated fadeInRight',
+                                    exit: 'animated fadeOutRight'
+                                }
+                            });
+                            
+                            if (result.status){
+                                $('#berkasView').empty()
+                            }
+                        }),
+                        error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                            alert("Error: " + errorThrown);
+                        })
+            
+                    });    
+                }
+            }
         });
-    });
 
-    $("#btnPrintRegister").click(function () {
-        $("#print-area").print({
-            noPrintSelector: ".no-print",
-            title: "Inbox Register Data",
-        });
     });
 </script>

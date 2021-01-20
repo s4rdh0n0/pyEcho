@@ -5,11 +5,13 @@ import tornado.web
 from tornado.options import options
 
 # Controller
-from controller.base import BaseAuthController
+from controller.base import BaseController
 
 
-class DashboardController(BaseAuthController):
-
+class DashboardController(BaseController):
+	
+	def initialize(self):
+		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
 
 	@tornado.web.authenticated
 	def get(self):
