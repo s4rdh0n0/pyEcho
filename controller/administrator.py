@@ -24,7 +24,7 @@ class DaftarPegawaiViewController(BaseController):
     def get(self):
         useractived = self.get_user_actived(cookies=self.get_cookies_user())
         if useractived != None:
-            collection = self.CONNECTION.collection(database="1228_trenggalek", name="users")
+            collection = self.CONNECTION.collection(database="pyDatabase", name="users")
             if UserModel(collection=collection, service=options.service).find_role(userid=useractived['_id'], role="ADMINISTRATOR") != None and useractived['actived']:
 
                 self.page_data['description'] = 'ASN dan PPNPN Actived'
@@ -44,7 +44,7 @@ class DaftarPegawaiViewController(BaseController):
         cookies = self.get_cookies_user()
         body = tornado.escape.json_decode(self.request.body)
 
-        user = UserModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="users"), service=options.service)
+        user = UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=options.service)
         list_response = []
         count_reponse = 0
 
@@ -66,7 +66,7 @@ class DaftarPegawaiViewController(BaseController):
         cookies = self.get_cookies_user()
         body = tornado.escape.json_decode(self.request.body)
 
-        collection = self.CONNECTION.collection(database="1228_trenggalek", name="users")
+        collection = self.CONNECTION.collection(database="pyDatabase", name="users")
         user = UserModel(collection=collection, service=options.service)
         responseUser = user.get(filter={"_id": body['userid']})
 
@@ -94,7 +94,7 @@ class PegawaiController(BaseController):
     def get(self, username=""):
         cookies = self.get_cookies_user()
 
-        collection = self.CONNECTION.collection(database="1228_trenggalek", name="users")
+        collection = self.CONNECTION.collection(database="pyDatabase", name="users")
         user = UserModel(collection=collection, service=options.service)
         response_count = user.count(filter={"username": username})
         response_pegawai = user.kkp(officeid=cookies['officeid'],username=username)
@@ -109,7 +109,7 @@ class PegawaiController(BaseController):
         cookies = self.get_cookies_user()
         body = tornado.escape.json_decode(self.request.body)
 
-        collection = self.CONNECTION.collection(database="1228_trenggalek", name="users")
+        collection = self.CONNECTION.collection(database="pyDatabase", name="users")
         user = UserModel(collection=collection, service=options.service)
         response_entity = user.kkp(officeid=cookies['officeid'], username=body['username'])
         if response_entity.status_code == 200:
@@ -123,30 +123,26 @@ class PegawaiController(BaseController):
     @tornado.web.authenticated
     @tornado.gen.coroutine
     def post(self):
-        cookies = self.get_cookies_user()
-
-        # client request
         body = tornado.escape.json_decode(self.request.body)
-        collection = self.CONNECTION.collection(database="1228_trenggalek", name="users")
-        user = UserModel(collection=collection, service=options.service)
+        user = UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=options.service)
         count_reponse = user.count(filter={"_id": body['userid']})
         if count_reponse == 0:
-            schema = user.schema
+            schema_user = dict()
+            schema_user['_id'] = body['userid']
+            schema_user['officeid'] = self.get_cookies_user()['officeid']
+            schema_user['username'] = body['username']
+            schema_user['password'] = body['password']
+            schema_user['pegawaiid'] = body['pegawaiid']
+            schema_user['nama'] = body['nama']
+            schema_user['phone'] = body['phone']
+            schema_user['email'] = body['email']
+            schema_user['role'] = []
+            schema_user['usercreate'] = self.get_cookies_user()['userid']
+            schema_user['createdate'] = datetime.datetime.now()
+            schema_user['actived'] = True
 
-            schema['_id'] = body['userid']
-            schema['officeid'] = cookies['officeid']
-            schema['username'] = body['username']
-            schema['password'] = body['password']
-            schema['pegawaiid'] = body['pegawaiid']
-            schema['nama'] = body['nama']
-            schema['phone'] = body['phone']
-            schema['email'] = body['email']
-            schema['usercreate'] = cookies['userid']
-            schema['createdate'] = datetime.datetime.now()
-            schema['actived'] = True
-
-            user.add(schema=schema)
-            self.write({'status': True, 'type': 'info', 'msg': '{} Actived'.format(schema['nama'])})
+            user.add(schema=schema_user)
+            self.write({'status': True, 'type': 'info', 'msg': '{} Actived'.format(schema_user['nama'])})
 
 class RoleController(BaseController):
 
@@ -155,11 +151,11 @@ class RoleController(BaseController):
     def get(self, userid=""):
         cookies = self.get_cookies_user()
 
-        user_collection = self.CONNECTION.collection(database="1228_trenggalek", name="users")
-        master_collection = self.CONNECTION.collection(database="1228_trenggalek", name="master")
+        user_collection = self.CONNECTION.collection(database="pyDatabase", name="users")
+        master_collection = self.CONNECTION.collection(database="pyDatabase", name="master")
 
         ruser = UserModel(collection=user_collection, service=options.service).get(filter={"_id": userid})
-        rtype = MasterModel(collection=master_collection, service=options.service).select(filter={"type": "ROLE"})
+        rtype = MasterModel(collection=master_collection, service=options.service).select(filter={"type": "JOB"})
         self.render('node/detailrole.html', user=ruser, typeregister=rtype)
 
     @tornado.web.authenticated
@@ -168,7 +164,7 @@ class RoleController(BaseController):
         cookies = self.get_cookies_user()
         body = tornado.escape.json_decode(self.request.body)
 
-        collection = self.CONNECTION.collection(database="1228_trenggalek", name="users")
+        collection = self.CONNECTION.collection(database="pyDatabase", name="users")
         user = UserModel(collection=collection, service=options.service).get(filter={"_id": body['userid']})
         self.write({'status': True, 'draw': 0, 'data': json.dumps(user['role'], default=json_util.default), 'recordsTotal': len(user['role']), 'recordsFiltered': len(user['role'])})
 
@@ -178,13 +174,12 @@ class RoleController(BaseController):
         cookies = self.get_cookies_user()
         body = tornado.escape.json_decode(self.request.body)
 
-        user_collection = self.CONNECTION.collection(database="1228_trenggalek", name="users")
-        master_collection = self.CONNECTION.collection(database="1228_trenggalek", name="master")
-        master = MasterModel(collection=master_collection, service=options.service).get(filter={"type": "ROLE", "code": body['key']})
+        user_collection = self.CONNECTION.collection(database="pyDatabase", name="users")
+        master_collection = self.CONNECTION.collection(database="pyDatabase", name="master")
+        master = MasterModel(collection=master_collection, service=options.service).get(filter={"type": "JOB", "code": body['key']})
 
         if UserModel(collection=user_collection, service=options.service).find_role(userid=body['userid'], role=master['code']) == None:
-
-            schema_role = UserModel(collection=user_collection, service=options.service).schema_role
+            schema_role = dict()
             schema_role['key'] = master['code']
             schema_role['description'] = master['description']
             schema_role['startdate'] = datetime.datetime.now()
@@ -205,6 +200,6 @@ class RoleController(BaseController):
         cookies = self.get_cookies_user()
         body = tornado.escape.json_decode(self.request.body)
 
-        user_collection = self.CONNECTION.collection(database="1228_trenggalek", name="users")
+        user_collection = self.CONNECTION.collection(database="pyDatabase", name="users")
         user = UserModel(collection=user_collection, service=options.service).delete_role(userid=body['userid'], role=body['key'])
         self.write({'status': True})

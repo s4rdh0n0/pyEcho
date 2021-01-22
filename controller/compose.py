@@ -55,12 +55,94 @@ class ComponseController(BaseController):
 			if count == 0:
 				self.write({'status': True, 'data': response['data']['result']})
 			else:
-				self.write({'status': False, 'title': 'Warning', 'msg': 'Nomor berkas {}/{} sudah terregister sebelumnya.'.format(body['nomor'], body['tahun']), 'type': 'minimalist'})
+				self.write({'status': False, 'title': 'Warning', 'msg': 'Berkas {}/{} sudah terregister sebelumnya.'.format(body['nomor'], body['tahun']), 'type': 'minimalist'})
 		else:
-			self.write({'status': False, 'title': 'Warning', 'msg': 'Nomor berkas {}/{} tidak ada pada database https://kkp2.atrbpn.go.id/.'.format(body['nomor'], body['tahun']), 'type': 'minimalist'})
+			self.write({'status': False, 'title': 'Warning', 'msg': 'Berkas {}/{} tidak ada pada database https://kkp2.atrbpn.go.id/.'.format(body['nomor'], body['tahun']), 'type': 'minimalist'})
+	
+	@tornado.web.authenticated
+	def put(self):
+		useractived = self.get_user_actived(cookies=self.get_cookies_user())
+		body = tornado.escape.json_decode(self.request.body)
+
+		offices = OfficeModel(collection=self.CONNECTION.collection(database="pyDatabase", name="offices"), service=None)
+		berkas =  BerkasModel(collection=self.CONNECTION.collection(database="pyDatabase", name="berkas"), service=options.service)
+		region = RegionModel(collection=None, service=options.service)
+		pegawai = UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=None)
+		register = RegisterModel(collection=self.CONNECTION.collection(database="pyDatabase", name="register"), service=None)
+
+		msg = ""
+		status = False
+		tipe = ""
+		title = ""
+
+		berkas_entity = berkas.find(berkasid=body['berkasid']).json()['result']
+		di_entity = berkas.daftarisian(berkasid=body['berkasid']).json()['result']
+		doc_entity = berkas.produk(berkasid=body['berkasid']).json()['result']
+		region_entity = region.all_desa(officeid=self.get_cookies_user()['officeid'])
+
+		if berkas.count(filter={"_id": body['berkasid']}) == 0:
+			office_entity = offices.get(filter={"_id": self.get_cookies_user()['officeid']})
+
+			region = dict()
+			for d in region_entity.json()['result']:
+				if body['desaid'] == d['_id']:
+					region = d
+
+			schema_berkas = dict()
+			schema_berkas['_id'] = berkas_entity['infoberkas']['_id']
+			schema_berkas['nomorregister'] = offices.booking(officeid=office_entity['_id'], counter='REG')
+			schema_berkas['userregisterin'] = useractived['_id']
+			schema_berkas['userregisterinname'] = useractived['nama']
+			schema_berkas['userregisterindate'] = datetime.datetime.now()
+			schema_berkas['officeid'] = office_entity['_id']
+			schema_berkas['officetype'] = office_entity['officetypeid']
+			schema_berkas['officenama'] = office_entity['nama']
+			schema_berkas['kecamatanid'] = region['wilayahinduk']['wilayahid']
+			schema_berkas['kecamatannama'] = region['wilayahinduk']['nama']
+			schema_berkas['desaid'] = region['_id']
+			schema_berkas['desanama'] = region['nama'] 
+			schema_berkas['nomorberkas'] = berkas_entity['infoberkas']['nomor']
+			schema_berkas['tahunberkas'] = berkas_entity['infoberkas']['tahun']
+			schema_berkas['prosedur'] = berkas_entity['infoberkas']['prosedur']
+			schema_berkas['kegiatan'] = berkas_entity['infoberkas']['kegiatan']
+			schema_berkas['email'] = body['email']
+			schema_berkas['phone'] = body['phone']
+			schema_berkas['pemilik'] = berkas_entity['pemohon']
+			schema_berkas['daftarisian'] = di_entity
+			schema_berkas['document'] = doc_entity
+			schema_berkas['status'] = body['operation']
+			schema_berkas['actived'] = True
+			berkas.add(schema=schema_berkas)
+
+			schema_register = dict()
+			sender = pegawai.get(filter={'_id': useractived['_id']})
+			recieve = pegawai.get(filter={'_id': body['petugasid']})
+			schema_register['_id'] = uuid.uuid4().__str__()
+			schema_register['berkasid'] = schema_berkas['_id']
+			schema_register['sender'] = sender['_id']
+			schema_register['sendername'] = sender['nama']
+			schema_register['senderdate'] = datetime.datetime.now()
+			schema_register['recieve'] = recieve['_id']
+			schema_register['recievename'] = recieve['nama']
+			schema_register['recievedate'] = None
+			schema_register['messange'] = body['pesan']
+			schema_register['actived'] = True
+			register.add(schema=schema_register)
+
+			msg = "{} <br> Berkas {}/{} berhasil tersimpan.".format(office_entity['nama'], schema_berkas['nomorberkas'], schema_berkas['tahunberkas'])
+			status = True
+			tipe = "info"
+			title = '<strong>Info</strong> <br>'
+		else:
+			msg = "Berkas {}/{} sudah tersimpan sebelumnya.".format(berkas_entity['infoberkas']['nomor'], berkas_entity['infoberkas']['tahun'])
+			status = False
+			tipe = "minimalist"
+			title = '<strong>Warning</strong> <br>'
+
+		self.write({'status': status, 'title': title, 'type': tipe, 'msg': msg})
 
 
-class BerkasMasukController(BaseController):
+class ComposeListController(BaseController):
 
 	def initialize(self):
 		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
@@ -70,7 +152,7 @@ class BerkasMasukController(BaseController):
 	def get(self):
 		try:
 			if UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=options.service).find_role(userid=self.useractived['_id'], role="REGIN") != None:
-				self.page_data['title'] = 'Compose List'
+				self.page_data['title'] = 'Berkas Masuk'
 				self.page_data['description'] = 'Daftar Berkas Masuk'
 				self.render('page/register/compose_list.html', page=self.page_data, useractived=self.useractived)
 			else:
@@ -80,7 +162,6 @@ class BerkasMasukController(BaseController):
 		except Exception as e:
 			print(e)
 
-	
 	@tornado.web.authenticated
 	def post(self):
 		list_response = []
@@ -88,34 +169,31 @@ class BerkasMasukController(BaseController):
 		body = tornado.escape.json_decode(self.request.body)
 		try:
 			inbox = BerkasModel(collection=self.CONNECTION.collection(database="pyDatabase", name="berkas"), service=None)
-			if body['nomor'] == "" and body['tahun'] == "":
-				count_reponse = inbox.count(filter={"officeid": self.get_cookies_user()['officeid'] , "status": "REGIN" ,"actived": True})
-				list_response = inbox.pagination(filter={"officeid": self.get_cookies_user()['officeid'], "status": "REGIN", "actived": True}, page_size = body['limit'], page_num = body['page'] + 1)
-			elif body['nomor']  != "" and body['tahun'] == "":
-				count_reponse = inbox.count(filter={"officeid": self.get_cookies_user()['officeid'], "nomorberkas": body['nomor'], "status": "REGIN", "actived": True})
-				list_response = inbox.pagination(filter={"officeid": self.get_cookies_user()['officeid'], "nomorberkas": body['nomor'], "status": "REGIN", "actived": True}, page_size = body['limit'], page_num = body['page'] + 1)
-			elif body['nomor'] == "" and body['tahun'] != "":
-				count_reponse = inbox.count(filter={"officeid": self.get_cookies_user()['officeid'], "tahunberkas": body['tahun'], "status": "REGIN", "actived": True})
-				list_response = inbox.pagination(filter={"officeid": self.get_cookies_user()['officeid'], "tahunberkas": body['tahun'], "status": "REGIN", "actived": True}, page_size = body['limit'], page_num = body['page'] + 1)
-			elif body['nomor'] != "" and body['tahun'] != "":
-				count_reponse = inbox.count(filter={"officeid": self.get_cookies_user()['officeid'], "nomorberkas":body['nomor'] ,"tahunberkas": body['tahun'], "status": "REGIN", "actived": True})
-				list_response = inbox.pagination(filter={"officeid": self.get_cookies_user()['officeid'], "nomorberkas":body['nomor'] ,"tahunberkas": body['tahun'], "status": "REGIN", "actived": True}, page_size = body['limit'], page_num = body['page'] + 1)
+			filter = {"officeid": self.get_cookies_user()['officeid']}
+			if body['nomor'] != "":
+				filter['nomorberkas'] = body['nomor']
+			elif body['tahun'] != "":
+				filter['tahunberkas'] = body['tahun']
+
+			count_reponse = inbox.count(filter=filter)
+			list_response = inbox.pagination(filter=filter, page_size = body['limit'], page_num = body['page'] + 1)
+			
 			self.write({'status': True, 'draw': body['draw'], 'data': json.dumps(list_response, default=json_util.default), 'recordsTotal': count_reponse, 'recordsFiltered': count_reponse})
 		except Exception as e:
 			print(e)
 
 
-
-class DetailBerkasController(BaseController):
+class DetailComposeController(BaseController):
 
 	@tornado.web.authenticated
 	@tornado.gen.coroutine
-	def get(self, berkasid=""):		
+	def get(self, berkasid="", type=""):
 		info = {}
 		pemohon = []
 		pemilik = []
+		petugas = []
 
-		berkas = BerkasModel(collection=None, service=options.service)
+		berkas = BerkasModel(collection=self.CONNECTION.collection(database='pyDatabase', name='berkas'), service=options.service)
 		yield gen.sleep(0.1)
 		infoResponse = berkas.find(berkasid=berkasid)
 		yield gen.sleep(0.1)
@@ -125,6 +203,17 @@ class DetailBerkasController(BaseController):
 		yield gen.sleep(0.1)
 		daftarisianResponse = berkas.daftarisian(berkasid=berkasid)
 		yield gen.sleep(0.1)
+		register = berkas.get(filter={'_id': berkasid})
+		yield gen.sleep(0.1)
+		regionResponse = RegionModel(collection=None, service=options.service).all_desa(officeid=self.get_cookies_user()['officeid'])
+		yield gen.sleep(0.1)
+		petugasResponse = UserModel(collection=self.CONNECTION.collection(database='pyDatabase', name='users'), service=None).select(filter={"actived": True})
+		yield gen.sleep(0.1)
+		operationResponse = MasterModel(collection=self.CONNECTION.collection(database='pyDatabase', name='master'), service=None).select(filter={"type": 'OPERATION'})
+		for p in petugasResponse:
+			if p['_id'] != self.get_cookies_user()['userid']:
+				petugas.append(p)
+
 		if infoResponse.status_code == 200 and simponiResponse.status_code == 200 and produkResponse.status_code == 200 and daftarisianResponse.status_code == 200:
 			info = infoResponse.json()['result']['infoberkas']
 			simponi = simponiResponse.json()['result']
@@ -136,63 +225,6 @@ class DetailBerkasController(BaseController):
 				elif p['typepemilikid'] == 'M':
 					pemilik.append(p)
 					
-			self.render("node/detailberkas.html", office=self.get_office_actived(cookies=self.get_cookies_user()), info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)
+			self.render("node/detailcompose.html", type=type, office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, region=regionResponse.json()['result'],  operation=operationResponse ,petugas=petugas, info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)
 		else:
 			self.render("page/error/400.html")
-
-
-	@tornado.web.authenticated
-	@tornado.gen.coroutine
-	def post(self):
-		useractived = self.get_user_actived(cookies=self.get_cookies_user())
-		body = tornado.escape.json_decode(self.request.body)
-
-		offices = OfficeModel(collection=self.CONNECTION.collection(database="pyDatabase", name="offices"), service=None)
-		berkas =  BerkasModel(collection=self.CONNECTION.collection(database="pyDatabase", name="berkas"), service=options.service)
-
-		msg = ""
-		status = False
-		tipe = ""
-		title = ""
-
-		berkas_entity = berkas.find(berkasid=body['berkasid']).json()['result']
-		yield gen.sleep(0.1)
-		di_entity = berkas.daftarisian(berkasid=body['berkasid']).json()['result']
-		yield gen.sleep(0.1)
-		doc_entity = berkas.produk(berkasid=body['berkasid']).json()['result']
-		
-		if berkas.count(filter={"_id": body['berkasid']}) == 0:
-			office_entity = offices.get(filter={"_id": self.get_cookies_user()['officeid']})
-
-			# Insert berkas
-			schema_berkas = dict() 
-			schema_berkas['_id'] = berkas_entity['infoberkas']['_id']
-			schema_berkas['nomorregister'] = offices.booking(officeid=office_entity['_id'], counter='REG')
-			schema_berkas['userregisterin'] = useractived['_id']
-			schema_berkas['userregisterinname'] = useractived['nama']
-			schema_berkas['userregisterindate'] = datetime.datetime.now()
-			schema_berkas['officeid'] = office_entity['_id']
-			schema_berkas['officetype'] = office_entity['officetypeid']
-			schema_berkas['officenama'] = office_entity['nama']
-			schema_berkas['nomorberkas'] = berkas_entity['infoberkas']['nomor']
-			schema_berkas['tahunberkas'] = berkas_entity['infoberkas']['tahun']
-			schema_berkas['prosedur'] = berkas_entity['infoberkas']['prosedur']
-			schema_berkas['kegiatan'] = berkas_entity['infoberkas']['kegiatan']
-			schema_berkas['pemilik'] = berkas_entity['pemohon']
-			schema_berkas['daftarisian'] = di_entity
-			schema_berkas['document'] = doc_entity
-			schema_berkas['status'] = 'REGIN'
-			schema_berkas['actived'] = True
-			berkas.add(schema=schema_berkas)
-
-			msg = "Berkas {}/{} berhasil tersimpan.".format(schema_berkas['nomorberkas'], schema_berkas['tahunberkas'])
-			status = True
-			tipe = "info"
-			title = '<strong>Info</strong> <br>'
-		else:
-			msg = "Berkas {}/{} sudah tersimpan sebelumnya.".format(berkas_entity['infoberkas']['nomor'], berkas_entity['infoberkas']['tahun'])
-			status = False
-			tipe = "minimalist"
-			title = '<strong>Warning</strong> <br>'
-
-		self.write({'status': status, 'title': title, 'type': tipe, 'msg': msg})

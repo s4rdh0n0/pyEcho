@@ -87,21 +87,14 @@ master:
   - code: REGOUT
     type: JOB
     description: Petugas pelaksana register berkas keluar
-  - code: SURVEY
+  - code: REGISTER
     type: JOB
-    description: Pengukuran bidang tanah
-  - code: DRAWING
-    type: JOB
-    description: Penggambaran dan Pemetaan bidang tanah
-  - code: VALIDATOR
-    type: JOB
-    description: Koreksi dan validasi data
+    description: register berkas
   - code: ADMINISTRATOR
     type: JOB
     description: Pengelola aplikasi dan data
 
 
-    
   - code: REG
     type: COUNTER
     description: Counter nomor register berkas
