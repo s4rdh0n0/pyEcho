@@ -23,187 +23,146 @@ from model.master import MasterModel
 from model.register import RegisterModel
 
 class InboxController(BaseController):
+	
+	def initialize(self):
+		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
 
-    @tornado.web.authenticated
-    @tornado.gen.coroutine
-    def get(self):
-        useractived = self.get_user_actived(cookies=self.get_cookies_user())
-        if useractived != None:
-            if UserModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="users"), service=options.service).find_role(userid=useractived['_id'], role="REGISTER") != None and useractived['actived']:
-                self.page_data['title'] = 'Inbox'
-                self.page_data['description'] = 'Daftar Berkas Masuk'
-                self.render('page/register/inbox.html', page=self.page_data, useractived=useractived)
+	@tornado.web.authenticated
+	@tornado.gen.coroutine
+	def get(self):
+		try:
+			if UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=options.service).find_role(userid=self.useractived['_id'], role="REGISTER") != None:
+				self.page_data['title'] = 'Inbox'
+				self.page_data['description'] = 'Daftar Berkas Masuk'
+				self.render('page/register/inbox.html', page=self.page_data, useractived=self.useractived)
+			else:
+				self.page_data['title'] = '403'
+				self.page_data['description'] = 'Access denied'
+				self.render("page/error/403.html", page=self.page_data,  useractived=self.useractived)
+		except Exception as e:
+			print(e)
 
-            else:
-                self.page_data['title'] = '403'
-                self.page_data['description'] = 'Access denied'
-                self.render("page/error/403.html", page=self.page_data,  useractived=useractived)
-        else:
-            self.redirect("/logout")
+	@tornado.web.authenticated
+	@tornado.gen.coroutine
+	def post(self):
+		list_response = []
+		count_reponse = 0
+		body = tornado.escape.json_decode(self.request.body)
+		try:
+			inbox = RegisterModel(collection=self.CONNECTION.collection(database="pyDatabase", name="register"), service=None)
+			filter = {"officeid": self.get_cookies_user()['officeid'], "recieve": self.get_cookies_user()['userid'], "actived": True}
+			if body['nomor'] != "":
+				filter['nomorberkas'] = body['nomor']
+			elif body['tahun'] != "":
+				filter['tahunberkas'] = body['tahun']
 
-    @tornado.web.authenticated
-    @tornado.gen.coroutine
-    def post(self):
-        useractived = self.get_user_actived(cookies=self.get_cookies_user())
-        if useractived != None:
-            cookies = self.get_cookies_user()
-            body = tornado.escape.json_decode(self.request.body)
+			count_reponse = inbox.count(filter=filter)
+			list_response = inbox.pagination(filter=filter, page_size = body['limit'], page_num = body['page'] + 1)
+			
+			self.write({'status': True, 'draw': body['draw'], 'data': json.dumps(list_response, default=json_util.default), 'recordsTotal': count_reponse, 'recordsFiltered': count_reponse})
+		except Exception as e:
+			print(e)
 
-            list_response = []
-            count_reponse = 0
+	@tornado.web.authenticated
+	def put(self):
+		useractived = self.get_user_actived(cookies=self.get_cookies_user())
+		body = tornado.escape.json_decode(self.request.body)
 
-            inbox = RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None)
-            if body['nomor']  == "" and body['tahun'] == "":
-                count_reponse = inbox.count(filter={"officeid": cookies['officeid'] ,"receive": cookies['userid'] ,"status": "PROSES" ,"actived": True})
-                list_response  = inbox.pagination(filter={"officeid": cookies['officeid'] ,"receive": cookies['userid'],"status": "PROSES" ,"actived": True}, page_size=body['limit'], page_num=body['page'] + 1)
-            elif body['nomor']  != "" and body['tahun'] == "":
-                count_reponse = inbox.count(filter={"officeid": cookies['officeid'] ,"receive": cookies['userid'] ,"nomorberkas": body['nomor'] ,"status": "PROSES" ,"actived": True})
-                list_response  = inbox.pagination(filter={"officeid": cookies['officeid'] ,"receive": cookies['userid'] ,"nomorberkas": body['nomor'] ,"status": "PROSES" ,"actived": True}, page_size=body['limit'], page_num=body['page'] + 1)               
-            elif body['nomor']  == "" and body['tahun']  != "":
-                count_reponse = inbox.count(filter={"officeid": cookies['officeid'] ,"receive": cookies['userid'] , "tahunberkas": body['tahun'] ,"status": "PROSES" ,"actived": True})
-                list_response  = inbox.pagination(filter={"officeid": cookies['officeid'] ,"receive": cookies['userid'] ,"tahunberkas": body['tahun'] ,"status": "PROSES" ,"actived": True}, page_size=body['limit'], page_num=body['page'] + 1)
-            else:
-                count_reponse = inbox.count(filter={"officeid": cookies['officeid'] ,"receive": cookies['userid'] ,"nomorberkas": body['nomor'] ,"tahunberkas": body['tahun'] ,"status": "PROSES" ,"actived": True})
-                list_response  = inbox.pagination(filter={"officeid": cookies['officeid'] ,"receive": cookies['userid'] ,"nomorberkas": body['nomor'] ,"tahunberkas": body['tahun'] ,"status": "PROSES" ,"actived": True}, page_size=body['limit'], page_num=body['page'] + 1)
+		berkas =  BerkasModel(collection=self.CONNECTION.collection(database="pyDatabase", name="berkas"), service=options.service)
+		pegawai = UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=None)
+		register = RegisterModel(collection=self.CONNECTION.collection(database="pyDatabase", name="register"), service=None)
 
-            result = []
-            for x in list_response:
-                x['berkas'] = BerkasModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="berkas"), service=None).get(filter={'_id': x['berkasid']})
-                result.append(x)
+		msg = ""
+		status = False
+		tipe = ""
+		title = ""
 
-            self.write({'status': True, 'draw': body['draw'], 'data': json.dumps(result, default=json_util.default), 'recordsTotal': count_reponse, 'recordsFiltered': count_reponse})
-        else:
-            self.redirect("/logout")
+		berkas_entity = berkas.find(berkasid=body['berkasid']).json()['result']
+		di_entity = berkas.daftarisian(berkasid=body['berkasid']).json()['result']
+		doc_entity = berkas.produk(berkasid=body['berkasid']).json()['result']
+
+
+		schema_berkas = berkas.get(filter={'_id': body['berkasid']})
+		schema_berkas['pemilik'] = berkas_entity['pemohon']
+		schema_berkas['daftarisian'] = di_entity
+		schema_berkas['document'] = doc_entity
+		berkas.update(filter={'_id': body['berkasid']}, schema=schema_berkas)
+
+		node = register.get(filter={'_id': body['nodeid']})
+		node['actived'] = False
+		register.update(filter={'_id': body['nodeid']}, schema=node)
+
+		sender = pegawai.get(filter={'_id': useractived['_id']})
+		recieve = pegawai.get(filter={'_id': body['petugasid']})
+		schema_register = dict()
+		schema_register['_id'] = uuid.uuid4().__str__()
+		schema_register['officeid']   = schema_berkas['officeid']
+		schema_register['officetype'] = schema_berkas['officetype']
+		schema_register['officenama'] = schema_berkas['officenama']
+		schema_register['berkasid'] = schema_berkas['_id']
+		schema_register['nomorberkas'] = schema_berkas['nomorberkas']
+		schema_register['tahunberkas'] = schema_berkas['tahunberkas']
+		schema_register['prosedur'] = schema_berkas['prosedur']
+		schema_register['kegiatan'] = schema_berkas['kegiatan']
+		schema_register['sender'] = sender['_id']
+		schema_register['sendername'] = sender['nama']
+		schema_register['senderdate'] = datetime.datetime.now()
+		schema_register['recieve'] = recieve['_id']
+		schema_register['recievename'] = recieve['nama']
+		schema_register['recievedate'] = None
+		schema_register['messange'] = body['pesan']
+		schema_register['actived'] = True
+		register.add(schema=schema_register)
+
+
+		msg = "{} <br> Berkas {}/{} berhasil tersimpan.".format(schema_berkas['officenama'], schema_berkas['nomorberkas'], schema_berkas['tahunberkas'])
+		status = True
+		tipe = "info"
+		title = '<strong>Info</strong> <br>'
+
+		self.write({'status': status, 'title': title, 'type': tipe, 'msg': msg})
 
 
 class InboxDetailController(BaseController):
 
-    @tornado.web.authenticated
-    @tornado.gen.coroutine
-    def get(self, registerid="", type=""):
-        cookies = self.get_cookies_user()
-
-        if type == 'newmessange':
-            users = UserModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="users"), service=None).select(filter={"officeid": cookies['officeid'], "actived": True})
-            self.render('node/detailmessange.html', users=users, useractived=cookies['userid'])
-        elif type == 'inforegister':
-            info = {}
-            pemohon = []
-            pemilik = []
-
-            updateReceiveDate = RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None).get(filter={"_id": registerid})
-            if updateReceiveDate['receivedate'] == None:
-                updateReceiveDate['receivedate'] = datetime.datetime.now()
-                RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None).update(filter={"_id": registerid}, schema=updateReceiveDate)
-
-            inboxResponse = RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None).get(filter={"_id": registerid})
-            yield gen.sleep(0.1)
-            berkas = BerkasModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=options.service)
-            infoResponse = berkas.find(berkasid=inboxResponse['berkasid'])
-            yield gen.sleep(0.1)
-            simponiResponse = berkas.simponi(berkasid=inboxResponse['berkasid'])
-            yield gen.sleep(0.1)
-            produkResponse = berkas.produk(berkasid=inboxResponse['berkasid'])
-            yield gen.sleep(0.1)
-            daftarisianResponse = berkas.daftarisian(berkasid=inboxResponse['berkasid'])
-            yield gen.sleep(0.1)
-            if infoResponse.status_code == 200 and simponiResponse.status_code == 200 and produkResponse.status_code == 200 and daftarisianResponse.status_code == 200:
-                info = infoResponse.json()['result']['infoberkas']
-                simponi = simponiResponse.json()['result']
-                produk = produkResponse.json()['result']
-                daftarisian = daftarisianResponse.json()['result']
-                for p in infoResponse.json()['result']['pemohon']:
-                    if p['typepemilikid'] == 'P':
-                        pemohon.append(p)
-                    elif p['typepemilikid'] == 'M':
-                        pemilik.append(p)
-                        
-                self.render("node/detailberkas.html", office=self.get_office_actived(cookies=cookies), inbox=inboxResponse, info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)
-            else:
-                self.render("page/error/400.html")
+	@tornado.web.authenticated
+	@tornado.gen.coroutine
+	def get(self, registerid=""):
+		info = {}
+		pemohon = []
+		pemilik = []
+		
+		inbox = RegisterModel(collection=self.CONNECTION.collection(database="pyDatabase", name="register"), service=None)
+			
+		berkas = BerkasModel(collection=self.CONNECTION.collection(database='pyDatabase', name='berkas'), service=options.service)
+		node = inbox.get(filter={"_id": registerid})
+		yield gen.sleep(0.1)
+		infoResponse = berkas.find(berkasid=node['berkasid'])
+		yield gen.sleep(0.1)
+		simponiResponse = berkas.simponi(berkasid=node['berkasid'])
+		yield gen.sleep(0.1)
+		produkResponse = berkas.produk(berkasid=node['berkasid'])
+		yield gen.sleep(0.1)
+		daftarisianResponse = berkas.daftarisian(berkasid=node['berkasid'])
+		yield gen.sleep(0.1)
+		register = berkas.get(filter={'_id': node['berkasid']})
+		yield gen.sleep(0.1)
+		petugasResponse = UserModel(collection=self.CONNECTION.collection(database='pyDatabase', name='users'), service=None).select(filter={"actived": True, "_id": {"$ne":  self.get_cookies_user()['userid']}})
+		yield gen.sleep(0.1)
 
 
-    @tornado.web.authenticated
-    @tornado.gen.coroutine
-    def post(self):
-        cookies = self.get_cookies_user()
-        body = tornado.escape.json_decode(self.request.body)
-
-        inbox = RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None).get(filter={"_id": body['registerid']})
-        inbox['status'] = 'FINNISH'
-        inbox['actived'] = False
-        RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None).update(filter={"_id": body['registerid']}, schema=inbox)
-
-        user = UserModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="users"), service=options.service)
-        inbox['_id'] = uuid.uuid4().__str__()
-        inbox['sender'] = cookies['userid']
-        inbox['sendername'] = self.get_user_actived(cookies=cookies)['nama']
-        inbox['senddate'] = datetime.datetime.now()
-        inbox['messsange'] = body['messsange']
-        inbox['receivedate'] = None
-        inbox['receive'] = body['receive']
-        inbox['receivename'] = user.get(filter={"_id": body['receive']})['nama']
-        inbox['status'] = 'PROSES'
-        inbox['actived'] = True
-        RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None).add(schema=inbox)
-
-        berkas =  BerkasModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="berkas"), service=options.service)
-        infoResponse = berkas.find(berkasid=inbox['berkasid'])
-        yield gen.sleep(0.1)
-        pemilik = []
-        for p in infoResponse.json()['result']['pemohon']:
-            if p['typepemilikid'] == 'P':
-                pemilik.append(p)
-            elif p['typepemilikid'] == 'M':
-                pemilik.append(p)
-
-        yield gen.sleep(0.1)        
-        produkResponse = berkas.produk(berkasid=inbox['berkasid'])
-        yield gen.sleep(0.1)
-        daftarisianResponse = berkas.daftarisian(berkasid=inbox['berkasid'])
-        yield gen.sleep(0.1)
-        berkas.update(filter={"_id": inbox['berkasid']},schema={"pemilik": pemilik, "daftarisian": daftarisianResponse.json()['result'], "document": produkResponse.json()['result']})
-
-        self.write({'status': True, 'title': '<strong>Info</strong> <br>', 'type': 'info', 'msg': "Berkas {}/{} berhasil dikirim kepada {}.".format(inbox['nomorberkas'], inbox['tahunberkas'], inbox['receivename'])})
-
-
-class InfoInboxController(BaseController):
-
-    @tornado.web.authenticated
-    @tornado.gen.coroutine
-    def get(self, registerid=""):
-        cookies = self.get_cookies_user()
-        
-        info = {}
-        pemohon = []
-        pemilik = []
-
-        inboxResponse = RegisterModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="register"), service=None).get(filter={"_id": registerid})
-        yield gen.sleep(0.1)
-        berkas = BerkasModel(collection=self.CONNECTION.collection(database="1228_trenggalek", name="berkas"), service=options.service)
-        yield gen.sleep(0.1)
-        registerResponse = berkas.get(filter={"_id": inboxResponse['berkasid']})
-        print(registerResponse)
-        yield gen.sleep(0.1)
-        infoResponse = berkas.find(berkasid=inboxResponse['berkasid'])
-        yield gen.sleep(0.1)
-        simponiResponse = berkas.simponi(berkasid=inboxResponse['berkasid'])
-        yield gen.sleep(0.1)
-        produkResponse = berkas.produk(berkasid=inboxResponse['berkasid'])
-        yield gen.sleep(0.1)
-        daftarisianResponse = berkas.daftarisian(berkasid=inboxResponse['berkasid'])
-        yield gen.sleep(0.1)
-        if infoResponse.status_code == 200 and simponiResponse.status_code == 200 and produkResponse.status_code == 200 and daftarisianResponse.status_code == 200:
-            info = infoResponse.json()['result']['infoberkas']
-            simponi = simponiResponse.json()['result']
-            produk = produkResponse.json()['result']
-            daftarisian = daftarisianResponse.json()['result']
-            for p in infoResponse.json()['result']['pemohon']:
-                if p['typepemilikid'] == 'P':
-                    pemohon.append(p)
-                elif p['typepemilikid'] == 'M':
-                    pemilik.append(p)
-                    
-            self.render("node/detailberkas.html", office=self.get_office_actived(cookies=cookies), inbox=inboxResponse, info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)
-        else:
-            self.render("page/error/400.html")
+		info = infoResponse.json()['result']['infoberkas']
+		simponi = simponiResponse.json()['result']
+		produk = produkResponse.json()['result']
+		daftarisian = daftarisianResponse.json()['result']
+		for p in infoResponse.json()['result']['pemohon']:
+			if p['typepemilikid'] == 'P':
+				pemohon.append(p)
+			elif p['typepemilikid'] == 'M':
+				pemilik.append(p)
+		
+		if node['recievedate'] == None:
+			node['recievedate'] = datetime.datetime.now()
+			inbox.update(filter={"_id": node['_id']}, schema=node)
+		
+		self.render("node/detailinbox.html", office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, node=node, petugas=petugasResponse, info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)

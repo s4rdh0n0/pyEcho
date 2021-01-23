@@ -12,7 +12,7 @@ from model.user import UserModel
 from model.office import OfficeModel
 
 
-""" Global variable """
+""" Global Variable """
 
 # Database
 define("db_host", default="localhost", help="Mongo DB")

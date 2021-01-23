@@ -1,43 +1,39 @@
+<div class="callout callout-success" style="margin-bottom: 0!important;">
+    <h4><i class="fa fa-info"></i> Note:</h4>
+    {{ node['sendername'] }} <br> Tgl Kirim.{{ node['senderdate'].strftime('%d/%m/%Y, %H:%M:%S') }} <br>
+    <h4>{{ node['messange'] }}</h4>
+</div>
+
 <section class="box box-solid">
-    {% if type == 'REGIN' %}
     <div class="box-header with-border">
         <h3 class="box-title">
-            <button type="button" id="btnNewRegister" name="btnNewRegister" class="btn btn-primary btn-md btn-flat"  data-toggle="modal" data-target="#modal-messange"><i class="fa fa-floppy-o" aria-hidden="true"></i> New Register</button>
+            <button type="button" id="btnSendBerkas" name="btnSendBerkas" class="btn btn-primary btn-md btn-flat"  data-toggle="modal" data-target="#modal-messange"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send Berkas</button>
         </h3>
-    </div>
-    {% elif type == 'INFO' %}
-    <div class="box-header with-border">
-        <h4 class="box-title">No. {{register['nomorregister']}}</h4>
         <div class="box-tools pull-right">
-            <span class="label label-danger">Tgl Masuk. {{ register['userregisterindate'].strftime('%d/%m/%Y, %H:%M:%S') }}</span>
+            <span class="label label-default">Tgl Diterima. {{ node['recievedate'].strftime('%d/%m/%Y, %H:%M:%S') }}</span>
         </div>
     </div>
-    {% end %}
+
     <div class="box-body">
         <div class="row">
             <div class="col-sm-4">
                 <strong>Kantor :</strong> <address>{{ office['nama'].upper() }}</address>
                 <strong>Nomor Berkas :</strong> <address>{{ info['nomor'] }} / {{ info['tahun'] }}</address>
                 <strong>Tanggal Pendaftaran :</strong> <address>{{ datetime.datetime.strptime(info['createdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}</address>
-                {% if type == 'INFO' %}
-                    <strong>Region :</strong> <address>KEC. {{ register['kecamatannama'] }}, DS/KEL.{{ register['desanama'] }}</address>
-                {% end %}
+                <strong>Region :</strong> <address>KEC. {{ register['kecamatannama'] }}, DS/KEL.{{ register['desanama'] }}</address>
             </div>
             <div class="col-sm-4">
                 <strong>Kegiatan :</strong> <address>{{ info['prosedur'] }}</address>
                 <strong>Pemohon Berkas :</strong> <address>{{ info['pemohon'] }} </address>
                 <strong>Posisi Berkas :</strong> <address>{{ info['profile'] }}</address>
-                {% if type == 'INFO' %}
-                    <strong>Register Masuk :</strong> <address>{{ register['userregisterinname'] }}</address>
-                {% end %}
+                <strong>Register Masuk :</strong> <address>{{ register['userregisterinname'] }}</address>
             </div>
             <div class="col-sm-4">
                 <strong>Petugas Terakhir :</strong> <address>{{ info['pegawai'] }}</address>
-                {% if type == 'INFO' %}
-                    <strong>Phone :</strong> <address>{{ register['phone'] }}</address>
-                    <strong>Email :</strong> <address>{{ register['email'] }}</address>
-                {% end %}
+                <strong>Phone :</strong> <address>{{ register['phone'] }}</address>
+                <strong>Email :</strong> <address>{{ register['email'] }}</address>
                 <strong>Status :</strong> <address>{{ info['kegiatan'].upper() }} , {% if info['status'] == '1' %}PROSES{% elif info['status'] == '0' %}SELESAI {% if info['finnishdate'] != '0001-01-01T00:00:00Z' %}  Tgl.{{ datetime.datetime.strptime(info['finnishdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}{% end %}{% end %}</address>
+            
             </div>
         </div>
         <div class="row">
@@ -166,7 +162,7 @@
     </div>
 </section>
 
-{% if type == 'REGIN' %}
+
 <div class="modal fade" id="modal-messange" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -175,22 +171,12 @@
                     <button type="button" class="btn close" data-dismiss="modal" aria-label="Close"><i class="fa fa-times"></i>
                     </button>
                 </div>
-                <h4 class="modal-title"><i class="fa fa-envelope-o" aria-hidden="true"></i> New Register</h4>
+                <h4 class="modal-title"><i class="fa fa-envelope-o" aria-hidden="true"></i> Send Berkas</h4>
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" id="formSendMessange" method="PUT">
                     <input type="hidden" name="berkasid" value="{{ info['_id'] }}">
-                    <div class="form-group">
-                        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="region">Region:</label>
-                        <div class="col-md-9 col-sm-9 col-xs-12">
-                            <select id="region" name="region" class="select2 form-control" style="width: 100%;">
-                                <option value=""></option>
-                                {% for r in region %}
-                                    <option value="{{ r['_id'] }}">DESA/KEL.{{ r['nama'].upper() }}, KEC.{{ r['wilayahinduk']['nama'] }}</option>
-                                {% end %}
-                            </select>
-                        </div>
-                    </div>
+                    <input type="hidden" name="nodeid" value="{{ node['_id'] }}">
                     <div class="form-group">
                         <label class="control-label col-md-2 col-sm-2 col-xs-12" for="petugas">Petugas:</label>
                         <div class="col-md-9 col-sm-9 col-xs-12">
@@ -200,29 +186,6 @@
                                     <option value="{{ p['_id'] }}">{{ p['nama'].upper() }}</option>
                                 {% end %}
                             </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="operation">Operation:</label>
-                        <div class="col-md-9 col-sm-9 col-xs-12">
-                            <select id="operation" name="operation" class="select2 form-control" style="width: 100%;">
-                                <option value=""></option>
-                                {% for p in operation %}
-                                    <option value="{{ p['code'] }}">{{ p['description'] }}</option>
-                                {% end %}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="phone">Phone:</label>
-                        <div class="col-md-9 col-sm-9 col-xs-12">
-                            <input type="text" class="form-control" name="phone" id="phone">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="email">Email:</label>
-                        <div class="col-md-9 col-sm-9 col-xs-12">
-                            <input type="text" class="form-control" name="email" id="email">
                         </div>
                     </div>
                     <div class="form-group">
@@ -244,15 +207,6 @@
     </div>
 </div>
 <script>
-    $('#region').on('change', function () {
-        $(this).valid();
-    });
-
-    $("#region").select2({
-        placeholder: "Pilih region",
-        theme: "bootstrap",
-        allowClear: true
-    });
 
     $('#petugas').on('change', function () {
         $(this).valid();
@@ -264,37 +218,15 @@
         allowClear: true
     });
 
-    $('#operation').on('change', function () {
-        $(this).valid();
-    });
-    
-    $("#operation").select2({
-        placeholder: "Pilih status berkas",
-        theme: "bootstrap",
-        allowClear: true
-    });
-
     $('#formSendMessange').validate({
         rules: {
-            region: {
-                required: true,
-            },
             petugas: {
-                required: true,
-            },
-            operation: {
                 required: true,
             }
         },
         messages: {
-            region: {
-                required: 'Region wajib diisi.',
-            },
             petugas: {
                 required: 'Petugas wajib diisi.',
-            },
-            operation: {
-                required: 'Operation wajib diisi.',
             }
         },
         errorElement: "small",
@@ -326,15 +258,12 @@
             $('#modal-messange').modal('hide');
             $.ajax({
                 type: 'PUT',
-                url: '/register/compose/save',
+                url: '/register/inbox/save',
                 data: JSON.stringify({
                     berkasid: $('input:hidden[name=berkasid]').val(),
-                    desaid: $('#region').val(),
+                    nodeid: $('input:hidden[name=nodeid]').val(),
                     petugasid: $('#petugas').val(),
-                    operation: $('#operation').val(),
-                    pesan: $('#pesan').val(),
-                    phone: $('#phone').val(),
-                    email: $('#email').val(),
+                    pesan: $('#pesan').text(),
                 }),
                 async: false,
                 headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
@@ -343,9 +272,13 @@
                         message: result.msg,
                         size: 'medium',
                         callback: function () {
-                            $('#berkasView').empty();
+                            $('.nav-tabs a[href="#tabPencarian"]').tab('show');
+                            $('#tabDetail').load('/node/error/400', function () {
+                                $('#tableBerkas').DataTable().ajax.reload(null, false);
+                            });
                         }
                     });
+                    
                 }),
                 error: (function (XMLHttpRequest, textStatus, errorThrown) {
                     alert("Error: " + errorThrown);
@@ -353,7 +286,4 @@
             });
         }
     });
-
 </script>
-
-{% end %}

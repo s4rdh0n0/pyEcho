@@ -33,8 +33,8 @@ class Application(tornado.web.Application):
                 (r"/register/compose/list", ComposeListController),
 
                 (r"/register/inbox", InboxController),
-                (r"/register/inbox/send", InboxDetailController),
-                (r"/register/inbox/registerid=([A-Za-z0-9\ -@.]+)&type=([A-Za-z0-9\ -@.]+)", InboxDetailController),
+                (r"/register/inbox/save", InboxController),
+                (r"/register/inbox/registerid=([A-Za-z0-9\ -@.]+)", InboxDetailController),
 
                 (r"/register/sent", SentController),
 

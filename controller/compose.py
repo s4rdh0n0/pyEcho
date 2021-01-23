@@ -118,7 +118,14 @@ class ComponseController(BaseController):
 			sender = pegawai.get(filter={'_id': useractived['_id']})
 			recieve = pegawai.get(filter={'_id': body['petugasid']})
 			schema_register['_id'] = uuid.uuid4().__str__()
+			schema_register['officeid']   = schema_berkas['officeid']
+			schema_register['officetype'] = schema_berkas['officetype']
+			schema_register['officenama'] = schema_berkas['officenama']
 			schema_register['berkasid'] = schema_berkas['_id']
+			schema_register['nomorberkas'] = schema_berkas['nomorberkas']
+			schema_register['tahunberkas'] = schema_berkas['tahunberkas']
+			schema_register['prosedur'] = schema_berkas['prosedur']
+			schema_register['kegiatan'] = schema_berkas['kegiatan']
 			schema_register['sender'] = sender['_id']
 			schema_register['sendername'] = sender['nama']
 			schema_register['senderdate'] = datetime.datetime.now()
@@ -191,7 +198,6 @@ class DetailComposeController(BaseController):
 		info = {}
 		pemohon = []
 		pemilik = []
-		petugas = []
 
 		berkas = BerkasModel(collection=self.CONNECTION.collection(database='pyDatabase', name='berkas'), service=options.service)
 		yield gen.sleep(0.1)
@@ -207,24 +213,18 @@ class DetailComposeController(BaseController):
 		yield gen.sleep(0.1)
 		regionResponse = RegionModel(collection=None, service=options.service).all_desa(officeid=self.get_cookies_user()['officeid'])
 		yield gen.sleep(0.1)
-		petugasResponse = UserModel(collection=self.CONNECTION.collection(database='pyDatabase', name='users'), service=None).select(filter={"actived": True})
+		petugasResponse = UserModel(collection=self.CONNECTION.collection(database='pyDatabase', name='users'), service=None).select(filter={"actived": True, "_id": {"$ne":  self.get_cookies_user()['userid']}})
 		yield gen.sleep(0.1)
 		operationResponse = MasterModel(collection=self.CONNECTION.collection(database='pyDatabase', name='master'), service=None).select(filter={"type": 'OPERATION'})
-		for p in petugasResponse:
-			if p['_id'] != self.get_cookies_user()['userid']:
-				petugas.append(p)
 
-		if infoResponse.status_code == 200 and simponiResponse.status_code == 200 and produkResponse.status_code == 200 and daftarisianResponse.status_code == 200:
-			info = infoResponse.json()['result']['infoberkas']
-			simponi = simponiResponse.json()['result']
-			produk = produkResponse.json()['result']
-			daftarisian = daftarisianResponse.json()['result']
-			for p in infoResponse.json()['result']['pemohon']:
-				if p['typepemilikid'] == 'P':
-					pemohon.append(p)
-				elif p['typepemilikid'] == 'M':
-					pemilik.append(p)
-					
-			self.render("node/detailcompose.html", type=type, office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, region=regionResponse.json()['result'],  operation=operationResponse ,petugas=petugas, info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)
-		else:
-			self.render("page/error/400.html")
+		info = infoResponse.json()['result']['infoberkas']
+		simponi = simponiResponse.json()['result']
+		produk = produkResponse.json()['result']
+		daftarisian = daftarisianResponse.json()['result']
+		for p in infoResponse.json()['result']['pemohon']:
+			if p['typepemilikid'] == 'P':
+				pemohon.append(p)
+			elif p['typepemilikid'] == 'M':
+				pemilik.append(p)
+				
+		self.render("node/detailcompose.html", type=type, office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, region=regionResponse.json()['result'],  operation=operationResponse, petugas=petugasResponse, info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)

@@ -168,7 +168,7 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "data": 'status',
             "className": "dt-center text-center",
             "render": function (data) {
-                return '<button id="btnInfo" type="button" class="btn btn-default btn-flat"> <i class="fa fa-envelope-open-o" aria-hidden="true"></i></button>'
+                return '<a id="btnInfo" class="btn btn-default btn-flat"><i class="fa fa-info-circle" aria-hidden="true"></i></a>'
             }
         }
     ],

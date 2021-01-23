@@ -51,8 +51,6 @@ var tableBerkas = $('#tableBerkas').DataTable({
             type: 'POST',
             url: '/register/sent',
             data: JSON.stringify({
-
-                // NOTE: Query table berkas
                 nomor: $('#nomorBerkas').val(),
                 tahun: $('#tahunBerkas').val(),
                 page: $('#tableBerkas').DataTable().page.info()['page'],
@@ -89,12 +87,12 @@ var tableBerkas = $('#tableBerkas').DataTable({
             }
         }, {
             "targets": [2],
-            "width": "10%",
+            "width": "5%",
             "data": 'nomorberkas',
             "className": "dt-center text-center"
         }, {
             "targets": [3],
-            "width": "10%",
+            "width": "5%",
             "data": 'tahunberkas',
             "className": "dt-center text-center",
             "render": function (data) {
@@ -102,13 +100,13 @@ var tableBerkas = $('#tableBerkas').DataTable({
             }
         },{
             "targets": [4],
-            "width": "10%",
+            "width": "5%",
             "data": 'sendername',
             "className": "dt-center text-center"
         }, {
             "targets": [5],
-            "width": "10%",
-            "data": 'senddate',
+            "width": "5%",
+            "data": 'senderdate',
             "className": "dt-center text-center",
             "render": function (data) {
                 var date = new Date(data.$date);
@@ -117,13 +115,13 @@ var tableBerkas = $('#tableBerkas').DataTable({
             }
         },{
             "targets": [6],
-            "width": "10%",
-            "data": 'receivename',
+            "width": "5%",
+            "data": 'recievename',
             "className": "dt-center text-center"
         },{
             "targets": [7],
-            "width": "10%",
-            "data": 'receivedate',
+            "width": "5%",
+            "data": 'recievedate',
             "className": "dt-center text-center",
             "render": function (data) {
                 if(data != undefined){

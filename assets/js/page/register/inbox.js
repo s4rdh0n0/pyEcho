@@ -20,10 +20,27 @@
         }
 
         if (tableBerkas.row(selected_row).data()[0] != "") {
-            run_wait('#tabDetail');
-            $('.nav-tabs a[href="#tabDetail"]').tab('show'); 
-            $('#tabDetail').load('/register/inbox/registerid=' + tableBerkas.row(selected_row).data()['_id'] + '&type=inforegister', function () {
-                $('#tabDetail').waitMe("hide");
+            bootbox.confirm({
+                message: "Apakah kamu menerima secara fisik berkas ini ?",
+                buttons: {
+                    confirm: {
+                        label: 'Yes',
+                        className: 'btn-success'
+                    },
+                    cancel: {
+                        label: 'No',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function (result) {
+                    if(result){
+                        run_wait('#tabDetail');
+                        $('.nav-tabs a[href="#tabDetail"]').tab('show');
+                        $('#berkasView').load('/register/inbox/registerid=' + tableBerkas.row(selected_row).data()['_id'], function () {
+                            $('#tabDetail').waitMe("hide");
+                        });
+                    }
+                }
             });
         }
 
@@ -80,20 +97,24 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "targets": [0],
             "visible": false,
             "data": '_id',
-        }, {
+        },{
             "targets": [1],
+            "visible": false,
+            "data": "berkasid"
+        },{
+            "targets": [2],
             "width": "3%",
             "className": "dt-center text-center",
             "render": function (data, type, row, meta) {
                 return meta.row + meta.settings._iDisplayStart + 1;
             }
         }, {
-            "targets": [2],
+            "targets": [3],
             "width": "10%",
             "data": 'nomorberkas',
             "className": "dt-center text-center"
         }, {
-            "targets": [3],
+            "targets": [4],
             "width": "10%",
             "data": 'tahunberkas',
             "className": "dt-center text-center",
@@ -101,9 +122,9 @@ var tableBerkas = $('#tableBerkas').DataTable({
                 return data.toUpperCase();
             }
         }, {
-            "targets": [4],
+            "targets": [5],
             "width": "10%",
-            "data": 'senddate',
+            "data": 'senderdate',
             "className": "dt-center text-center",
             "render": function (data) {
                 var date = new Date(data.$date);
@@ -111,26 +132,31 @@ var tableBerkas = $('#tableBerkas').DataTable({
                 return (date.getUTCDate().toString().length > 1 ? date.getUTCDate() : "0" + date.getUTCDate()) + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCFullYear() + "  " + (date.getUTCHours().toString().length > 1 ? date.getUTCHours() : "0" + date.getUTCHours()) + ":" + (date.getUTCMinutes().toString().length > 1 ? date.getUTCMinutes() : "0" + date.getUTCMinutes()) + ":" + (date.getUTCSeconds().toString().length > 1 ? date.getUTCSeconds() : "0" + date.getUTCSeconds());
             }
         },{
-            "targets": [6],
+            "targets": [7],
             "width": "15%",
             "data": 'sendername',
             "className": "dt-center text-center"
         },{
-            "targets": [7],
-            "width": "26%",
-            "data": 'berkas.kegiatan',
-            "className": "dt-center text-center"
-        }, {
             "targets": [8],
-            "width": "20%",
-            "data": 'berkas.prosedur',
+            "width": "26%",
+            "data": 'kegiatan',
             "className": "dt-center text-center"
         }, {
             "targets": [9],
+            "width": "20%",
+            "data": 'prosedur',
+            "className": "dt-center text-center"
+        }, {
+            "targets": [10],
             "width": "6%",
+            "data": 'recievedate',
             "className": "dt-center text-center",
             "render": function (data) {
-                return '<a id="btnInfo" class="btn btn-default btn-flat"><i class="fa fa-info-circle" aria-hidden="true"></i></a>'
+                if (data == undefined){
+                    return '<a id="btnInfo" class="btn btn-default btn-flat"><i class="fa fa-envelope-o" aria-hidden="true"></i></a>'
+                }else{
+                    return '<a id="btnInfo" class="btn btn-default btn-flat"><i class="fa fa-envelope-open-o" aria-hidden="true"></i></a>'
+                }
             }
         }
     ],

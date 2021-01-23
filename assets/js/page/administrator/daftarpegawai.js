@@ -270,27 +270,41 @@
         
         if (tablePegawai.row(selected_row).data()[0] != "") {
             var pesan
-            if (tablePegawai.row(selected_row).data()['actived']){
-                pesan = "AKAN DINONAKTIFKAN.....?"
-            }else{
-                pesan = "AKAN DIAKTIFKAN.....?"
+            if (tablePegawai.row(selected_row).data()['actived']) {
+                pesan = " AKAN DINONAKTIFKAN ?"
+            } else {
+                pesan = " AKAN DIAKTIFKAN ?"
             }
-            var answer = window.confirm(tablePegawai.row(selected_row).data()['nama'].toUpperCase() + pesan );
-            if (answer) {
-                $.ajax({
-                    type: 'PUT',
-                    url: '/administrator/daftarpegawai/pegawai/status',
-                    data: JSON.stringify({
-                        userid: tablePegawai.row(selected_row).data()['_id'],
-                    }),
-                    async: true,
-                    headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
-                    error: (function (XMLHttpRequest, textStatus, errorThrown) {
-                        alert("Error: " + errorThrown);
-                    })
-                });
-                $('#tablePegawai').DataTable().ajax.reload(null, false);
-            }
+            bootbox.confirm({
+                message: tablePegawai.row(selected_row).data()['nama'].toUpperCase() + pesan ,
+                buttons: {
+                    confirm: {
+                        label: 'Yes',
+                        className: 'btn-success'
+                    },
+                    cancel: {
+                        label: 'No',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function (result) {
+                    if (result){
+                        $.ajax({
+                            type: 'PUT',
+                            url: '/administrator/daftarpegawai/pegawai/status',
+                            data: JSON.stringify({
+                                userid: tablePegawai.row(selected_row).data()['_id'],
+                            }),
+                            async: true,
+                            headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+                            error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                                alert("Error: " + errorThrown);
+                            })
+                        });
+                        $('#tablePegawai').DataTable().ajax.reload(null, false);
+                    }
+                }
+            });
         }
 
         return false
