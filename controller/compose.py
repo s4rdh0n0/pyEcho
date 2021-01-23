@@ -60,6 +60,7 @@ class ComponseController(BaseController):
 			self.write({'status': False, 'title': 'Warning', 'msg': 'Berkas {}/{} tidak ada pada database https://kkp2.atrbpn.go.id/.'.format(body['nomor'], body['tahun']), 'type': 'minimalist'})
 	
 	@tornado.web.authenticated
+	@tornado.gen.coroutine
 	def put(self):
 		useractived = self.get_user_actived(cookies=self.get_cookies_user())
 		body = tornado.escape.json_decode(self.request.body)
@@ -76,10 +77,13 @@ class ComponseController(BaseController):
 		title = ""
 
 		berkas_entity = berkas.find(berkasid=body['berkasid']).json()['result']
+		yield gen.sleep(0.1)
 		di_entity = berkas.daftarisian(berkasid=body['berkasid']).json()['result']
+		yield gen.sleep(0.1)
 		doc_entity = berkas.produk(berkasid=body['berkasid']).json()['result']
+		yield gen.sleep(0.1)
 		region_entity = region.all_desa(officeid=self.get_cookies_user()['officeid'])
-
+		yield gen.sleep(0.1)
 		if berkas.count(filter={"_id": body['berkasid']}) == 0:
 			office_entity = offices.get(filter={"_id": self.get_cookies_user()['officeid']})
 
@@ -113,6 +117,7 @@ class ComponseController(BaseController):
 			schema_berkas['status'] = body['operation']
 			schema_berkas['actived'] = True
 			berkas.add(schema=schema_berkas)
+			yield gen.sleep(0.1)
 
 			schema_register = dict()
 			sender = pegawai.get(filter={'_id': useractived['_id']})
@@ -170,6 +175,7 @@ class ComposeListController(BaseController):
 			print(e)
 
 	@tornado.web.authenticated
+	@tornado.gen.coroutine
 	def post(self):
 		list_response = []
 		count_reponse = 0
@@ -199,6 +205,7 @@ class DetailComposeController(BaseController):
 		pemohon = []
 		pemilik = []
 
+		regionResponse = RegionModel(collection=None, service=options.service).all_desa(officeid=self.get_cookies_user()['officeid'])
 		berkas = BerkasModel(collection=self.CONNECTION.collection(database='pyDatabase', name='berkas'), service=options.service)
 		yield gen.sleep(0.1)
 		infoResponse = berkas.find(berkasid=berkasid)
@@ -210,8 +217,6 @@ class DetailComposeController(BaseController):
 		daftarisianResponse = berkas.daftarisian(berkasid=berkasid)
 		yield gen.sleep(0.1)
 		register = berkas.get(filter={'_id': berkasid})
-		yield gen.sleep(0.1)
-		regionResponse = RegionModel(collection=None, service=options.service).all_desa(officeid=self.get_cookies_user()['officeid'])
 		yield gen.sleep(0.1)
 		petugasResponse = UserModel(collection=self.CONNECTION.collection(database='pyDatabase', name='users'), service=None).select(filter={"actived": True, "_id": {"$ne":  self.get_cookies_user()['userid']}})
 		yield gen.sleep(0.1)

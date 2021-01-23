@@ -65,62 +65,65 @@ class InboxController(BaseController):
 
 	@tornado.web.authenticated
 	def put(self):
-		useractived = self.get_user_actived(cookies=self.get_cookies_user())
-		body = tornado.escape.json_decode(self.request.body)
+		try:
+			useractived = self.get_user_actived(cookies=self.get_cookies_user())
+			body = tornado.escape.json_decode(self.request.body)
 
-		berkas =  BerkasModel(collection=self.CONNECTION.collection(database="pyDatabase", name="berkas"), service=options.service)
-		pegawai = UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=None)
-		register = RegisterModel(collection=self.CONNECTION.collection(database="pyDatabase", name="register"), service=None)
+			berkas =  BerkasModel(collection=self.CONNECTION.collection(database="pyDatabase", name="berkas"), service=options.service)
+			pegawai = UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=None)
+			register = RegisterModel(collection=self.CONNECTION.collection(database="pyDatabase", name="register"), service=None)
 
-		msg = ""
-		status = False
-		tipe = ""
-		title = ""
+			msg = ""
+			status = False
+			tipe = ""
+			title = ""
 
-		berkas_entity = berkas.find(berkasid=body['berkasid']).json()['result']
-		di_entity = berkas.daftarisian(berkasid=body['berkasid']).json()['result']
-		doc_entity = berkas.produk(berkasid=body['berkasid']).json()['result']
+			berkas_entity = berkas.find(berkasid=body['berkasid']).json()['result']
+			di_entity = berkas.daftarisian(berkasid=body['berkasid']).json()['result']
+			doc_entity = berkas.produk(berkasid=body['berkasid']).json()['result']
+
+			# Update Berkas.
+			schema_berkas = berkas.get(filter={'_id': body['berkasid']})
+			schema_berkas['pemilik'] = berkas_entity['pemohon']
+			schema_berkas['daftarisian'] = di_entity
+			schema_berkas['document'] = doc_entity
+			berkas.update(filter={'_id': body['berkasid']}, schema=schema_berkas)
+
+			node = register.get(filter={'_id': body['nodeid']})
+			node['actived'] = False
+			register.update(filter={'_id': body['nodeid']}, schema=node)
+
+			sender = pegawai.get(filter={'_id': useractived['_id']})
+			recieve = pegawai.get(filter={'_id': body['petugasid']})
+			schema_register = dict()
+			schema_register['_id'] = uuid.uuid4().__str__()
+			schema_register['officeid']   = schema_berkas['officeid']
+			schema_register['officetype'] = schema_berkas['officetype']
+			schema_register['officenama'] = schema_berkas['officenama']
+			schema_register['berkasid'] = schema_berkas['_id']
+			schema_register['nomorberkas'] = schema_berkas['nomorberkas']
+			schema_register['tahunberkas'] = schema_berkas['tahunberkas']
+			schema_register['prosedur'] = schema_berkas['prosedur']
+			schema_register['kegiatan'] = schema_berkas['kegiatan']
+			schema_register['sender'] = sender['_id']
+			schema_register['sendername'] = sender['nama']
+			schema_register['senderdate'] = datetime.datetime.now()
+			schema_register['recieve'] = recieve['_id']
+			schema_register['recievename'] = recieve['nama']
+			schema_register['recievedate'] = None
+			schema_register['messange'] = body['pesan']
+			schema_register['actived'] = True
+			register.add(schema=schema_register)
 
 
-		schema_berkas = berkas.get(filter={'_id': body['berkasid']})
-		schema_berkas['pemilik'] = berkas_entity['pemohon']
-		schema_berkas['daftarisian'] = di_entity
-		schema_berkas['document'] = doc_entity
-		berkas.update(filter={'_id': body['berkasid']}, schema=schema_berkas)
+			msg = "{} <br> Berkas {}/{} berhasil tersimpan.".format(schema_berkas['officenama'], schema_berkas['nomorberkas'], schema_berkas['tahunberkas'])
+			status = True
+			tipe = "info"
+			title = '<strong>Info</strong> <br>'
 
-		node = register.get(filter={'_id': body['nodeid']})
-		node['actived'] = False
-		register.update(filter={'_id': body['nodeid']}, schema=node)
-
-		sender = pegawai.get(filter={'_id': useractived['_id']})
-		recieve = pegawai.get(filter={'_id': body['petugasid']})
-		schema_register = dict()
-		schema_register['_id'] = uuid.uuid4().__str__()
-		schema_register['officeid']   = schema_berkas['officeid']
-		schema_register['officetype'] = schema_berkas['officetype']
-		schema_register['officenama'] = schema_berkas['officenama']
-		schema_register['berkasid'] = schema_berkas['_id']
-		schema_register['nomorberkas'] = schema_berkas['nomorberkas']
-		schema_register['tahunberkas'] = schema_berkas['tahunberkas']
-		schema_register['prosedur'] = schema_berkas['prosedur']
-		schema_register['kegiatan'] = schema_berkas['kegiatan']
-		schema_register['sender'] = sender['_id']
-		schema_register['sendername'] = sender['nama']
-		schema_register['senderdate'] = datetime.datetime.now()
-		schema_register['recieve'] = recieve['_id']
-		schema_register['recievename'] = recieve['nama']
-		schema_register['recievedate'] = None
-		schema_register['messange'] = body['pesan']
-		schema_register['actived'] = True
-		register.add(schema=schema_register)
-
-
-		msg = "{} <br> Berkas {}/{} berhasil tersimpan.".format(schema_berkas['officenama'], schema_berkas['nomorberkas'], schema_berkas['tahunberkas'])
-		status = True
-		tipe = "info"
-		title = '<strong>Info</strong> <br>'
-
-		self.write({'status': status, 'title': title, 'type': tipe, 'msg': msg})
+			self.write({'status': status, 'title': title, 'type': tipe, 'msg': msg})
+		except Exception as e:
+			print(e)
 
 
 class InboxDetailController(BaseController):
@@ -133,8 +136,9 @@ class InboxDetailController(BaseController):
 		pemilik = []
 		
 		inbox = RegisterModel(collection=self.CONNECTION.collection(database="pyDatabase", name="register"), service=None)
-			
 		berkas = BerkasModel(collection=self.CONNECTION.collection(database='pyDatabase', name='berkas'), service=options.service)
+
+		
 		node = inbox.get(filter={"_id": registerid})
 		yield gen.sleep(0.1)
 		infoResponse = berkas.find(berkasid=node['berkasid'])

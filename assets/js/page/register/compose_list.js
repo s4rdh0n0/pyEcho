@@ -149,38 +149,44 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "className": "dt-center text-center"
         },{
             "targets": [6],
+            "width": "5%",
+            "data": 'kecamatannama',
+            "className": "dt-center text-center"
+        },{
+            "targets": [7],
+            "width": "5%",
+            "data": 'desanama',
+            "className": "dt-center text-center"
+        },{
+            "targets": [8],
             "width": "10%",
             "data": 'kegiatan',
             "className": "dt-center text-center"
         }, {
-            "targets": [7],
+            "targets": [8],
             "width": "20%",
             "data": 'prosedur',
             "className": "dt-center text-center"
         }, {
-            "targets": [8],
+            "targets": [9],
             "width": "3%",
             "data": 'status',
             "className": "dt-center text-center"
         },{
-            "targets": [9],
+            "targets": [10],
             "width": "3%",
-            "data": 'status',
             "className": "dt-center text-center",
             "render": function (data) {
                 return '<a id="btnInfo" class="btn btn-default btn-flat"><i class="fa fa-info-circle" aria-hidden="true"></i></a>'
             }
         }
     ],
-    dom: 'Bfrtip',
-    buttons: [
+    "dom": 'Bfrtip',
+    "buttons": [
         {
             extend: 'csv',
             text: 'Export CSV',
-            className: 'btn-space',
-            exportOptions: {
-                orthogonal: null
-            }
+            className: 'btn-space'
         }
     ],
     "oLanguage": {

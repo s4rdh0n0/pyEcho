@@ -21,7 +21,7 @@ define("db_user", default="1228_Trenggalek", help="Mongo DB")
 define("db_password", default="1228trenggalek", help="Mongo DB")
 
 # Service
-define("service", default="http://localhost:8000", help="web service")
+define("service", default="http://180.178.109.123:8000", help="web service")
 
 # Cookies
 define("cookies", default="pyEchoCookies", help="website")
