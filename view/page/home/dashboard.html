@@ -3,6 +3,7 @@
 {% block css %}
 <link rel="stylesheet" href="{{ static_url('vendor/bootstrap/dist/css/bootstrap.css') }}">
 <link rel="stylesheet" href="{{ static_url('vendor/font-awesome/css/font-awesome.css') }}">
+<link rel="stylesheet" href="{{ static_url('vendor/Ionicons/css/ionicons.css') }}">
 <link rel="stylesheet" href="{{ static_url('css/init.css') }}">
 <link rel="stylesheet" href="{{ static_url('css/skin-blue.css') }}">
 {% end %}
@@ -29,6 +30,51 @@
 </section>
 
 <section class="content">
+    <div class="row">
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-aqua"><i class="ion ion-android-folder-open"></i></span>
 
+                <div class="info-box-content">
+                    <span class="info-box-text">Berkas Masuk</span>
+                    <span class="info-box-number">{{ berkasmasuk }} <small> Berkas</small></span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-green"><i class="ion ion-android-folder-open"></i></span>
+        
+                <div class="info-box-content">
+                    <span class="info-box-text">Berkas Proses</span>
+                    <span class="info-box-number">{{ berkasproses }} <small> Berkas</small></span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-green"><i class="ion ion-android-folder-open"></i></span>
+        
+                <div class="info-box-content">
+                    <span class="info-box-text">Berkas Tunda</span>
+                    <span class="info-box-number">{{ berkastunda }} <small> Berkas</small></span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-green"><i class="ion ion-android-folder-open"></i></span>
+        
+                <div class="info-box-content">
+                    <span class="info-box-text">Berkas Selesai</span>
+                    <span class="info-box-number">{{ berkasselesai }} <small> Berkas</small></span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+        </div>
+    </div>
 </section>
 {% end %}

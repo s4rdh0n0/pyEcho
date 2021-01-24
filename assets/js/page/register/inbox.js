@@ -99,22 +99,18 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "data": '_id',
         },{
             "targets": [1],
-            "visible": false,
-            "data": "berkasid"
-        },{
-            "targets": [2],
             "width": "3%",
             "className": "dt-center text-center",
             "render": function (data, type, row, meta) {
                 return meta.row + meta.settings._iDisplayStart + 1;
             }
         }, {
-            "targets": [3],
+            "targets": [2],
             "width": "10%",
             "data": 'nomorberkas',
             "className": "dt-center text-center"
         }, {
-            "targets": [4],
+            "targets": [3],
             "width": "10%",
             "data": 'tahunberkas',
             "className": "dt-center text-center",
@@ -122,7 +118,7 @@ var tableBerkas = $('#tableBerkas').DataTable({
                 return data.toUpperCase();
             }
         }, {
-            "targets": [5],
+            "targets": [4],
             "width": "10%",
             "data": 'senderdate',
             "className": "dt-center text-center",
@@ -132,22 +128,22 @@ var tableBerkas = $('#tableBerkas').DataTable({
                 return (date.getUTCDate().toString().length > 1 ? date.getUTCDate() : "0" + date.getUTCDate()) + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCFullYear() + "  " + (date.getUTCHours().toString().length > 1 ? date.getUTCHours() : "0" + date.getUTCHours()) + ":" + (date.getUTCMinutes().toString().length > 1 ? date.getUTCMinutes() : "0" + date.getUTCMinutes()) + ":" + (date.getUTCSeconds().toString().length > 1 ? date.getUTCSeconds() : "0" + date.getUTCSeconds());
             }
         },{
-            "targets": [7],
+            "targets": [5],
             "width": "15%",
             "data": 'sendername',
             "className": "dt-center text-center"
         },{
-            "targets": [8],
+            "targets": [6],
             "width": "26%",
             "data": 'kegiatan',
             "className": "dt-center text-center"
         }, {
-            "targets": [9],
+            "targets": [7],
             "width": "20%",
             "data": 'prosedur',
             "className": "dt-center text-center"
         }, {
-            "targets": [10],
+            "targets": [8],
             "width": "6%",
             "data": 'recievedate',
             "className": "dt-center text-center",

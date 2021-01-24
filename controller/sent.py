@@ -31,8 +31,8 @@ class SentController(BaseController):
 	def get(self):
 		try:
 			if UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=options.service).find_role(userid=self.useractived['_id'], role="REGISTER") != None:
-				self.page_data['title'] = 'Inbox'
-				self.page_data['description'] = 'Daftar Berkas Masuk'
+				self.page_data['title'] = 'Sent'
+				self.page_data['description'] = 'Daftar Berkas Terkirim'
 				self.render('page/register/sent.html', page=self.page_data, useractived=self.useractived)
 			else:
 				self.page_data['title'] = '403'
@@ -49,7 +49,7 @@ class SentController(BaseController):
 		body = tornado.escape.json_decode(self.request.body)
 		try:
 			inbox = RegisterModel(collection=self.CONNECTION.collection(database="pyDatabase", name="register"), service=None)
-			filter = {"officeid": self.get_cookies_user()['officeid'], "sender": self.get_cookies_user()['userid'], "actived": False}
+			filter = {"officeid": self.get_cookies_user()['officeid'], "sender": self.get_cookies_user()['userid']}
 			if body['nomor'] != "":
 				filter['nomorberkas'] = body['nomor']
 			elif body['tahun'] != "":

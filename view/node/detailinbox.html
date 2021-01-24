@@ -1,72 +1,44 @@
-<div class="callout callout-success" style="margin-bottom: 0!important;">
+<div class="callout callout-warning" style="margin-bottom: 0!important;">
     <h4><i class="fa fa-info"></i> Note:</h4>
-    {{ node['sendername'] }} <br> Tgl Kirim.{{ node['senderdate'].strftime('%d/%m/%Y, %H:%M:%S') }} <br>
-    <h4>{{ node['messange'] }}</h4>
+    <strong>From</strong>: <br>
+    {{ node['sendername'] }} ,Tgl Kirim.{{ node['senderdate'].strftime('%d/%m/%Y, %H:%M:%S') }} <br>
+    <strong>Messange</strong>:<br>
+    {{ node['messange'] }}
 </div>
 
 <section class="box box-solid">
-    <div class="box-header with-border">
+    <div class="box-header with-border text-center">
         <h3 class="box-title">
-            <button type="button" id="btnSendBerkas" name="btnSendBerkas" class="btn btn-primary btn-md btn-flat"  data-toggle="modal" data-target="#modal-messange"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send Berkas</button>
+        {% if register['status'] == 'PROSES' %}
+            <a class="btn btn-app bg-green" id="btnSendBerkas" name="btnSendBerkas" data-toggle="modal" data-target="#modal-messange">
+                <i class="fa fa-paper-plane" aria-hidden="true"></i> Send Berkas
+            </a>
+            <a class="btn btn-app bg-green" id="btnUpdate" name="btnUpdate">
+                <i class="fa fa-refresh" aria-hidden="true"></i> Update KKP
+            </a>
+        {% end %}
+            <a class="btn btn-app bg-green" id="btnKembali" name="btnKembali">
+                <i class="fa fa-undo" aria-hidden="true"></i> Kembali
+            </a>
         </h3>
-        <div class="box-tools pull-right">
-            <span class="label label-default">Tgl Diterima. {{ node['recievedate'].strftime('%d/%m/%Y, %H:%M:%S') }}</span>
-        </div>
     </div>
 
     <div class="box-body">
         <div class="row">
             <div class="col-sm-4">
                 <strong>Kantor :</strong> <address>{{ office['nama'].upper() }}</address>
-                <strong>Nomor Berkas :</strong> <address>{{ info['nomor'] }} / {{ info['tahun'] }}</address>
-                <strong>Tanggal Pendaftaran :</strong> <address>{{ datetime.datetime.strptime(info['createdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}</address>
+                <strong>Nomor Berkas :</strong> <address>{{ register['nomorberkas'] }} / {{ register['tahunberkas'] }}</address>
                 <strong>Region :</strong> <address>KEC. {{ register['kecamatannama'] }}, DS/KEL.{{ register['desanama'] }}</address>
             </div>
             <div class="col-sm-4">
-                <strong>Kegiatan :</strong> <address>{{ info['prosedur'] }}</address>
-                <strong>Pemohon Berkas :</strong> <address>{{ info['pemohon'] }} </address>
-                <strong>Posisi Berkas :</strong> <address>{{ info['profile'] }}</address>
+                <strong>Kegiatan :</strong> <address>{{ register['kegiatan'] }}, {{ register['prosedur'] }}</address>
+                <strong>Pemohon Berkas :</strong> <address>{{ pemohon['nama'] }} </address>
                 <strong>Register Masuk :</strong> <address>{{ register['userregisterinname'] }}</address>
             </div>
             <div class="col-sm-4">
-                <strong>Petugas Terakhir :</strong> <address>{{ info['pegawai'] }}</address>
+                <strong>Tanggal Diterima :</strong> <address>{{ node['recievedate'].strftime('%d/%m/%Y, %H:%M:%S') }}</address>
                 <strong>Phone :</strong> <address>{{ register['phone'] }}</address>
                 <strong>Email :</strong> <address>{{ register['email'] }}</address>
-                <strong>Status :</strong> <address>{{ info['kegiatan'].upper() }} , {% if info['status'] == '1' %}PROSES{% elif info['status'] == '0' %}SELESAI {% if info['finnishdate'] != '0001-01-01T00:00:00Z' %}  Tgl.{{ datetime.datetime.strptime(info['finnishdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}{% end %}{% end %}</address>
-            
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <h5> <strong>KODE BILLING:</strong> </h5>
-            </div>
-            <div class="col-sm-12">
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <tbody>
-                            <tr>
-                                <th class="text-center">Kode Billing</th>
-                                <th class="text-center">Biaya</th>
-                                <th class="text-center">NTPN</th>
-                                <th class="text-center">Tanggal Kadaluarsa</th>
-                                <th class="text-center">Tanggal Bayar</th>
-                            </tr>
-                            {% if simponi != None %}
-                                {% for s in simponi %}
-                                <tr>
-                                    <td class="text-center">{{ s['kodebilling'] }}</td>
-                                    <td class="text-center">{{ s['biaya'] }}</td>
-                                    <td class="text-center">{{ s['ntpn'] }}</td>
-                                    <td class="text-center">{{ s['expiredate'] }}</td>
-                                    {% if s['buydate'] != "" %}
-                                    <td class="text-center">{{ datetime.datetime.strptime(s['buydate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d-%m-%Y, %H:%M:%S') }}</td>
-                                    {% end%}
-                                </tr>
-                                {% end %}
-                            {% end %}
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </div>
         <div class="row">
@@ -82,8 +54,8 @@
                                 <th class="text-center">Nomor</th>
                                 <th class="text-center">Tanggal</th>
                             </tr>
-                            {% if daftarisian != None %}
-                                {% for d in daftarisian %}
+                            {% if register['daftarisian'] != None %}
+                                {% for d in register['daftarisian'] %}
                                 <tr>
                                     <td class="text-center">{{ d['typediid'] }}</td>
                                     <td class="text-center">{{ d['description'].split("-")[1].split(" No.")[1] }}</td>
@@ -112,8 +84,8 @@
                                 <th class="text-center">Nomor</th>
                                 <th class="text-center">Desa</th>
                             </tr>
-                            {% if produk != None %}
-                                {% for p in produk %}
+                            {% if register['document'] != None %}
+                                {% for p in register['document'] %}
                                 <tr>
                                     {% if p['type'] == 'STP' %}
                                     <td style="display:none">{{ p['documentid'] }}</td>
@@ -162,7 +134,7 @@
     </div>
 </section>
 
-
+{% if register['status'] == 'PROSES' %}
 <div class="modal fade" id="modal-messange" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -175,7 +147,7 @@
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" id="formSendMessange" method="PUT">
-                    <input type="hidden" name="berkasid" value="{{ info['_id'] }}">
+                    <input type="hidden" name="berkasid" value="{{ register['_id'] }}">
                     <input type="hidden" name="nodeid" value="{{ node['_id'] }}">
                     <div class="form-group">
                         <label class="control-label col-md-2 col-sm-2 col-xs-12" for="petugas">Petugas:</label>
@@ -206,7 +178,13 @@
         </div>
     </div>
 </div>
+{% end %}
 <script>
+
+    $("#btnKembali").click(function () {
+        $('.nav-tabs a[href="#tabPencarian"]').tab('show');
+        $('#tableBerkas').DataTable().ajax.reload(null, false);
+    });
 
     $('#petugas').on('change', function () {
         $(this).valid();

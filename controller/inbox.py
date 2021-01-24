@@ -33,7 +33,7 @@ class InboxController(BaseController):
 		try:
 			if UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=options.service).find_role(userid=self.useractived['_id'], role="REGISTER") != None:
 				self.page_data['title'] = 'Inbox'
-				self.page_data['description'] = 'Daftar Berkas Masuk'
+				self.page_data['description'] = 'Daftar Berkas Tunggakan'
 				self.render('page/register/inbox.html', page=self.page_data, useractived=self.useractived)
 			else:
 				self.page_data['title'] = '403'
@@ -90,38 +90,45 @@ class InboxController(BaseController):
 			berkas.update(filter={'_id': body['berkasid']}, schema=schema_berkas)
 
 			node = register.get(filter={'_id': body['nodeid']})
-			node['actived'] = False
-			register.update(filter={'_id': body['nodeid']}, schema=node)
+			if node['actived']:
+				node['actived'] = False
+				register.update(filter={'_id': body['nodeid']}, schema=node)
 
-			sender = pegawai.get(filter={'_id': useractived['_id']})
-			recieve = pegawai.get(filter={'_id': body['petugasid']})
-			schema_register = dict()
-			schema_register['_id'] = uuid.uuid4().__str__()
-			schema_register['officeid']   = schema_berkas['officeid']
-			schema_register['officetype'] = schema_berkas['officetype']
-			schema_register['officenama'] = schema_berkas['officenama']
-			schema_register['berkasid'] = schema_berkas['_id']
-			schema_register['nomorberkas'] = schema_berkas['nomorberkas']
-			schema_register['tahunberkas'] = schema_berkas['tahunberkas']
-			schema_register['prosedur'] = schema_berkas['prosedur']
-			schema_register['kegiatan'] = schema_berkas['kegiatan']
-			schema_register['sender'] = sender['_id']
-			schema_register['sendername'] = sender['nama']
-			schema_register['senderdate'] = datetime.datetime.now()
-			schema_register['recieve'] = recieve['_id']
-			schema_register['recievename'] = recieve['nama']
-			schema_register['recievedate'] = None
-			schema_register['messange'] = body['pesan']
-			schema_register['actived'] = True
-			register.add(schema=schema_register)
+				sender = pegawai.get(filter={'_id': useractived['_id']})
+				recieve = pegawai.get(filter={'_id': body['petugasid']})
+				schema_register = dict()
+				schema_register['_id'] = uuid.uuid4().__str__()
+				schema_register['officeid']   = schema_berkas['officeid']
+				schema_register['officetype'] = schema_berkas['officetype']
+				schema_register['officenama'] = schema_berkas['officenama']
+				schema_register['berkasid'] = schema_berkas['_id']
+				schema_register['nomorberkas'] = schema_berkas['nomorberkas']
+				schema_register['tahunberkas'] = schema_berkas['tahunberkas']
+				schema_register['prosedur'] = schema_berkas['prosedur']
+				schema_register['kegiatan'] = schema_berkas['kegiatan']
+				schema_register['sender'] = sender['_id']
+				schema_register['sendername'] = sender['nama']
+				schema_register['senderdate'] = datetime.datetime.now()
+				schema_register['recieve'] = recieve['_id']
+				schema_register['recievename'] = recieve['nama']
+				schema_register['recievedate'] = None
+				schema_register['messange'] = body['pesan']
+				schema_register['actived'] = True
+				register.add(schema=schema_register)
 
 
-			msg = "{} <br> Berkas {}/{} berhasil tersimpan.".format(schema_berkas['officenama'], schema_berkas['nomorberkas'], schema_berkas['tahunberkas'])
-			status = True
-			tipe = "info"
-			title = '<strong>Info</strong> <br>'
+				msg = "{} <br> Berkas {}/{} berhasil tersimpan.".format(schema_berkas['officenama'], schema_berkas['nomorberkas'], schema_berkas['tahunberkas'])
+				status = True
+				tipe = "info"
+				title = '<strong>Info</strong> <br>'
 
-			self.write({'status': status, 'title': title, 'type': tipe, 'msg': msg})
+				self.write({'status': status, 'title': title, 'type': tipe, 'msg': msg})
+			else:
+				msg = "{} <br> Berkas {}/{} berhasil tersimpan.".format(schema_berkas['officenama'], schema_berkas['nomorberkas'], schema_berkas['tahunberkas'])
+				status = True
+				tipe = "info"
+				title = '<strong>Info</strong> <br>'
+				self.write({'status': status, 'title': title, 'type': tipe, 'msg': msg})
 		except Exception as e:
 			print(e)
 
@@ -132,36 +139,23 @@ class InboxDetailController(BaseController):
 	@tornado.gen.coroutine
 	def get(self, registerid=""):
 		info = {}
-		pemohon = []
+		pemohon = None
 		pemilik = []
 		
 		inbox = RegisterModel(collection=self.CONNECTION.collection(database="pyDatabase", name="register"), service=None)
-		berkas = BerkasModel(collection=self.CONNECTION.collection(database='pyDatabase', name='berkas'), service=options.service)
+		berkas = BerkasModel(collection=self.CONNECTION.collection(database='pyDatabase', name='berkas'), service=None)
 
 		
 		node = inbox.get(filter={"_id": registerid})
-		yield gen.sleep(0.1)
-		infoResponse = berkas.find(berkasid=node['berkasid'])
-		yield gen.sleep(0.1)
-		simponiResponse = berkas.simponi(berkasid=node['berkasid'])
-		yield gen.sleep(0.1)
-		produkResponse = berkas.produk(berkasid=node['berkasid'])
-		yield gen.sleep(0.1)
-		daftarisianResponse = berkas.daftarisian(berkasid=node['berkasid'])
 		yield gen.sleep(0.1)
 		register = berkas.get(filter={'_id': node['berkasid']})
 		yield gen.sleep(0.1)
 		petugasResponse = UserModel(collection=self.CONNECTION.collection(database='pyDatabase', name='users'), service=None).select(filter={"actived": True, "_id": {"$ne":  self.get_cookies_user()['userid']}})
 		yield gen.sleep(0.1)
 
-
-		info = infoResponse.json()['result']['infoberkas']
-		simponi = simponiResponse.json()['result']
-		produk = produkResponse.json()['result']
-		daftarisian = daftarisianResponse.json()['result']
-		for p in infoResponse.json()['result']['pemohon']:
+		for p in register['pemilik']:
 			if p['typepemilikid'] == 'P':
-				pemohon.append(p)
+				pemohon = p
 			elif p['typepemilikid'] == 'M':
 				pemilik.append(p)
 		
@@ -169,4 +163,4 @@ class InboxDetailController(BaseController):
 			node['recievedate'] = datetime.datetime.now()
 			inbox.update(filter={"_id": node['_id']}, schema=node)
 		
-		self.render("node/detailinbox.html", office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, node=node, petugas=petugasResponse, info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)
+		self.render("node/detailinbox.html", office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, node=node, petugas=petugasResponse, pemohon=pemohon)

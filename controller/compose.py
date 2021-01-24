@@ -114,7 +114,7 @@ class ComponseController(BaseController):
 			schema_berkas['pemilik'] = berkas_entity['pemohon']
 			schema_berkas['daftarisian'] = di_entity
 			schema_berkas['document'] = doc_entity
-			schema_berkas['status'] = body['operation']
+			schema_berkas['status'] = 'PROSES'
 			schema_berkas['actived'] = True
 			berkas.add(schema=schema_berkas)
 			yield gen.sleep(0.1)
@@ -219,8 +219,6 @@ class DetailComposeController(BaseController):
 		register = berkas.get(filter={'_id': berkasid})
 		yield gen.sleep(0.1)
 		petugasResponse = UserModel(collection=self.CONNECTION.collection(database='pyDatabase', name='users'), service=None).select(filter={"actived": True, "_id": {"$ne":  self.get_cookies_user()['userid']}})
-		yield gen.sleep(0.1)
-		operationResponse = MasterModel(collection=self.CONNECTION.collection(database='pyDatabase', name='master'), service=None).select(filter={"type": 'OPERATION'})
 
 		info = infoResponse.json()['result']['infoberkas']
 		simponi = simponiResponse.json()['result']
@@ -232,4 +230,4 @@ class DetailComposeController(BaseController):
 			elif p['typepemilikid'] == 'M':
 				pemilik.append(p)
 				
-		self.render("node/detailcompose.html", type=type, office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, region=regionResponse.json()['result'],  operation=operationResponse, petugas=petugasResponse, info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)
+		self.render("node/detailcompose.html", type=type, office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, region=regionResponse.json()['result'],  petugas=petugasResponse, info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)
