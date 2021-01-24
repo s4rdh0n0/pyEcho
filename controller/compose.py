@@ -34,6 +34,7 @@ class ComponseController(BaseController):
 		try:
 			if UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=options.service).find_role(userid=self.useractived['_id'], role="REGIN") != None:
 				self.page_data['title'] = 'Compose'
+				self.page_data['menu'] = 'compose'
 				self.page_data['description'] = 'Register Berkas Masuk'
 				self.render('page/register/compose.html', page=self.page_data, useractived=self.useractived)
 			else:
@@ -154,6 +155,42 @@ class ComponseController(BaseController):
 		self.write({'status': status, 'title': title, 'type': tipe, 'msg': msg})
 
 
+class DetailComposeController(BaseController):
+
+	@tornado.web.authenticated
+	@tornado.gen.coroutine
+	def get(self, berkasid=""):
+		info = {}
+		pemohon = []
+		pemilik = []
+
+		regionResponse = RegionModel(collection=None, service=options.service).all_desa(officeid=self.get_cookies_user()['officeid'])
+
+		berkas = BerkasModel(collection=None, service=options.service)
+		yield gen.sleep(0.1)
+		infoResponse = berkas.find(berkasid=berkasid)
+		yield gen.sleep(0.1)
+		simponiResponse = berkas.simponi(berkasid=berkasid)
+		yield gen.sleep(0.1)
+		produkResponse = berkas.produk(berkasid=berkasid)
+		yield gen.sleep(0.1)
+		daftarisianResponse = berkas.daftarisian(berkasid=berkasid)
+		yield gen.sleep(0.1)
+		petugasResponse = UserModel(collection=self.CONNECTION.collection(database='pyDatabase', name='users'), service=None).select(filter={"actived": True, "_id": {"$ne":  self.get_cookies_user()['userid']}})
+
+		info = infoResponse.json()['result']['infoberkas']
+		simponi = simponiResponse.json()['result']
+		produk = produkResponse.json()['result']
+		daftarisian = daftarisianResponse.json()['result']
+		for p in infoResponse.json()['result']['pemohon']:
+			if p['typepemilikid'] == 'P':
+				pemohon.append(p)
+			elif p['typepemilikid'] == 'M':
+				pemilik.append(p)
+
+		self.render("node/detailcompose.html", office=self.get_office_actived(cookies=self.get_cookies_user()), region=regionResponse.json()['result'],  petugas=petugasResponse, info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)
+
+
 class ComposeListController(BaseController):
 
 	def initialize(self):
@@ -182,7 +219,7 @@ class ComposeListController(BaseController):
 		body = tornado.escape.json_decode(self.request.body)
 		try:
 			inbox = BerkasModel(collection=self.CONNECTION.collection(database="pyDatabase", name="berkas"), service=None)
-			filter = {"officeid": self.get_cookies_user()['officeid']}
+			filter = {"officeid": self.get_cookies_user()['officeid'], "actived": True}
 			if body['nomor'] != "":
 				filter['nomorberkas'] = body['nomor']
 			elif body['tahun'] != "":
@@ -194,40 +231,3 @@ class ComposeListController(BaseController):
 			self.write({'status': True, 'draw': body['draw'], 'data': json.dumps(list_response, default=json_util.default), 'recordsTotal': count_reponse, 'recordsFiltered': count_reponse})
 		except Exception as e:
 			print(e)
-
-
-class DetailComposeController(BaseController):
-
-	@tornado.web.authenticated
-	@tornado.gen.coroutine
-	def get(self, berkasid="", type=""):
-		info = {}
-		pemohon = []
-		pemilik = []
-
-		regionResponse = RegionModel(collection=None, service=options.service).all_desa(officeid=self.get_cookies_user()['officeid'])
-		berkas = BerkasModel(collection=self.CONNECTION.collection(database='pyDatabase', name='berkas'), service=options.service)
-		yield gen.sleep(0.1)
-		infoResponse = berkas.find(berkasid=berkasid)
-		yield gen.sleep(0.1)
-		simponiResponse = berkas.simponi(berkasid=berkasid)
-		yield gen.sleep(0.1)
-		produkResponse = berkas.produk(berkasid=berkasid)
-		yield gen.sleep(0.1)
-		daftarisianResponse = berkas.daftarisian(berkasid=berkasid)
-		yield gen.sleep(0.1)
-		register = berkas.get(filter={'_id': berkasid})
-		yield gen.sleep(0.1)
-		petugasResponse = UserModel(collection=self.CONNECTION.collection(database='pyDatabase', name='users'), service=None).select(filter={"actived": True, "_id": {"$ne":  self.get_cookies_user()['userid']}})
-
-		info = infoResponse.json()['result']['infoberkas']
-		simponi = simponiResponse.json()['result']
-		produk = produkResponse.json()['result']
-		daftarisian = daftarisianResponse.json()['result']
-		for p in infoResponse.json()['result']['pemohon']:
-			if p['typepemilikid'] == 'P':
-				pemohon.append(p)
-			elif p['typepemilikid'] == 'M':
-				pemilik.append(p)
-				
-		self.render("node/detailcompose.html", type=type, office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, region=regionResponse.json()['result'],  petugas=petugasResponse, info=info, pemohon=pemohon, pemilik=pemilik, simponi=simponi, produk=produk, daftarisian=daftarisian)

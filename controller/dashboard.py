@@ -22,6 +22,7 @@ class DashboardController(BaseController):
 			berkas = BerkasModel(collection=self.CONNECTION.collection(database="pyDatabase", name="berkas"), service=None)
 
 			self.page_data['title'] = 'Dashboard'
+			self.page_data['menu'] = 'dashboard'
 			self.page_data['description'] = 'Rekapitulasi register berkas'
 			self.render('page/home/dashboard.html', 
 						page=self.page_data, 

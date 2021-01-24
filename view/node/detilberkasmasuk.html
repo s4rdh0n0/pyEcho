@@ -1,24 +1,62 @@
 <section class="box box-solid">
+    {% if type == 'REGIN' %}
     <div class="box-header with-border">
         <h3 class="box-title">
-            <button type="button" id="btnNewRegister" name="btnNewRegister" class="btn btn-primary btn-md btn-flat"  data-toggle="modal" data-target="#modal-messange"><i class="fa fa-floppy-o" aria-hidden="true"></i> New Register</button>
+            <button type="button" id="btnNewRegister" name="btnNewRegister" class="btn btn-primary btn-md btn-flat"
+                data-toggle="modal" data-target="#modal-messange"><i class="fa fa-floppy-o" aria-hidden="true"></i> New
+                Register</button>
         </h3>
     </div>
+    {% elif type == 'INFO' %}
+    <div class="box-header with-border">
+        <h4 class="box-title">No. {{register['nomorregister']}}</h4>
+        <div class="box-tools pull-right">
+            <span class="label label-danger">Tgl Masuk. {{ register['userregisterindate'].strftime('%d/%m/%Y, %H:%M:%S')
+                }}</span>
+        </div>
+    </div>
+    {% end %}
     <div class="box-body">
         <div class="row">
             <div class="col-sm-4">
-                <strong>Kantor :</strong> <address>{{ office['nama'].upper() }}</address>
-                <strong>Nomor Berkas :</strong> <address>{{ info['nomor'] }} / {{ info['tahun'] }}</address>
-                <strong>Tanggal Pendaftaran :</strong> <address>{{ datetime.datetime.strptime(info['createdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}</address>
+                <strong>Kantor :</strong>
+                <address>{{ office['nama'].upper() }}</address>
+                <strong>Nomor Berkas :</strong>
+                <address>{{ info['nomor'] }} / {{ info['tahun'] }}</address>
+                <strong>Tanggal Pendaftaran :</strong>
+                <address>{{ datetime.datetime.strptime(info['createdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y,
+                    %H:%M:%S') }}</address>
+                {% if type == 'INFO' %}
+                <strong>Region :</strong>
+                <address>KEC. {{ register['kecamatannama'] }}, DS/KEL.{{ register['desanama'] }}</address>
+                {% end %}
             </div>
             <div class="col-sm-4">
-                <strong>Kegiatan :</strong> <address>{{ info['kegiatan'] }} <br> {{ info['prosedur'] }}</address>
-                <strong>Pemohon Berkas :</strong> <address>{{ info['pemohon'] }} </address>
-                <strong>Posisi Berkas :</strong> <address>{{ info['profile'] }}</address>
+                <strong>Kegiatan :</strong>
+                <address>{{ info['prosedur'] }}</address>
+                <strong>Pemohon Berkas :</strong>
+                <address>{{ info['pemohon'] }} </address>
+                <strong>Posisi Berkas :</strong>
+                <address>{{ info['profile'] }}</address>
+                {% if type == 'INFO' %}
+                <strong>Register Masuk :</strong>
+                <address>{{ register['userregisterinname'] }}</address>
+                {% end %}
             </div>
             <div class="col-sm-4">
-                <strong>Petugas Terakhir :</strong> <address>{{ info['pegawai'] }}</address>
-                <strong>Status :</strong> <address>{% if info['status'] == '1' %}PROSES{% elif info['status'] == '0' %}SELESAI {% if info['finnishdate'] != '0001-01-01T00:00:00Z' %}  Tgl.{{ datetime.datetime.strptime(info['finnishdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}{% end %}{% end %}</address>
+                <strong>Petugas Terakhir :</strong>
+                <address>{{ info['pegawai'] }}</address>
+                {% if type == 'INFO' %}
+                <strong>Phone :</strong>
+                <address>{{ register['phone'] }}</address>
+                <strong>Email :</strong>
+                <address>{{ register['email'] }}</address>
+                {% end %}
+                <strong>Status :</strong>
+                <address>{{ info['kegiatan'].upper() }} , {% if info['status'] == '1' %}PROSES{% elif info['status'] ==
+                    '0' %}SELESAI {% if info['finnishdate'] != '0001-01-01T00:00:00Z' %} Tgl.{{
+                    datetime.datetime.strptime(info['finnishdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y,
+                    %H:%M:%S') }}{% end %}{% end %}</address>
             </div>
         </div>
         <div class="row">
@@ -37,17 +75,18 @@
                                 <th class="text-center">Tanggal Bayar</th>
                             </tr>
                             {% if simponi != None %}
-                                {% for s in simponi %}
-                                <tr>
-                                    <td class="text-center">{{ s['kodebilling'] }}</td>
-                                    <td class="text-center">{{ s['biaya'] }}</td>
-                                    <td class="text-center">{{ s['ntpn'] }}</td>
-                                    <td class="text-center">{{ s['expiredate'] }}</td>
-                                    {% if s['buydate'] != "" %}
-                                    <td class="text-center">{{ datetime.datetime.strptime(s['buydate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d-%m-%Y, %H:%M:%S') }}</td>
-                                    {% end%}
-                                </tr>
-                                {% end %}
+                            {% for s in simponi %}
+                            <tr>
+                                <td class="text-center">{{ s['kodebilling'] }}</td>
+                                <td class="text-center">{{ s['biaya'] }}</td>
+                                <td class="text-center">{{ s['ntpn'] }}</td>
+                                <td class="text-center">{{ s['expiredate'] }}</td>
+                                {% if s['buydate'] != "" %}
+                                <td class="text-center">{{ datetime.datetime.strptime(s['buydate'],
+                                    '%Y-%m-%dT%H:%M:%S%z').strftime('%d-%m-%Y, %H:%M:%S') }}</td>
+                                {% end%}
+                            </tr>
+                            {% end %}
                             {% end %}
                         </tbody>
                     </table>
@@ -68,14 +107,15 @@
                                 <th class="text-center">Tanggal</th>
                             </tr>
                             {% if daftarisian != None %}
-                                {% for d in daftarisian %}
-                                <tr>
-                                    <td class="text-center">{{ d['typediid'] }}</td>
-                                    <td class="text-center">{{ d['description'].split("-")[1].split(" No.")[1] }}</td>
-                                    <td class="text-center">{{ d['description'].split("-")[1].split(", ")[0].split("Tgl. ")[1] }}
-                                    </td>
-                                </tr>
-                                {% end %}
+                            {% for d in daftarisian %}
+                            <tr>
+                                <td class="text-center">{{ d['typediid'] }}</td>
+                                <td class="text-center">{{ d['description'].split("-")[1].split(" No.")[1] }}</td>
+                                <td class="text-center">{{ d['description'].split("-")[1].split(", ")[0].split("Tgl.
+                                    ")[1] }}
+                                </td>
+                            </tr>
+                            {% end %}
                             {% end %}
                         </tbody>
                     </table>
@@ -98,46 +138,46 @@
                                 <th class="text-center">Desa</th>
                             </tr>
                             {% if produk != None %}
-                                {% for p in produk %}
-                                <tr>
-                                    {% if p['type'] == 'STP' %}
-                                    <td style="display:none">{{ p['documentid'] }}</td>
-                                    <td style="display:none">{{ p['type'] }}</td>
-                                    <td class="text-center">SURAT TUGAS PENGUKURAN</td>
-                                    <td class="text-center">{{ p['nomor'] }}</td>
-                                    <td class="text-center">{{ p['wilayah'] }}</td>
-                                    </td>
-                                    {% elif p['type'] == 'PERSIL' %}
-                                    <td style="display:none">{{ p['documentid'] }}</td>
-                                    <td style="display:none">{{ p['type'] }}</td>
-                                    <td class="text-center">NIB</td>
-                                    <td class="text-center">{{ p['nomor'] }}</td>
-                                    <td class="text-center">{{ p['wilayah'] }}</td>
-                                    </td>
-                                    {% elif p['type'] == 'GU' %}
-                                    <td style="display:none">{{ p['documentid'] }}</td>
-                                    <td style="display:none">{{ p['type'] }}</td>
-                                    <td class="text-center">GAMBAR UKUR</td>
-                                    <td class="text-center">{{ p['nomor'] }}</td>
-                                    <td class="text-center">{{ p['wilayah'] }}</td>
-                                    </td>
-                                    {% elif p['type'] == 'SU' %}
-                                    <td style="display:none">{{ p['documentid'] }}</td>
-                                    <td style="display:none">{{ p['type'] }}</td>
-                                    <td class="text-center">SURAT UKUR</td>
-                                    <td class="text-center">{{ p['nomor'] }}</td>
-                                    <td class="text-center">{{ p['wilayah'] }}</td>
-                                    </td>
-                                    {% elif p['type'] == 'HAK' %}
-                                    <td style="display:none">{{ p['documentid'] }}</td>
-                                    <td style="display:none">{{ p['type'] }}</td>
-                                    <td class="text-center">BUKU TANAH</td>
-                                    <td class="text-center">{{ p['nomor'] }}</td>
-                                    <td class="text-center">{{ p['wilayah'] }}</td>
-                                    </td>
-                                    {% end %}
-                                </tr>
+                            {% for p in produk %}
+                            <tr>
+                                {% if p['type'] == 'STP' %}
+                                <td style="display:none">{{ p['documentid'] }}</td>
+                                <td style="display:none">{{ p['type'] }}</td>
+                                <td class="text-center">SURAT TUGAS PENGUKURAN</td>
+                                <td class="text-center">{{ p['nomor'] }}</td>
+                                <td class="text-center">{{ p['wilayah'] }}</td>
+                                </td>
+                                {% elif p['type'] == 'PERSIL' %}
+                                <td style="display:none">{{ p['documentid'] }}</td>
+                                <td style="display:none">{{ p['type'] }}</td>
+                                <td class="text-center">NIB</td>
+                                <td class="text-center">{{ p['nomor'] }}</td>
+                                <td class="text-center">{{ p['wilayah'] }}</td>
+                                </td>
+                                {% elif p['type'] == 'GU' %}
+                                <td style="display:none">{{ p['documentid'] }}</td>
+                                <td style="display:none">{{ p['type'] }}</td>
+                                <td class="text-center">GAMBAR UKUR</td>
+                                <td class="text-center">{{ p['nomor'] }}</td>
+                                <td class="text-center">{{ p['wilayah'] }}</td>
+                                </td>
+                                {% elif p['type'] == 'SU' %}
+                                <td style="display:none">{{ p['documentid'] }}</td>
+                                <td style="display:none">{{ p['type'] }}</td>
+                                <td class="text-center">SURAT UKUR</td>
+                                <td class="text-center">{{ p['nomor'] }}</td>
+                                <td class="text-center">{{ p['wilayah'] }}</td>
+                                </td>
+                                {% elif p['type'] == 'HAK' %}
+                                <td style="display:none">{{ p['documentid'] }}</td>
+                                <td style="display:none">{{ p['type'] }}</td>
+                                <td class="text-center">BUKU TANAH</td>
+                                <td class="text-center">{{ p['nomor'] }}</td>
+                                <td class="text-center">{{ p['wilayah'] }}</td>
+                                </td>
                                 {% end %}
+                            </tr>
+                            {% end %}
                             {% end %}
                         </tbody>
                     </table>
@@ -147,12 +187,14 @@
     </div>
 </section>
 
+{% if type == 'REGIN' %}
 <div class="modal fade" id="modal-messange" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header" style="text-align:left;">
                 <div class="box-tools pull-right">
-                    <button type="button" class="btn close" data-dismiss="modal" aria-label="Close"><i class="fa fa-times"></i>
+                    <button type="button" class="btn close" data-dismiss="modal" aria-label="Close"><i
+                            class="fa fa-times"></i>
                     </button>
                 </div>
                 <h4 class="modal-title"><i class="fa fa-envelope-o" aria-hidden="true"></i> New Register</h4>
@@ -166,7 +208,8 @@
                             <select id="region" name="region" class="select2 form-control" style="width: 100%;">
                                 <option value=""></option>
                                 {% for r in region %}
-                                    <option value="{{ r['_id'] }}">DESA/KEL.{{ r['nama'].upper() }}, KEC.{{ r['wilayahinduk']['nama'] }}</option>
+                                <option value="{{ r['_id'] }}">DESA/KEL.{{ r['nama'].upper() }}, KEC.{{
+                                    r['wilayahinduk']['nama'] }}</option>
                                 {% end %}
                             </select>
                         </div>
@@ -177,7 +220,7 @@
                             <select id="petugas" name="petugas" class="select2 form-control" style="width: 100%;">
                                 <option value=""></option>
                                 {% for p in petugas %}
-                                    <option value="{{ p['_id'] }}">{{ p['nama'].upper() }}</option>
+                                <option value="{{ p['_id'] }}">{{ p['nama'].upper() }}</option>
                                 {% end %}
                             </select>
                         </div>
@@ -203,7 +246,9 @@
                     <div class="form-group">
                         <div class="col-md-8 col-sm-8 col-xs-12 col-md-offset-3">
                             <div class="pull-right">
-                                <button type="submit" id="btnSimpan" name="btnSimpan" class="btn btn-success btn-flat"><i class="fa fa-paper-plane" aria-hidden="true"></i> Kirim</button>
+                                <button type="submit" id="btnSimpan" name="btnSimpan"
+                                    class="btn btn-success btn-flat"><i class="fa fa-paper-plane"
+                                        aria-hidden="true"></i> Kirim</button>
                             </div>
                         </div>
                     </div>
@@ -226,7 +271,7 @@
     $('#petugas').on('change', function () {
         $(this).valid();
     });
-    
+
     $("#petugas").select2({
         placeholder: "Pilih petugas",
         theme: "bootstrap",
@@ -275,7 +320,7 @@
                 error.insertAfter(element);
             }
         },
-        submitHandler: function() {
+        submitHandler: function () {
             $('#modal-messange').modal('hide');
             $.ajax({
                 type: 'PUT',
@@ -307,3 +352,5 @@
     });
 
 </script>
+
+{% end %}

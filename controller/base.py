@@ -41,6 +41,7 @@ class BaseController(tornado.web.RequestHandler):
 
 	page_data = {
 		'title': None,
+		'menu': None,
 		'description': None,
 	}
 
