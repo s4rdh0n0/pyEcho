@@ -14,7 +14,7 @@
                 <i class="fa fa-paper-plane" aria-hidden="true"></i> Send Berkas
             </a>
             <a class="btn btn-app bg-green" id="btnUpdate" name="btnUpdate">
-                <i class="fa fa-refresh" aria-hidden="true"></i> Update KKP
+                <i class="fa fa-refresh" aria-hidden="true"></i> Update
             </a>
         {% end %}
             <a class="btn btn-app bg-green" id="btnKembali" name="btnKembali">
@@ -33,9 +33,12 @@
             <div class="col-sm-4">
                 <strong>Kegiatan :</strong> <address>{{ register['kegiatan'] }}, {{ register['prosedur'] }}</address>
                 <strong>Pemohon Berkas :</strong> <address>{{ pemohon['nama'] }} </address>
-                <strong>Register Masuk :</strong> <address>{{ register['userregisterinname'] }}</address>
+                <strong>Register Masuk :</strong>
+                <address>{{ register['userregisterinname'] }}</address>
             </div>
             <div class="col-sm-4">
+                <strong>Tanggal Register</strong>
+                <address>Tgl.{{ register['userregisterindate'].strftime('%d/%m/%Y, %H:%M:%S') }}</address>
                 <strong>Tanggal Diterima :</strong> <address>{{ node['recievedate'].strftime('%d/%m/%Y, %H:%M:%S') }}</address>
                 <strong>Phone :</strong> <address>{{ register['phone'] }}</address>
                 <strong>Email :</strong> <address>{{ register['email'] }}</address>
@@ -243,7 +246,7 @@
                     petugasid: $('#petugas').val(),
                     pesan: $('#pesan').val(),
                 }),
-                async: false,
+                async: true,
                 headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
                 success: (function (result) {
                     bootbox.alert({
@@ -256,7 +259,6 @@
                             });
                         }
                     });
-                    
                 }),
                 error: (function (XMLHttpRequest, textStatus, errorThrown) {
                     alert("Error: " + errorThrown);

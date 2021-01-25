@@ -10,7 +10,7 @@ from model.master import MasterModel
 
 
 def InsertOffice(connection: None, document: None):
-    office = OfficeModel(collection=connection.collection(database="pyDatabase", name="offices"), service="http://localhost:8000")
+    office = OfficeModel(collection=connection.collection(database="pyDatabase", name="offices"), service="http://180.178.109.123:8000")
     master = MasterModel(collection=connection.collection(database="pyDatabase", name="master"), service=None)
     for d in document['office']:
         print("=> {}".format(d['kantah']))
@@ -42,7 +42,7 @@ def InsertOffice(connection: None, document: None):
 
 def InsertUser(connection: None, document: None):
     master = MasterModel(collection=connection.collection(database="pyDatabase", name="master"), service=None)
-    user = UserModel(collection= connection.collection(database="pyDatabase", name="users"), service="http://localhost:8000")
+    user = UserModel(collection= connection.collection(database="pyDatabase", name="users"), service="http://180.178.109.123:8000")
     for d in document['user']:
         print("=> {}".format(d['username']))
         if user.count(filter={"username": d['username']}) == 0:

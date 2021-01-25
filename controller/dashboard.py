@@ -12,12 +12,13 @@ from model.berkas import BerkasModel
 
 
 class DashboardController(BaseController):
-	
+
 	def initialize(self):
-		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
+		self.useractived = None
 
 	@tornado.web.authenticated
 	def get(self):
+		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
 		try:
 			berkas = BerkasModel(collection=self.CONNECTION.collection(database="pyDatabase", name="berkas"), service=None)
 

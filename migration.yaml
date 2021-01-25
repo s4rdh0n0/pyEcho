@@ -83,16 +83,16 @@ master:
 
   - code: REGIN
     type: JOB
-    description: Petugas pelaksana register berkas masuk
+    description: Petugas Pelaksana Register Berkas Masuk
   - code: REGOUT
     type: JOB
-    description: Petugas pelaksana register berkas keluar
+    description: Petugas Pelaksana Register Berkas Keluar
   - code: REGISTER
     type: JOB
-    description: register berkas
+    description: Register Berkas
   - code: ADMINISTRATOR
     type: JOB
-    description: Pengelola aplikasi dan data
+    description: Pengelola Aplikasi dan Data
 
 
   - code: REG

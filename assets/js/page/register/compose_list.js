@@ -61,7 +61,7 @@
         if (tableBerkas.row(selected_row).data()[0] != "") {
             run_wait('#tabDetail');
             $('.nav-tabs a[href="#tabDetail"]').tab('show');
-            $('#berkasView').load('/register/compose/berkasid=' + tableBerkas.row(selected_row).data()['_id'] + '&type=INFO', function () {
+            $('#berkasView').load('/register/compose/list/berkasid=' + tableBerkas.row(selected_row).data()['_id'], function () {
                 $('#tabDetail').waitMe("hide");
             });
         }

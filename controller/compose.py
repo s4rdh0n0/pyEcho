@@ -98,7 +98,7 @@ class ComponseController(BaseController):
 			schema_berkas['nomorregister'] = offices.booking(officeid=office_entity['_id'], counter='REG')
 			schema_berkas['userregisterin'] = useractived['_id']
 			schema_berkas['userregisterinname'] = useractived['nama']
-			schema_berkas['userregisterindate'] = datetime.datetime.now()
+			schema_berkas['userregisterindate'] = datetime.datetime.strptime(body['tglregister'], '%d/%m/%Y') 
 			schema_berkas['officeid'] = office_entity['_id']
 			schema_berkas['officetype'] = office_entity['officetypeid']
 			schema_berkas['officenama'] = office_entity['nama']
@@ -142,12 +142,12 @@ class ComponseController(BaseController):
 			schema_register['actived'] = True
 			register.add(schema=schema_register)
 
-			msg = "{} <br> Berkas {}/{} berhasil tersimpan.".format(office_entity['nama'], schema_berkas['nomorberkas'], schema_berkas['tahunberkas'])
+			msg = "{} <br> Berkas {}/{}. <br> Nomor Register {} ,Tgl.{}  berhasil tersimpan.".format(office_entity['nama'], schema_berkas['nomorberkas'], schema_berkas['tahunberkas'], schema_berkas['nomorregister'],body['tglregister'])
 			status = True
 			tipe = "info"
 			title = '<strong>Info</strong> <br>'
 		else:
-			msg = "Berkas {}/{} sudah tersimpan sebelumnya.".format(berkas_entity['infoberkas']['nomor'], berkas_entity['infoberkas']['tahun'])
+			msg = "{} <br> Berkas {}/{}. <br> Nomor Register {} ,Tgl.{}  berhasil tersimpan.".format(office_entity['nama'], schema_berkas['nomorberkas'], schema_berkas['tahunberkas'], schema_berkas['nomorregister'],schema_berkas['userregisterindate'])
 			status = False
 			tipe = "minimalist"
 			title = '<strong>Warning</strong> <br>'
@@ -231,3 +231,24 @@ class ComposeListController(BaseController):
 			self.write({'status': True, 'draw': body['draw'], 'data': json.dumps(list_response, default=json_util.default), 'recordsTotal': count_reponse, 'recordsFiltered': count_reponse})
 		except Exception as e:
 			print(e)
+
+
+class DetailComposeListController(BaseController):
+
+	@tornado.web.authenticated
+	@tornado.gen.coroutine
+	def get(self, berkasid=""):
+		pemohon = None
+		pemilik = []
+		
+		berkas = BerkasModel(collection=self.CONNECTION.collection(database='pyDatabase', name='berkas'), service=None)
+
+		register = berkas.get(filter={'_id': berkasid})
+		for p in register['pemilik']:
+			if p['typepemilikid'] == 'P':
+				pemohon = p
+			elif p['typepemilikid'] == 'M':
+				pemilik.append(p)
+		
+		self.render("node/detilberkasmasuk.html", office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, pemohon=pemohon)
+
