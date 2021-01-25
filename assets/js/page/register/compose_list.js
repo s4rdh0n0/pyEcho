@@ -183,6 +183,7 @@ var tableBerkas = $('#tableBerkas').DataTable({
     ],
     "dom": 'Bfrtip',
     "buttons": [
+        'pageLength',
         {
             extend: 'csv',
             text: 'Export CSV',
@@ -195,9 +196,13 @@ var tableBerkas = $('#tableBerkas').DataTable({
     'responsive': true,
     'paging': true,
     'autoWidth': true,
-    'pagingType': 'simple_numbers',
-    'lengthChange': false,
     'pageLength': 20,
+    'lengthMenu': [
+        [20, 50, 100, 1000],
+        ['20 rows', '50 rows', '100 rows', '1000 row']
+    ],
+    'pagingType': 'simple_numbers',
+    'lengthChange': true,
     'ordering': false,
     'searching': false,
     'info': true

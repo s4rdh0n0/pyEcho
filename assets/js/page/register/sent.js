@@ -5,13 +5,6 @@
         $('#tableBerkas').DataTable().ajax.reload(null, false);
     });
 
-    // NOTE: Reset table
-    $("#btnResetFilter").click(function () {
-        $('#nomorBerkas').val("");
-        $('#tahunBerkas').val("");
-        $('#tableBerkas').DataTable().ajax.reload(null, false);
-    });
-
     // NOTE: Info Berkas
     $('#tableBerkas tbody').on('click', '#btnInfo', function (event) {
         var selected_row = $(this).parents('tr');
@@ -97,7 +90,7 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "className": "dt-center text-center"
         },{
             "targets": [4],
-            "width": "5%",
+            "width": "10%",
             "data": 'senderdate',
             "className": "dt-center text-center",
             "render": function (data) {
@@ -107,12 +100,12 @@ var tableBerkas = $('#tableBerkas').DataTable({
             }
         },{
             "targets": [5],
-            "width": "5%",
+            "width": "10%",
             "data": 'recievename',
             "className": "dt-center text-center"
         },{
             "targets": [6],
-            "width": "5%",
+            "width": "10%",
             "data": 'recievedate',
             "className": "dt-center text-center",
             "render": function (data) {
@@ -126,15 +119,28 @@ var tableBerkas = $('#tableBerkas').DataTable({
             }
         }
     ],
+    "dom": 'Bfrtip',
+    "buttons": [
+        'pageLength',
+        {
+            extend: 'csv',
+            text: 'Export CSV',
+            className: 'btn-space'
+        }
+    ],
     "oLanguage": {
         "sProcessing": "<b>Sedang proses...</b> <br> harap tunggu"
     },
     'responsive': true,
     'paging': true,
     'autoWidth': true,
-    'pagingType': 'simple_numbers',
-    'lengthChange': false,
     'pageLength': 20,
+    'lengthMenu': [
+        [20, 50, 100, 1000],
+        ['20 rows', '50 rows', '100 rows', '1000 row']
+    ],
+    'pagingType': 'simple_numbers',
+    'lengthChange': true,
     'ordering': false,
     'searching': false,
     'info': true
