@@ -33,46 +33,83 @@
     <div class="row">
         <div class="col-md-3 col-sm-6 col-xs-12">
             <div class="info-box">
-                <span class="info-box-icon bg-aqua"><i class="ion ion-android-folder-open"></i></span>
+                <span class="info-box-icon bg-yellow"><i class="ion ion-android-exit"></i></span>
 
                 <div class="info-box-content">
                     <span class="info-box-text">Berkas Masuk</span>
-                    <span class="info-box-number">{{ berkasmasuk }} <small> Berkas</small></span>
+                    <span class="info-box-number">{{ berkas['masuk'] }} <small> Berkas</small></span>
                 </div>
                 <!-- /.info-box-content -->
             </div>
         </div>
         <div class="col-md-3 col-sm-6 col-xs-12">
             <div class="info-box">
-                <span class="info-box-icon bg-green"><i class="ion ion-android-folder-open"></i></span>
+                <span class="info-box-icon bg-blue"><i class="ion ion-android-document"></i></span>
         
                 <div class="info-box-content">
                     <span class="info-box-text">Berkas Proses</span>
-                    <span class="info-box-number">{{ berkasproses }} <small> Berkas</small></span>
+                    <span class="info-box-number">{{ berkas['proses'] }} <small> Berkas</small></span>
                 </div>
                 <!-- /.info-box-content -->
             </div>
         </div>
         <div class="col-md-3 col-sm-6 col-xs-12">
             <div class="info-box">
-                <span class="info-box-icon bg-green"><i class="ion ion-android-folder-open"></i></span>
+                <span class="info-box-icon bg-red"><i class="ion ion-android-remove-circle"></i></span>
         
                 <div class="info-box-content">
                     <span class="info-box-text">Berkas Tunda</span>
-                    <span class="info-box-number">{{ berkastunda }} <small> Berkas</small></span>
+                    <span class="info-box-number">{{ berkas['tunda'] }} <small> Berkas</small></span>
                 </div>
                 <!-- /.info-box-content -->
             </div>
         </div>
         <div class="col-md-3 col-sm-6 col-xs-12">
             <div class="info-box">
-                <span class="info-box-icon bg-green"><i class="ion ion-android-folder-open"></i></span>
+                <span class="info-box-icon bg-green"><i class="ion ion-ios-flag"></i></span>
         
                 <div class="info-box-content">
                     <span class="info-box-text">Berkas Selesai</span>
-                    <span class="info-box-number">{{ berkasselesai }} <small> Berkas</small></span>
+                    <span class="info-box-number">{{ berkas['selesai'] }} <small> Berkas</small></span>
                 </div>
                 <!-- /.info-box-content -->
+            </div>
+        </div>
+    </div>
+    <div class="box box-solid">
+        <div class="box-body">
+            <div class="row">
+                <div class="col-sm-12">
+                    <h5> <strong>Update Data:   {{ datetime.datetime.now().strftime('%d/%m/%Y, %H:%M:%S') }}</strong> </h5>
+                </div>
+                <div class="col-sm-12">
+                    <div class="table-responsive">
+                        <table  class="table table-bordered table-hover" role="grid" >
+                            <tbody>
+                                <tr>
+                                    <th class="text-center">Nama</th>
+                                    <th class="text-center">Berkas Masuk</th>
+                                    <th class="text-center">Tunggakan</th>
+                                    <th class="text-center">Terkirim</th>
+                                    <th class="text-center">Belum Diterima</th>
+                                    <th class="text-center">Sudah Diterima</th>
+                                </tr>
+                                {% if cal_berkas != None %}
+                                    {% for c in cal_berkas %}
+                                    <tr>
+                                        <td class="text-center">{{ c['nama'].upper() }}</td>
+                                        <td class="text-center">{{ c['berkas'] }}</td>
+                                        <td class="text-center">{{ c['tunggakan'] }}</td>
+                                        <td class="text-center">{{ c['selesai'] }}</td>
+                                        <td class="text-center">{{ c['selesai_blm_terima'] }}</td>
+                                        <td class="text-center">{{ c['selesai'] - c['selesai_blm_terima'] }}</td>
+                                    </tr>
+                                    {% end %}
+                                {% end %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

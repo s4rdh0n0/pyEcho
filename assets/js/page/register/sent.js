@@ -15,7 +15,7 @@
         if (tableBerkas.row(selected_row).data()[0] != "") {
             run_wait('#tabDetail');
             $('.nav-tabs a[href="#tabDetail"]').tab('show');
-            $('#tabDetail').load('/register/inbox/registerid=' + tableBerkas.row(selected_row).data()['_id'] + '&type=inforegister', function () {
+            $('#berkasView').load('/register/sent/registerid=' + tableBerkas.row(selected_row).data()['_id'], function () {
                 $('#tabDetail').waitMe("hide");
             });
         }
@@ -116,6 +116,23 @@ var tableBerkas = $('#tableBerkas').DataTable({
                 }else{
                     return ""
                 }
+            }
+        },{
+            "targets": [7],
+            "width": "5%",
+            "data": 'kegiatan',
+            "className": "dt-center text-center"
+        },{
+            "targets": [7],
+            "width": "10%",
+            "data": 'prosedur',
+            "className": "dt-center text-center"        
+        },{
+            "targets": [8],
+            "width": "5%",
+            "className": "dt-center text-center",
+            "render": function (data) {
+                return '<a id="btnInfo" class="btn btn-default btn-flat"><i class="fa fa-info-circle" aria-hidden="true"></i></a>'
             }
         }
     ],

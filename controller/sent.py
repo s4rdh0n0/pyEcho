@@ -61,3 +61,30 @@ class SentController(BaseController):
 			self.write({'status': True, 'draw': body['draw'], 'data': json.dumps(list_response, default=json_util.default), 'recordsTotal': count_reponse, 'recordsFiltered': count_reponse})
 		except Exception as e:
 			print(e)
+
+
+
+class SentDetailController(BaseController):
+
+	@tornado.web.authenticated
+	@tornado.gen.coroutine
+	def get(self, registerid=""):
+		info = {}
+		pemohon = None
+		pemilik = []
+		
+		inbox = RegisterModel(collection=self.CONNECTION.collection(database="pyDatabase", name="register"), service=None)
+		berkas = BerkasModel(collection=self.CONNECTION.collection(database='pyDatabase', name='berkas'), service=None)
+
+		
+		node = inbox.get(filter={"_id": registerid})
+		yield gen.sleep(0.1)
+		register = berkas.get(filter={'_id': node['berkasid']})
+
+		for p in register['pemilik']:
+			if p['typepemilikid'] == 'P':
+				pemohon = p
+			elif p['typepemilikid'] == 'M':
+				pemilik.append(p)
+		
+		self.render("node/detailsent.html", office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, node=node, pemohon=pemohon)

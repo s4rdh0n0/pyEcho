@@ -1,0 +1,126 @@
+<section class="box box-solid">
+    <div class="box-header with-border text-center">
+        <h3 class="box-title">
+            <a class="btn btn-app bg-green" id="btnKembali" name="btnKembali">
+                <i class="fa fa-undo" aria-hidden="true"></i> Kembali
+            </a>
+        </h3>
+    </div>
+
+    <div class="box-body">
+        <div class="row">
+            <div class="col-sm-4">
+                <strong>Kantor :</strong><address>{{ office['nama'].upper() }}</address>
+                <strong>Nomor Berkas :</strong><address>{{ register['nomorberkas'] }} / {{ register['tahunberkas'] }}</address>
+                <strong>Region :</strong><address>KEC. {{ register['kecamatannama'] }}, DS/KEL.{{ register['desanama'] }}</address>
+                <strong>Kegiatan :</strong><address>{{ register['kegiatan'] }}, {{ register['prosedur'] }}</address>
+            </div>
+            <div class="col-sm-4">
+                <strong>Pemohon Berkas :</strong><address>{{ pemohon['nama'] }} </address>
+                <strong>Register Masuk :</strong><address>{{ register['userregisterinname'] }}</address>
+                <strong>Tanggal Register</strong><address>Tgl.{{ register['userregisterindate'].strftime('%d/%m/%Y') }}</address>
+                <strong>Tanggal Diterima :</strong><address>{{ node['recievedate'].strftime('%d/%m/%Y, %H:%M:%S') }}</address>
+            </div>
+            <div class="col-sm-4">
+                <strong>Phone :</strong><address>{{ register['phone'] }}</address>
+                <strong>Email :</strong><address>{{ register['email'] }}</address>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <h5> <strong>DAFTAR ISIAN:</strong> </h5>
+            </div>
+            <div class="col-sm-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th class="text-center">Daftar Isian</th>
+                                <th class="text-center">Nomor</th>
+                                <th class="text-center">Tanggal</th>
+                            </tr>
+                            {% if register['daftarisian'] != None %}
+                                {% for d in register['daftarisian'] %}
+                                <tr>
+                                    <td class="text-center">{{ d['typediid'] }}</td>
+                                    <td class="text-center">{{ d['description'].split("-")[1].split(" No.")[1] }}</td>
+                                    <td class="text-center">{{ d['description'].split("-")[1].split(", ")[0].split("Tgl.")[1] }}
+                                    </td>
+                                </tr>
+                                {% end %}
+                            {% end %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <h5> <strong>PRODUK:</strong> </h5>
+            </div>
+            <div class="col-sm-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th style="display:none"></th>
+                                <th style="display:none"></th>
+                                <th class="text-center">Produk</th>
+                                <th class="text-center">Nomor</th>
+                                <th class="text-center">Desa</th>
+                            </tr>
+                            {% if register['document'] != None %}
+                                {% for p in register['document'] %}
+                                <tr>
+                                    {% if p['type'] == 'STP' %}
+                                    <td style="display:none">{{ p['documentid'] }}</td>
+                                    <td style="display:none">{{ p['type'] }}</td>
+                                    <td class="text-center">SURAT TUGAS PENGUKURAN</td>
+                                    <td class="text-center">{{ p['nomor'] }}</td>
+                                    <td class="text-center">{{ p['wilayah'] }}</td>
+                                    </td>
+                                    {% elif p['type'] == 'PERSIL' %}
+                                    <td style="display:none">{{ p['documentid'] }}</td>
+                                    <td style="display:none">{{ p['type'] }}</td>
+                                    <td class="text-center">NIB</td>
+                                    <td class="text-center">{{ p['nomor'] }}</td>
+                                    <td class="text-center">{{ p['wilayah'] }}</td>
+                                    </td>
+                                    {% elif p['type'] == 'GU' %}
+                                    <td style="display:none">{{ p['documentid'] }}</td>
+                                    <td style="display:none">{{ p['type'] }}</td>
+                                    <td class="text-center">GAMBAR UKUR</td>
+                                    <td class="text-center">{{ p['nomor'] }}</td>
+                                    <td class="text-center">{{ p['wilayah'] }}</td>
+                                    </td>
+                                    {% elif p['type'] == 'SU' %}
+                                    <td style="display:none">{{ p['documentid'] }}</td>
+                                    <td style="display:none">{{ p['type'] }}</td>
+                                    <td class="text-center">SURAT UKUR</td>
+                                    <td class="text-center">{{ p['nomor'] }}</td>
+                                    <td class="text-center">{{ p['wilayah'] }}</td>
+                                    </td>
+                                    {% elif p['type'] == 'HAK' %}
+                                    <td style="display:none">{{ p['documentid'] }}</td>
+                                    <td style="display:none">{{ p['type'] }}</td>
+                                    <td class="text-center">BUKU TANAH</td>
+                                    <td class="text-center">{{ p['nomor'] }}</td>
+                                    <td class="text-center">{{ p['wilayah'] }}</td>
+                                    </td>
+                                    {% end %}
+                                </tr>
+                                {% end %}
+                            {% end %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    $("#btnKembali").click(function () {
+        $('.nav-tabs a[href="#tabPencarian"]').tab('show');
+        $('#tableBerkas').DataTable().ajax.reload(null, false);
+    });
+</script>

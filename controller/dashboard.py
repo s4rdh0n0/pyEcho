@@ -9,6 +9,8 @@ from controller.base import BaseController
 
 # Model
 from model.berkas import BerkasModel
+from model.user import UserModel
+from model.register import RegisterModel
 
 
 class DashboardController(BaseController):
@@ -21,6 +23,22 @@ class DashboardController(BaseController):
 		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
 		try:
 			berkas = BerkasModel(collection=self.CONNECTION.collection(database="pyDatabase", name="berkas"), service=None)
+			register = RegisterModel(collection=self.CONNECTION.collection(database="pyDatabase", name="register"), service=None)
+			petugas = UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=None)
+
+			schema_berkas = {
+				'masuk': berkas.count(filter={"officeid": self.get_cookies_user()['officeid']}),
+				'proses': berkas.count(filter={"officeid": self.get_cookies_user()['officeid'], 'status': 'PROSES', 'actived': True}),
+				'tunda': berkas.count(filter={'officeid': self.get_cookies_user()['officeid'], 'status': 'TUNDA', 'actived': True}),
+				'selesai': berkas.count(filter={"officeid": self.get_cookies_user()['officeid'], 'status': 'FINNISH', 'actived': False})
+			}
+			cal_berkas = []
+			for p in petugas.select(filter={'officeid': self.useractived['officeid']}):
+				p['berkas'] = register.count({'recieve': p['_id']})
+				p['tunggakan'] = register.count({'recieve': p['_id'], 'actived': True})
+				p['selesai_blm_terima'] = register.count({'recieve': p['_id'], 'actived': True, "recievedate": {"$ne": None}})
+				p['selesai'] = register.count({'recieve': p['_id'], 'actived': False})
+				cal_berkas.append(p)
 
 			self.page_data['title'] = 'Dashboard'
 			self.page_data['menu'] = 'dashboard'
@@ -28,9 +46,8 @@ class DashboardController(BaseController):
 			self.render('page/home/dashboard.html', 
 						page=self.page_data, 
 						useractived=self.useractived,
-						berkasmasuk=berkas.count(filter={"officeid": self.get_cookies_user()['officeid']}),
-						berkasproses=berkas.count(filter={"officeid": self.get_cookies_user()['officeid'], 'status': 'PROSES', 'actived': True}),
-						berkastunda=berkas.count(filter={'officeid': self.get_cookies_user()['officeid'], 'status': 'TUNDA', 'actived': True}),
-						berkasselesai=berkas.count(filter={"officeid": self.get_cookies_user()['officeid'], 'status': 'FINNISH', 'actived': False}))
+						berkas=schema_berkas,
+						cal_berkas=cal_berkas)
+
 		except Exception as e:
 			print(e)
