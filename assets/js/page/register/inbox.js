@@ -113,10 +113,7 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "targets": [3],
             "width": "10%",
             "data": 'tahunberkas',
-            "className": "dt-center text-center",
-            "render": function (data) {
-                return data.toUpperCase();
-            }
+            "className": "dt-center text-center"
         }, {
             "targets": [4],
             "width": "10%",
@@ -129,12 +126,12 @@ var tableBerkas = $('#tableBerkas').DataTable({
             }
         },{
             "targets": [5],
-            "width": "15%",
+            "width": "10%",
             "data": 'sendername',
             "className": "dt-center text-center"
         },{
             "targets": [6],
-            "width": "26%",
+            "width": "10%",
             "data": 'kegiatan',
             "className": "dt-center text-center"
         }, {

@@ -1,7 +1,7 @@
-<div class="callout callout-warning" style="margin-bottom: 0!important;">
+<div class="callout bg-gray" style="margin-bottom: 0!important;">
     <h4><i class="fa fa-info"></i> Note:</h4>
     <strong>From</strong>: <br>
-    {{ node['sendername'] }} ,Tgl Kirim.{{ node['senderdate'].strftime('%d/%m/%Y, %H:%M:%S') }} <br>
+    {{ node['sendername'] }} ,Tgl.{{ node['senderdate'].strftime('%d/%m/%Y, %H:%M:%S') }} <br>
     <strong>Messange</strong>:<br>
     {{ node['messange'] }}
 </div>
@@ -12,9 +12,6 @@
         {% if register['status'] == 'PROSES' %}
             <a class="btn btn-app bg-green" id="btnSendBerkas" name="btnSendBerkas" data-toggle="modal" data-target="#modal-messange">
                 <i class="fa fa-paper-plane" aria-hidden="true"></i> Send Berkas
-            </a>
-            <a class="btn btn-app bg-green" id="btnUpdate" name="btnUpdate">
-                <i class="fa fa-refresh" aria-hidden="true"></i> Update
             </a>
         {% end %}
             <a class="btn btn-app bg-green" id="btnKembali" name="btnKembali">
@@ -29,17 +26,15 @@
                 <strong>Kantor :</strong> <address>{{ office['nama'].upper() }}</address>
                 <strong>Nomor Berkas :</strong> <address>{{ register['nomorberkas'] }} / {{ register['tahunberkas'] }}</address>
                 <strong>Region :</strong> <address>KEC. {{ register['kecamatannama'] }}, DS/KEL.{{ register['desanama'] }}</address>
-            </div>
-            <div class="col-sm-4">
                 <strong>Kegiatan :</strong> <address>{{ register['kegiatan'] }}, {{ register['prosedur'] }}</address>
-                <strong>Pemohon Berkas :</strong> <address>{{ pemohon['nama'] }} </address>
-                <strong>Register Masuk :</strong>
-                <address>{{ register['userregisterinname'] }}</address>
             </div>
             <div class="col-sm-4">
-                <strong>Tanggal Register</strong>
-                <address>Tgl.{{ register['userregisterindate'].strftime('%d/%m/%Y, %H:%M:%S') }}</address>
+                <strong>Pemohon Berkas :</strong> <address>{{ pemohon['nama'] }} </address>
+                <strong>Register Masuk :</strong><address>{{ register['userregisterinname'] }}</address>
+                <strong>Tanggal Register</strong><address>Tgl.{{ register['userregisterindate'].strftime('%d/%m/%Y') }}</address>
                 <strong>Tanggal Diterima :</strong> <address>{{ node['recievedate'].strftime('%d/%m/%Y, %H:%M:%S') }}</address>
+            </div>
+            <div class="col-sm-4">
                 <strong>Phone :</strong> <address>{{ register['phone'] }}</address>
                 <strong>Email :</strong> <address>{{ register['email'] }}</address>
             </div>
@@ -254,9 +249,8 @@
                         size: 'medium',
                         callback: function () {
                             $('.nav-tabs a[href="#tabPencarian"]').tab('show');
-                            $('#tabDetail').load('/node/error/400', function () {
-                                $('#tableBerkas').DataTable().ajax.reload(null, false);
-                            });
+                            $('#tabDetail').empty();
+                            $('#tableBerkas').DataTable().ajax.reload(null, false);
                         }
                     });
                 }),

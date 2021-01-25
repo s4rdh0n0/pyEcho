@@ -26,11 +26,12 @@ from model.register import RegisterModel
 class ComponseController(BaseController):
 
 	def initialize(self):
-		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
+		self.useractived = None
 
 	@tornado.web.authenticated
 	@tornado.gen.coroutine
 	def get(self):
+		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
 		try:
 			if UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=options.service).find_role(userid=self.useractived['_id'], role="REGIN") != None:
 				self.page_data['title'] = 'Compose'
@@ -142,12 +143,12 @@ class ComponseController(BaseController):
 			schema_register['actived'] = True
 			register.add(schema=schema_register)
 
-			msg = "{} <br> Berkas {}/{}. <br> Nomor Register {} ,Tgl.{}  berhasil tersimpan.".format(office_entity['nama'], schema_berkas['nomorberkas'], schema_berkas['tahunberkas'], schema_berkas['nomorregister'],body['tglregister'])
+			msg = "{} <br> Berkas {}/{} <br> Register {} , Tgl.{}.".format(office_entity['nama'], schema_berkas['nomorberkas'], schema_berkas['tahunberkas'], schema_berkas['nomorregister'],body['tglregister'])
 			status = True
 			tipe = "info"
 			title = '<strong>Info</strong> <br>'
 		else:
-			msg = "{} <br> Berkas {}/{}. <br> Nomor Register {} ,Tgl.{}  berhasil tersimpan.".format(office_entity['nama'], schema_berkas['nomorberkas'], schema_berkas['tahunberkas'], schema_berkas['nomorregister'],schema_berkas['userregisterindate'])
+			msg = "Berkas {}/{} sudah terregister sebelumnya.".format(berkas_entity['infoberkas']['nomor'], berkas_entity['infoberkas']['tahun'])
 			status = False
 			tipe = "minimalist"
 			title = '<strong>Warning</strong> <br>'
@@ -194,20 +195,16 @@ class DetailComposeController(BaseController):
 class ComposeListController(BaseController):
 
 	def initialize(self):
-		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
+		self.useractived = None
 
 	@tornado.web.authenticated
 	@tornado.gen.coroutine
 	def get(self):
+		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
 		try:
-			if UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=options.service).find_role(userid=self.useractived['_id'], role="REGIN") != None:
-				self.page_data['title'] = 'Berkas Masuk'
-				self.page_data['description'] = 'Daftar Berkas Masuk'
-				self.render('page/register/compose_list.html', page=self.page_data, useractived=self.useractived)
-			else:
-				self.page_data['title'] = '403'
-				self.page_data['description'] = 'Access denied'
-				self.render("page/error/403.html", page=self.page_data,  useractived=self.useractived)
+			self.page_data['title'] = 'Table Compose'
+			self.page_data['description'] = 'Daftar Register Berkas Masuk'
+			self.render('page/register/compose_list.html', page=self.page_data, useractived=self.useractived)
 		except Exception as e:
 			print(e)
 
@@ -242,6 +239,7 @@ class DetailComposeListController(BaseController):
 		pemilik = []
 		
 		berkas = BerkasModel(collection=self.CONNECTION.collection(database='pyDatabase', name='berkas'), service=None)
+		riwayat = RegisterModel(collection = self.CONNECTION.collection(database='pyDatabase', name='register'), service=None).select(filter={"berkasid": berkasid})
 
 		register = berkas.get(filter={'_id': berkasid})
 		for p in register['pemilik']:
@@ -250,5 +248,5 @@ class DetailComposeListController(BaseController):
 			elif p['typepemilikid'] == 'M':
 				pemilik.append(p)
 		
-		self.render("node/detilberkasmasuk.html", office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, pemohon=pemohon)
+		self.render("node/detilberkasmasuk.html", office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, riwayat=riwayat, pemohon=pemohon)
 

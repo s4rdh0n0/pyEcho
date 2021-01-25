@@ -130,7 +130,7 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "render": function (data) {
                 var date = new Date(data.$date);
                 var month = date.getUTCMonth() + 1;
-                return (date.getUTCDate().toString().length > 1 ? date.getUTCDate() : "0" + date.getUTCDate()) + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCFullYear() + "  " + (date.getUTCHours().toString().length > 1 ? date.getUTCHours() : "0" + date.getUTCHours()) + ":" + (date.getUTCMinutes().toString().length > 1 ? date.getUTCMinutes() : "0" + date.getUTCMinutes()) + ":" + (date.getUTCSeconds().toString().length > 1 ? date.getUTCSeconds() : "0" + date.getUTCSeconds());
+                return (date.getUTCDate().toString().length > 1 ? date.getUTCDate() : "0" + date.getUTCDate()) + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCFullYear();
             }
         }, {
             "targets": [3],
@@ -149,12 +149,12 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "className": "dt-center text-center"
         },{
             "targets": [6],
-            "width": "5%",
+            "width": "10%",
             "data": 'kecamatannama',
             "className": "dt-center text-center"
         },{
             "targets": [7],
-            "width": "5%",
+            "width": "10%",
             "data": 'desanama',
             "className": "dt-center text-center"
         },{
@@ -164,12 +164,12 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "className": "dt-center text-center"
         }, {
             "targets": [8],
-            "width": "20%",
+            "width": "10%",
             "data": 'prosedur',
             "className": "dt-center text-center"
         }, {
             "targets": [9],
-            "width": "3%",
+            "width": "10%",
             "data": 'status',
             "className": "dt-center text-center"
         },{

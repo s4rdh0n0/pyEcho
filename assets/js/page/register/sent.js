@@ -94,17 +94,9 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "targets": [3],
             "width": "5%",
             "data": 'tahunberkas',
-            "className": "dt-center text-center",
-            "render": function (data) {
-                return data.toUpperCase();
-            }
+            "className": "dt-center text-center"
         },{
             "targets": [4],
-            "width": "5%",
-            "data": 'sendername',
-            "className": "dt-center text-center"
-        }, {
-            "targets": [5],
             "width": "5%",
             "data": 'senderdate',
             "className": "dt-center text-center",
@@ -114,12 +106,12 @@ var tableBerkas = $('#tableBerkas').DataTable({
                 return (date.getUTCDate().toString().length > 1 ? date.getUTCDate() : "0" + date.getUTCDate()) + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCFullYear() + "  " + (date.getUTCHours().toString().length > 1 ? date.getUTCHours() : "0" + date.getUTCHours()) + ":" + (date.getUTCMinutes().toString().length > 1 ? date.getUTCMinutes() : "0" + date.getUTCMinutes()) + ":" + (date.getUTCSeconds().toString().length > 1 ? date.getUTCSeconds() : "0" + date.getUTCSeconds());
             }
         },{
-            "targets": [6],
+            "targets": [5],
             "width": "5%",
             "data": 'recievename',
             "className": "dt-center text-center"
         },{
-            "targets": [7],
+            "targets": [6],
             "width": "5%",
             "data": 'recievedate',
             "className": "dt-center text-center",
