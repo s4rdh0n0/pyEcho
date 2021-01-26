@@ -14,8 +14,8 @@ from controller.auth import SignInController, SignOutController, NotFoundControl
 from controller.error import NodeNotFoundController
 from controller.dashboard import DashboardController
 from controller.compose import ComponseController, DetailComposeController, ComposeListController, DetailComposeListController
-from controller.kkp import BerkasController
-from controller.inbox import InboxController, InboxDetailController
+from controller.kkp import BerkasKKPController, PegawaiKKPController
+from controller.inbox import InboxController, InboxDetailController, FinnishBerkasController
 from controller.sent import SentController, SentDetailController
 from controller.administrator import DaftarPegawaiViewController, PegawaiController, RoleController
 
@@ -28,7 +28,8 @@ class Application(tornado.web.Application):
                 (r"/login", SignInController),
                 (r"/", DashboardController),
 
-                (r"/kkp/berkas", BerkasController),
+                (r"/kkp/berkas", BerkasKKPController),
+                (r"/kkp/pegawai/username=([A-Za-z0-9\ -@.]+)", PegawaiKKPController),
 
                 (r"/register/compose", ComponseController),
                 (r"/register/compose/save", ComponseController),
@@ -43,6 +44,8 @@ class Application(tornado.web.Application):
 
                 (r"/register/sent", SentController),
                 (r"/register/sent/registerid=([A-Za-z0-9\ -@.]+)", SentDetailController),
+                
+                (r"/register/finnish", FinnishBerkasController),
 
                 (r"/administrator/daftarpegawai", DaftarPegawaiViewController),
                 (r"/administrator/daftarpegawai/pegawai/view/username=([A-Za-z0-9\ -@.]+)", PegawaiController),
@@ -56,6 +59,8 @@ class Application(tornado.web.Application):
 
                 (r"/node/error/400", NodeNotFoundController),
                 (r"/.*", NotFoundController)]
+
+
 
     def __init__(self):
 
