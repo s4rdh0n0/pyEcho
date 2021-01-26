@@ -29,15 +29,9 @@ class FinnishListController(BaseController):
 	def get(self):
 		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
 		try:
-			if UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=options.service).find_role(userid=self.useractived['_id'], role="REGOUT") != None:
-				self.page_data['title'] = 'Table Finnish'
-				self.page_data['description'] = 'Daftar Berkas Keluar'
-				self.render('page/register/finnish.html', page=self.page_data, useractived=useractived)
-
-			else:
-				self.page_data['title'] = '403'
-				self.page_data['description'] = 'Access denied'
-				self.render("page/error/403.html", page=self.page_data,  useractived=useractived)
+			self.page_data['title'] = 'Table Finnish'
+			self.page_data['description'] = 'Daftar Berkas Keluar'
+			self.render('page/register/finnish.html', page=self.page_data, useractived=self.useractived)
 		except Exception as e:
 			print(e)
 

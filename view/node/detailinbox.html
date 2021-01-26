@@ -197,7 +197,7 @@
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" id="formFinnishMessange" method="POST">
-                    <input type="hidden" name="userid">
+                    <input type="hidden" name="userid" id="userid" value="">
                     <div class="form-group">
                         <label class="control-label col-md-2 col-sm-2 col-xs-12" for="username">Username:</label>
                         <div class="col-md-9 col-sm-9 col-xs-12">
@@ -251,6 +251,7 @@
             success: (function (result) {
                 console.log(result);
                 if(result.status){
+                    $('#userid').val(result.data.userid);
                     $('#pegawaiid').val(result.data.pegawaiid);
                     $('#namapegawai').val(result.data.nama);
                 }

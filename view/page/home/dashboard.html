@@ -80,29 +80,29 @@
         <div class="box-body">
             <div class="row">
                 <div class="col-sm-12">
-                    <h5> <strong>Update Data:   {{ datetime.datetime.now().strftime('%d/%m/%Y, %H:%M:%S') }}</strong> </h5>
+                    <h4> <strong>Update Data:   {{ datetime.datetime.now().strftime('%d/%m/%Y, %H:%M:%S') }}</strong> </h4>
                 </div>
                 <div class="col-sm-12">
                     <div class="table-responsive">
-                        <table  class="table table-bordered table-hover" role="grid" >
+                        <table  class="table table-bordered" role="grid" >
                             <tbody>
-                                <tr>
-                                    <th class="text-center">Nama</th>
-                                    <th class="text-center">Beban Kerja</th>
-                                    <th class="text-center">Tunggakan</th>
-                                    <th class="text-center">Terkirim</th>
-                                    <th class="text-center">Belum Diterima</th>
-                                    <th class="text-center">Sudah Diterima</th>
+                                <tr class="bg-gray">
+                                    <th class="text-center">NAMA PETUGAS</th>
+                                    <th class="text-center">BEBAN KERJA</th>
+                                    <th class="text-center">TUNGGAKAN</th>
+                                    <th class="text-center">BELUM DITERIMA <br> <small>**( Berkas Belum Diterima Petugas Selanjutnya</small></th>
+                                    <th class="text-center">SUDAH DITERIMA <br> <small>**( Berkas Sudah Diterima Petugas Selanjutnya</small></th>
+                                    <th class="text-center">SELESAI</th>
                                 </tr>
                                 {% if cal_berkas != None %}
                                     {% for c in cal_berkas %}
                                     <tr>
                                         <td class="text-center">{{ c['nama'].upper() }}</td>
-                                        <td class="text-center">{{ c['tunggakan'] + c['selesai'] }}</td>
+                                        <td class="text-center bg-yellow disabled color-palette">{{ c['tunggakan'] + c['selesai'] }}</td>
                                         <td class="text-center">{{ c['tunggakan'] }}</td>
-                                        <td class="text-center">{{ c['selesai'] }}</td>
                                         <td class="text-center">{{ c['selesai_blm_terima'] }}</td>
                                         <td class="text-center">{{ c['selesai'] - c['selesai_blm_terima'] }}</td>
+                                        <td class="text-center bg-green disabled color-palette">{{ c['selesai'] }}</td>
                                     </tr>
                                     {% end %}
                                 {% end %}
