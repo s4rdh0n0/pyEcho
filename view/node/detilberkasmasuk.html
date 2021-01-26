@@ -1,11 +1,18 @@
 <section class="box box-solid">
     <div class="box-header with-border text-center">
         <h3 class="box-title">
-            {% if register['status'] == 'PROSES' %}
-            <a class="btn btn-app bg-green" id="btnUpdate" name="btnUpdate">
-                <i class="fa fa-refresh" aria-hidden="true"></i> Update
+            {% if register['status'] == 'PROSES' and role != None%}
+            <a class="btn btn-app bg-red" data-toggle="modal" data-target="#modal-messange">
+                <i class="fa fa-pause-circle-o" aria-hidden="true"></i> Tunda
+            </a>
+            {% elif register['status'] == 'TUNDA'  and role != None %}
+            <a class="btn btn-app bg-red" id="btnLanjutkan">
+                <i class="fa fa-caret-square-o-right" aria-hidden="true"></i> Lanjut
             </a>
             {% end %}
+            <a class="btn btn-app bg-yellow" id="btnUpdate">
+                <i class="fa fa-refresh" aria-hidden="true"></i> Update
+            </a>
             <a class="btn btn-app bg-green" id="btnKembali" name="btnKembali">
                 <i class="fa fa-undo" aria-hidden="true"></i> Kembali
             </a>
@@ -16,28 +23,21 @@
         <input type="hidden" name="berkasid" value="{{  register['_id']}}">
         <div class="row">
             <div class="col-sm-4">
-                <strong>Kantor :</strong>
-                <address>{{ office['nama'].upper() }}</address>
-                <strong>Nomor Berkas :</strong>
-                <address>{{ register['nomorberkas'] }} / {{ register['tahunberkas'] }}</address>
-                <strong>Region :</strong>
-                <address>KEC. {{ register['kecamatannama'] }}, DS/KEL.{{ register['desanama'] }}</address>
+                <strong>Kantor :</strong><address>{{ office['nama'].upper() }}</address>
+                <strong>Nomor Berkas :</strong><address>{{ register['nomorberkas'] }} / {{ register['tahunberkas'] }}</address>
+                <strong>Region :</strong><address>KEC. {{ register['kecamatannama'] }}, DS/KEL.{{ register['desanama'] }}</address>
+                <strong>Kegiatan :</strong><address>{{ register['kegiatan'] }}, {{ register['prosedur'] }}</address>
             </div>
             <div class="col-sm-4">
-                <strong>Kegiatan :</strong>
-                <address>{{ register['kegiatan'] }}, {{ register['prosedur'] }}</address>
-                <strong>Pemohon Berkas :</strong>
-                <address>{{ pemohon['nama'] }} </address>
-                <strong>Register Masuk :</strong>
-                <address>{{ register['userregisterinname'] }}</address>
+                <strong>Pemohon Berkas :</strong><address>{{ pemohon['nama'] }} </address>
+                <strong>Register Masuk :</strong><address>{{ register['userregisterinname'] }}</address>
+                <strong>Tanggal Register</strong><address>Tgl. {{ register['userregisterindate'].strftime('%d/%m/%Y') }}</address>
+                <strong>Phone :</strong><address>{{ register['phone'] }}</address>
             </div>
             <div class="col-sm-4">
-                <strong>Tanggal Register</strong>
-                <address>Tgl. {{ register['userregisterindate'].strftime('%d/%m/%Y') }}</address>
-                <strong>Phone :</strong>
-                <address>{{ register['phone'] }}</address>
-                <strong>Email :</strong>
-                <address>{{ register['email'] }}</address>
+                <strong>Email :</strong><address>{{ register['email'] }}</address>
+                <strong>Status :</strong><address>{{ register['status'] }}</address>
+                <strong>Keterangan :</strong><address>{% if 'keterangan' in register.keys() %}{{ register['keterangan'] }}{% end %}</address>
             </div>
         </div>
         <div class="row">
@@ -158,12 +158,96 @@
     </div>
 </section>
 
+<div class="modal fade" id="modal-messange" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="text-align:left;">
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn close" data-dismiss="modal" aria-label="Close"><i class="fa fa-times"></i>
+                    </button>
+                </div>
+                <h4 class="modal-title"><i class="fa fa-envelope-o" aria-hidden="true"></i> Tunda Berkas</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="formSendMessange" method="POST">
+                    <div class="form-group">
+                        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="pesan">Pesan:</label>
+                        <div class="col-md-9 col-sm-9 col-xs-12">
+                            <textarea name="pesan" id="pesan" class="form-control" cols="30" rows="5"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-8 col-sm-8 col-xs-12 col-md-offset-3">
+                            <div class="pull-right">
+                                <button type="button" id="btnTunda" name="btnTunda" class="btn btn-danger btn-flat"><i class="fa fa-pause-circle-o" aria-hidden="true"></i> Tunda</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
 
     $("#btnKembali").click(function () {
         $('.nav-tabs a[href="#tabPencarian"]').tab('show');
         $('#tableBerkas').DataTable().ajax.reload(null, false);
+    });
+
+    $("#btnTunda").click(function () {
+        $('#modal-messange').modal('hide');
+        $.ajax({
+            type: 'POST',
+            url: '/register/compose/list/update',
+            data: JSON.stringify({
+                berkasid: $('input:hidden[name=berkasid]').val(),
+                messange: $('#pesan').val()
+            }),
+            async: true,
+            headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+            success: (function (data) {
+                bootbox.alert({
+                    message: data.msg,
+                    size: 'medium',
+                    callback: function () {
+                        $('#berkasView').load('/register/compose/list/berkasid=' + $('input:hidden[name=berkasid]').val());
+                    }
+                });
+
+                return false
+            }),
+            error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                alert("Error: " + errorThrown);
+            })
+        });
+    });
+
+    $("#btnLanjutkan").click(function () {
+        $.ajax({
+            type: 'PUT',
+            url: '/register/compose/list/update',
+            data: JSON.stringify({
+                berkasid: $('input:hidden[name=berkasid]').val(),
+            }),
+            async: true,
+            headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+            success: (function (data) {
+                bootbox.alert({
+                    message: data.msg,
+                    size: 'medium',
+                    callback: function () {
+                        $('#berkasView').load('/register/compose/list/berkasid=' + $('input:hidden[name=berkasid]').val());
+                    }
+                });
+
+                return false
+            }),
+            error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                alert("Error: " + errorThrown);
+            })
+        });
     });
 
     $("#btnUpdate").click(function () {
@@ -180,10 +264,7 @@
                     message: data.msg,
                     size: 'medium',
                     callback: function () {
-                        run_wait('#tabDetail');
-                        $('#berkasView').load('/register/compose/list/berkasid=' + $('input:hidden[name=berkasid]').val(), function () {
-                            $('#tabDetail').waitMe("hide");
-                        });
+                        $('#berkasView').load('/register/compose/list/berkasid=' + $('input:hidden[name=berkasid]').val());
                     }
                 });
             }),

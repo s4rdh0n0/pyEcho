@@ -143,7 +143,7 @@ class ComponseController(BaseController):
 			schema_register['actived'] = True
 			register.add(schema=schema_register)
 
-			msg = "{} <br> Berkas {}/{} <br> Register {} , Tgl.{}.".format(office_entity['nama'], schema_berkas['nomorberkas'], schema_berkas['tahunberkas'], schema_berkas['nomorregister'],body['tglregister'])
+			msg = "{} <br> Berkas {}/{} berhasil terregister.".format(office_entity['nama'], schema_berkas['nomorberkas'], schema_berkas['tahunberkas'])
 			status = True
 			tipe = "info"
 			title = '<strong>Info</strong> <br>'
@@ -232,15 +232,19 @@ class ComposeListController(BaseController):
 
 class DetailComposeListController(BaseController):
 
+	def initialize(self):
+		self.useractived = None
+
 	@tornado.web.authenticated
 	@tornado.gen.coroutine
 	def get(self, berkasid=""):
+		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
 		pemohon = None
 		pemilik = []
 		
 		berkas = BerkasModel(collection=self.CONNECTION.collection(database='pyDatabase', name='berkas'), service=None)
 		riwayat = RegisterModel(collection = self.CONNECTION.collection(database='pyDatabase', name='register'), service=None).select(filter={"berkasid": berkasid})
-
+		role = UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=options.service).find_role(userid=self.useractived['_id'], role="ADMINISTRATOR")
 		register = berkas.get(filter={'_id': berkasid})
 		for p in register['pemilik']:
 			if p['typepemilikid'] == 'P':
@@ -248,5 +252,44 @@ class DetailComposeListController(BaseController):
 			elif p['typepemilikid'] == 'M':
 				pemilik.append(p)
 		
-		self.render("node/detilberkasmasuk.html", office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, riwayat=riwayat, pemohon=pemohon)
+		self.render("node/detilberkasmasuk.html", office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, riwayat=riwayat, pemohon=pemohon, role=role)
 
+
+	@tornado.web.authenticated
+	@tornado.gen.coroutine
+	def post(self):
+		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
+		body = tornado.escape.json_decode(self.request.body)
+
+		berkas = BerkasModel(collection=self.CONNECTION.collection(database='pyDatabase', name='berkas'), service=None)
+		schema_berkas = berkas.get(filter={'_id': body['berkasid'], 'status': 'PROSES'})
+		if schema_berkas != None and UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=options.service).find_role(userid=self.useractived['_id'], role="ADMINISTRATOR") != None:
+			schema_berkas['status'] = 'TUNDA'
+			schema_berkas['keterangan'] = body['messange']
+
+			berkas.update(filter={'_id': body['berkasid']}, schema=schema_berkas)
+
+			self.write({'status': True, 'msg': 'Berkas {}/{} berhasil ditunda.'.format(schema_berkas['nomorberkas'], schema_berkas['tahunberkas'])})
+		else:
+			self.write({'status': False, 'msg': 'Berkas gagal ditunda.'})
+
+	@tornado.web.authenticated
+	@tornado.gen.coroutine
+	def put(self):
+		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
+		body = tornado.escape.json_decode(self.request.body)
+
+		berkas = BerkasModel(collection=self.CONNECTION.collection(database='pyDatabase', name='berkas'), service=None)
+		schema_berkas = berkas.get(filter={'_id': body['berkasid'], 'status': 'TUNDA'})
+		
+		if schema_berkas != None and UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=options.service).find_role(userid=self.useractived['_id'], role="ADMINISTRATOR") != None:
+			schema_berkas['status'] = 'PROSES'
+			schema_berkas['keterangan'] = ""
+
+			berkas.update(filter={'_id': body['berkasid']}, schema=schema_berkas)
+
+			self.write({'status': True, 'msg': 'Berkas {}/{} berhasil dilanjutkan.'.format(schema_berkas['nomorberkas'], schema_berkas['tahunberkas'])})
+		else:
+			self.write({'status': False, 'msg': 'Berkas gagal dilanjutkan.'})
+
+	

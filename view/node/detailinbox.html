@@ -10,7 +10,7 @@
     <div class="box-header with-border text-center">
         <h3 class="box-title">
         {% if register['status'] == 'PROSES' %}
-            <a class="btn btn-app bg-green" id="btnSendBerkas" name="btnSendBerkas" data-toggle="modal" data-target="#modal-messange">
+            <a class="btn btn-app bg-yellow" id="btnSendBerkas" name="btnSendBerkas" data-toggle="modal" data-target="#modal-messange">
                 <i class="fa fa-paper-plane" aria-hidden="true"></i> Send Berkas
             </a>
         {% end %}
@@ -37,6 +37,8 @@
             <div class="col-sm-4">
                 <strong>Phone :</strong> <address>{{ register['phone'] }}</address>
                 <strong>Email :</strong> <address>{{ register['email'] }}</address>
+                <strong>Status :</strong><address>{{ register['status'] }}</address>
+                <strong>Keterangan :</strong><address>{% if 'keterangan' in register.keys() %}{{ register['keterangan'] }}{% end %}</address>
             </div>
         </div>
         <div class="row">
@@ -167,7 +169,7 @@
                     <div class="form-group">
                         <div class="col-md-8 col-sm-8 col-xs-12 col-md-offset-3">
                             <div class="pull-right">
-                                <button type="submit" id="btnSimpan" name="btnSimpan" class="btn btn-success btn-flat"><i class="fa fa-paper-plane" aria-hidden="true"></i> Kirim</button>
+                                <button type="submit" id="btnSimpan" name="btnSimpan" class="btn btn-warning btn-flat"><i class="fa fa-paper-plane" aria-hidden="true"></i> Kirim</button>
                             </div>
                         </div>
                     </div>

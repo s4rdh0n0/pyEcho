@@ -14,11 +14,12 @@
                 <strong>Tanggal Pendaftaran :</strong> <address>{{ datetime.datetime.strptime(info['createdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}</address>
             </div>
             <div class="col-sm-4">
-                <strong>Kegiatan :</strong> <address>{{ info['kegiatan'] }} <br> {{ info['prosedur'] }}</address>
+                <strong>Kegiatan :</strong> <address>{{ info['kegiatan'] }}</address>
+                <strong>Prosedur :</strong> <address>{{ info['prosedur'] }}</address>
                 <strong>Pemohon Berkas :</strong> <address>{{ info['pemohon'] }} </address>
-                <strong>Posisi Berkas :</strong> <address>{{ info['profile'] }}</address>
             </div>
             <div class="col-sm-4">
+                <strong>Posisi Berkas :</strong> <address>{{ info['profile'] }}</address>
                 <strong>Petugas Terakhir :</strong> <address>{{ info['pegawai'] }}</address>
                 <strong>Status :</strong> <address>{% if info['status'] == '1' %}PROSES{% elif info['status'] == '0' %}SELESAI {% if info['finnishdate'] != '0001-01-01T00:00:00Z' %}  Tgl.{{ datetime.datetime.strptime(info['finnishdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}{% end %}{% end %}</address>
             </div>

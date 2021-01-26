@@ -55,7 +55,7 @@
         </div>
         <div class="col-md-3 col-sm-6 col-xs-12">
             <div class="info-box">
-                <span class="info-box-icon bg-red"><i class="ion ion-android-remove-circle"></i></span>
+                <span class="info-box-icon bg-red"><i class="ion ion-ios-pause"></i></span>
         
                 <div class="info-box-content">
                     <span class="info-box-text">Berkas Tunda</span>
@@ -88,7 +88,7 @@
                             <tbody>
                                 <tr>
                                     <th class="text-center">Nama</th>
-                                    <th class="text-center">Berkas Masuk</th>
+                                    <th class="text-center">Beban Kerja</th>
                                     <th class="text-center">Tunggakan</th>
                                     <th class="text-center">Terkirim</th>
                                     <th class="text-center">Belum Diterima</th>
@@ -98,7 +98,7 @@
                                     {% for c in cal_berkas %}
                                     <tr>
                                         <td class="text-center">{{ c['nama'].upper() }}</td>
-                                        <td class="text-center">{{ c['berkas'] }}</td>
+                                        <td class="text-center">{{ c['tunggakan'] + c['selesai'] }}</td>
                                         <td class="text-center">{{ c['tunggakan'] }}</td>
                                         <td class="text-center">{{ c['selesai'] }}</td>
                                         <td class="text-center">{{ c['selesai_blm_terima'] }}</td>

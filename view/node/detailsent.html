@@ -18,12 +18,14 @@
             <div class="col-sm-4">
                 <strong>Pemohon Berkas :</strong><address>{{ pemohon['nama'] }} </address>
                 <strong>Register Masuk :</strong><address>{{ register['userregisterinname'] }}</address>
-                <strong>Tanggal Register</strong><address>Tgl.{{ register['userregisterindate'].strftime('%d/%m/%Y') }}</address>
-                <strong>Tanggal Diterima :</strong><address>{{ node['recievedate'].strftime('%d/%m/%Y, %H:%M:%S') }}</address>
+                <strong>Tanggal Register</strong><address>{{ register['userregisterindate'].strftime('%d/%m/%Y') }}</address>
+                <strong>Tanggal Diterima :</strong><address>{% if node['recievedate'] != None %}{{ node['recievedate'].strftime('%d/%m/%Y, %H:%M:%S') }}{% end %}</address>
             </div>
             <div class="col-sm-4">
                 <strong>Phone :</strong><address>{{ register['phone'] }}</address>
                 <strong>Email :</strong><address>{{ register['email'] }}</address>
+                <strong>Status :</strong><address>{{ register['status'] }}</address>
+                <strong>Keterangan :</strong><address>{% if 'keterangan' in register.keys() %}{{ register['keterangan'] }}{% end %}</address>
             </div>
         </div>
         <div class="row">

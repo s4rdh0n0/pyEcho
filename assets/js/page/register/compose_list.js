@@ -44,13 +44,7 @@
             $('#tableBerkas').DataTable().ajax.reload(null, false);
         }
     });
-
-    $("#btnResetFilter").click(function () {
-        $('#nomorBerkas').val("");
-        $('#tahunBerkas').val("");
-        $('#tableBerkas').DataTable().ajax.reload(null, false);
-    });
-
+    
     // NOTE: Info Berkas
     $('#tableBerkas tbody').on('click', '#btnInfo', function (event) {
         var selected_row = $(this).parents('tr');

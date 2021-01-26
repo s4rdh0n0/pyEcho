@@ -35,6 +35,7 @@ class Application(tornado.web.Application):
                 (r"/register/compose/berkasid=([A-Za-z0-9\ -@.]+)", DetailComposeController),
                 (r"/register/compose/list", ComposeListController),
                 (r"/register/compose/list/berkasid=([A-Za-z0-9\ -@.]+)", DetailComposeListController),
+                (r"/register/compose/list/update", DetailComposeListController),
 
                 (r"/register/inbox", InboxController),
                 (r"/register/inbox/save", InboxController),
