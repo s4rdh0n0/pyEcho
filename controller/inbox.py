@@ -24,11 +24,12 @@ from model.register import RegisterModel
 class InboxController(BaseController):
 	
 	def initialize(self):
-		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
+		self.useractived = None
 
 	@tornado.web.authenticated
 	@tornado.gen.coroutine
 	def get(self):
+		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
 		try:
 			if UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=options.service).find_role(userid=self.useractived['_id'], role="REGISTER") != None:
 				self.page_data['title'] = 'Inbox'
@@ -134,16 +135,20 @@ class InboxController(BaseController):
 
 class InboxDetailController(BaseController):
 
+	def initialize(self):
+		self.useractived = None
+
 	@tornado.web.authenticated
 	@tornado.gen.coroutine
 	def get(self, registerid=""):
+		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
 		info = {}
 		pemohon = None
 		pemilik = []
+		status_regout = False
 		
 		inbox = RegisterModel(collection=self.CONNECTION.collection(database="pyDatabase", name="register"), service=None)
 		berkas = BerkasModel(collection=self.CONNECTION.collection(database='pyDatabase', name='berkas'), service=None)
-
 		
 		node = inbox.get(filter={"_id": registerid})
 		yield gen.sleep(0.1)
@@ -151,6 +156,10 @@ class InboxDetailController(BaseController):
 		yield gen.sleep(0.1)
 		petugas = UserModel(collection=self.CONNECTION.collection(database='pyDatabase', name='users'), service=None).select(filter={"actived": True, "_id": {"$ne":  self.get_cookies_user()['userid']}})
 		yield gen.sleep(0.1)
+
+		for u in self.useractived['role']:
+			if u['key'] == 'REGOUT':
+				status_regout = True
 
 		for p in register['pemilik']:
 			if p['typepemilikid'] == 'P':
@@ -162,7 +171,7 @@ class InboxDetailController(BaseController):
 			node['recievedate'] = datetime.datetime.now()
 			inbox.update(filter={"_id": node['_id']}, schema=node)
 		
-		self.render("node/detailinbox.html", office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, node=node, petugas=petugas, pemohon=pemohon)
+		self.render("node/detailinbox.html", office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, node=node, petugas=petugas, pemohon=pemohon, status_regout=status_regout)
 
 
 class FinnishBerkasController(BaseController):

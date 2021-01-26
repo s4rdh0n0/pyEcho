@@ -14,9 +14,11 @@
                 <i class="fa fa-paper-plane" aria-hidden="true"></i> Send Berkas
             </a>
         {% end %}
+        {% if status_regout == True %}
             <a class="btn btn-app bg-red" data-toggle="modal" data-target="#modal-finnish">
                 <i class="fa fa-font-awesome" aria-hidden="true"></i> Finnish
             </a>
+        {% end %}
             <a class="btn btn-app bg-green" id="btnKembali" name="btnKembali">
                 <i class="fa fa-undo" aria-hidden="true"></i> Kembali
             </a>
@@ -182,6 +184,7 @@
     </div>
 </div>
 {% end %}
+{% if status_regout == True %}
 <div class="modal fade" id="modal-finnish" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -236,6 +239,7 @@
         </div>
     </div>
 </div>
+{% end %}
 <script>
 
     $("#btnFindPegawai").click(function () {
@@ -336,7 +340,7 @@
             $('#modal-finnish').modal('hide');
             $.ajax({
                 type: 'POST',
-                url: '/register/finnish',
+                url: '/register/finnish/save',
                 data: JSON.stringify({
                     berkasid: $('input:hidden[name=berkasid]').val(),
                     nodeid: $('input:hidden[name=nodeid]').val(),

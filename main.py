@@ -17,6 +17,7 @@ from controller.compose import ComponseController, DetailComposeController, Comp
 from controller.kkp import BerkasKKPController, PegawaiKKPController
 from controller.inbox import InboxController, InboxDetailController, FinnishBerkasController
 from controller.sent import SentController, SentDetailController
+from controller.finnish import FinnishListController
 from controller.administrator import DaftarPegawaiViewController, PegawaiController, RoleController
 
 
@@ -45,7 +46,8 @@ class Application(tornado.web.Application):
                 (r"/register/sent", SentController),
                 (r"/register/sent/registerid=([A-Za-z0-9\ -@.]+)", SentDetailController),
                 
-                (r"/register/finnish", FinnishBerkasController),
+                (r"/register/finnish", FinnishListController),
+                (r"/register/finnish/save", FinnishBerkasController),
 
                 (r"/administrator/daftarpegawai", DaftarPegawaiViewController),
                 (r"/administrator/daftarpegawai/pegawai/view/username=([A-Za-z0-9\ -@.]+)", PegawaiController),
