@@ -29,7 +29,7 @@ class FinnishListController(BaseController):
 	def get(self):
 		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
 		try:
-			self.page_data['title'] = 'Table Finnish'
+			self.page_data['title'] = 'Tabel Berkas Keluar'
 			self.page_data['description'] = 'Daftar Berkas Keluar'
 			self.render('page/register/finnish.html', page=self.page_data, useractived=self.useractived)
 		except Exception as e:

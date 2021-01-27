@@ -202,8 +202,8 @@ class ComposeListController(BaseController):
 	def get(self):
 		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
 		try:
-			self.page_data['title'] = 'Table Compose'
-			self.page_data['description'] = 'Daftar Register Berkas Masuk'
+			self.page_data['title'] = 'Tabel Berkas Masuk'
+			self.page_data['description'] = 'Daftar Berkas Masuk'
 			self.render('page/register/compose_list.html', page=self.page_data, useractived=self.useractived)
 		except Exception as e:
 			print(e)

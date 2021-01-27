@@ -161,13 +161,8 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "width": "10%",
             "data": 'prosedur',
             "className": "dt-center text-center"
-        }, {
+        },{
             "targets": [9],
-            "width": "10%",
-            "data": 'status',
-            "className": "dt-center text-center"
-        }, {
-            "targets": [10],
             "width": "3%",
             "className": "dt-center text-center",
             "render": function (data) {
