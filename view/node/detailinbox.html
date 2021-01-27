@@ -265,8 +265,7 @@
 
 
     $("#btnKembali").click(function () {
-        $('.nav-tabs a[href="#tabPencarian"]').tab('show');
-        $('#tableBerkas').DataTable().ajax.reload(null, false);
+        location.reload(true);
     });
 
     $('#petugas').on('change', function () {
@@ -357,9 +356,7 @@
                             message: result.msg,
                             size: 'medium',
                             callback: function () {
-                                $('.nav-tabs a[href="#tabPencarian"]').tab('show');
-                                $('#tabDetail').empty();
-                                $('#tableBerkas').DataTable().ajax.reload(null, false);
+                                location.reload(true);
                             }
                         });
                     }
@@ -425,9 +422,7 @@
                         message: result.msg,
                         size: 'medium',
                         callback: function () {
-                            $('.nav-tabs a[href="#tabPencarian"]').tab('show');
-                            $('#tabDetail').empty();
-                            $('#tableBerkas').DataTable().ajax.reload(null, false);
+                            location.reload(true);
                         }
                     });
                 }),

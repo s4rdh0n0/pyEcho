@@ -90,8 +90,6 @@
                                     <th class="text-center">NAMA PETUGAS</th>
                                     <th class="text-center">BEBAN KERJA</th>
                                     <th class="text-center">TUNGGAKAN</th>
-                                    <th class="text-center">BELUM DITERIMA <br> <small>**( Berkas Belum Diterima Petugas Selanjutnya</small></th>
-                                    <th class="text-center">SUDAH DITERIMA <br> <small>**( Berkas Sudah Diterima Petugas Selanjutnya</small></th>
                                     <th class="text-center">SELESAI</th>
                                 </tr>
                                 {% if cal_berkas != None %}
@@ -100,8 +98,6 @@
                                         <td class="text-center">{{ c['nama'].upper() }}</td>
                                         <td class="text-center bg-yellow disabled color-palette">{{ c['tunggakan'] + c['selesai'] }}</td>
                                         <td class="text-center">{{ c['tunggakan'] }}</td>
-                                        <td class="text-center">{{ c['selesai_blm_terima'] }}</td>
-                                        <td class="text-center">{{ c['selesai'] - c['selesai_blm_terima'] }}</td>
                                         <td class="text-center bg-green disabled color-palette">{{ c['selesai'] }}</td>
                                     </tr>
                                     {% end %}

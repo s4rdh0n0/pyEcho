@@ -119,7 +119,7 @@ var tableBerkas = $('#tableBerkas').DataTable({
         }, {
             "targets": [2],
             "width": "5%",
-            "data": 'userregisterindate',
+            "data": 'finnishdate',
             "className": "dt-center text-center",
             "render": function (data) {
                 var date = new Date(data.$date);
@@ -129,7 +129,7 @@ var tableBerkas = $('#tableBerkas').DataTable({
         }, {
             "targets": [3],
             "width": "10%",
-            "data": 'userregisterinname',
+            "data": 'finnishname',
             "className": "dt-center text-center"
         }, {
             "targets": [4],
