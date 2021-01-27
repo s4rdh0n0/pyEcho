@@ -44,7 +44,7 @@
             $('#tableBerkas').DataTable().ajax.reload(null, false);
         }
     });
-    
+
     // NOTE: Info Berkas
     $('#tableBerkas tbody').on('click', '#btnInfo', function (event) {
         var selected_row = $(this).parents('tr');
@@ -81,7 +81,7 @@ var tableBerkas = $('#tableBerkas').DataTable({
     'ajax': function (data, callback) {
         $.ajax({
             type: 'POST',
-            url: '/register/compose/list',
+            url: '/register/finnish',
             data: JSON.stringify({
                 // NOTE: Query table berkas
                 nomor: $('#nomorBerkas').val(),
@@ -116,10 +116,10 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "width": "3%",
             "data": 'nomorregister',
             "className": "dt-center text-center"
-        },{
+        }, {
             "targets": [2],
             "width": "5%",
-            "data": 'userregisterindate',
+            "data": 'finnishdate',
             "className": "dt-center text-center",
             "render": function (data) {
                 var date = new Date(data.$date);
@@ -129,7 +129,7 @@ var tableBerkas = $('#tableBerkas').DataTable({
         }, {
             "targets": [3],
             "width": "10%",
-            "data": 'userregisterinname',
+            "data": 'finnishname',
             "className": "dt-center text-center"
         }, {
             "targets": [4],
@@ -141,17 +141,17 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "width": "5%",
             "data": 'tahunberkas',
             "className": "dt-center text-center"
-        },{
+        }, {
             "targets": [6],
             "width": "10%",
             "data": 'kecamatannama',
             "className": "dt-center text-center"
-        },{
+        }, {
             "targets": [7],
             "width": "10%",
             "data": 'desanama',
             "className": "dt-center text-center"
-        },{
+        }, {
             "targets": [8],
             "width": "10%",
             "data": 'kegiatan',
@@ -161,13 +161,8 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "width": "10%",
             "data": 'prosedur',
             "className": "dt-center text-center"
-        }, {
-            "targets": [9],
-            "width": "10%",
-            "data": 'status',
-            "className": "dt-center text-center"
         },{
-            "targets": [10],
+            "targets": [9],
             "width": "3%",
             "className": "dt-center text-center",
             "render": function (data) {

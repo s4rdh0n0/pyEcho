@@ -1,4 +1,4 @@
-import requests
+from datetime import date, datetime
 
 # Tornado Framework
 import tornado.web
@@ -26,17 +26,24 @@ class DashboardController(BaseController):
 			register = RegisterModel(collection=self.CONNECTION.collection(database="pyDatabase", name="register"), service=None)
 			petugas = UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=None)
 
+			today = date.today()
+			start = datetime(
+				year=today.year,
+				month=today.month,
+				day=today.day,
+			)
+			end = datetime.now()
 			schema_berkas = {
 				'masuk': berkas.count(filter={"officeid": self.get_cookies_user()['officeid']}),
+				'masuk_harini': berkas.count(filter={"officeid": self.get_cookies_user()['officeid'], 'userregisterindate': {'$gte': start, '$lt': end}}),
 				'proses': berkas.count(filter={"officeid": self.get_cookies_user()['officeid'], 'status': 'PROSES', 'actived': True}),
 				'tunda': berkas.count(filter={'officeid': self.get_cookies_user()['officeid'], 'status': 'TUNDA', 'actived': True}),
-				'selesai': berkas.count(filter={"officeid": self.get_cookies_user()['officeid'], 'status': 'FINNISH', 'actived': False})
+				'selesai': berkas.count(filter={"officeid": self.get_cookies_user()['officeid'], 'status': 'FINNISH', 'actived': False}),
+                'selesai_hariini': berkas.count(filter={"officeid": self.get_cookies_user()['officeid'], 'status': 'FINNISH', 'actived': False, 'finnishdate': {'$gte': start, '$lt': end}})
 			}
 			cal_berkas = []
 			for p in petugas.select(filter={'officeid': self.useractived['officeid']}):
-				p['berkas'] = register.count({'recieve': p['_id']})
 				p['tunggakan'] = register.count({'recieve': p['_id'], 'actived': True})
-				p['selesai_blm_terima'] = register.count({'recieve': p['_id'], 'actived': True, "recievedate": {"$ne": None}})
 				p['selesai'] = register.count({'recieve': p['_id'], 'actived': False})
 				cal_berkas.append(p)
 

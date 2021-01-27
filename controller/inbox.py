@@ -24,11 +24,12 @@ from model.register import RegisterModel
 class InboxController(BaseController):
 	
 	def initialize(self):
-		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
+		self.useractived = None
 
 	@tornado.web.authenticated
 	@tornado.gen.coroutine
 	def get(self):
+		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
 		try:
 			if UserModel(collection=self.CONNECTION.collection(database="pyDatabase", name="users"), service=options.service).find_role(userid=self.useractived['_id'], role="REGISTER") != None:
 				self.page_data['title'] = 'Inbox'
@@ -134,23 +135,31 @@ class InboxController(BaseController):
 
 class InboxDetailController(BaseController):
 
+	def initialize(self):
+		self.useractived = None
+
 	@tornado.web.authenticated
 	@tornado.gen.coroutine
 	def get(self, registerid=""):
+		self.useractived = self.get_user_actived(cookies=self.get_cookies_user())
 		info = {}
 		pemohon = None
 		pemilik = []
+		status_regout = False
 		
 		inbox = RegisterModel(collection=self.CONNECTION.collection(database="pyDatabase", name="register"), service=None)
 		berkas = BerkasModel(collection=self.CONNECTION.collection(database='pyDatabase', name='berkas'), service=None)
-
 		
 		node = inbox.get(filter={"_id": registerid})
 		yield gen.sleep(0.1)
 		register = berkas.get(filter={'_id': node['berkasid']})
 		yield gen.sleep(0.1)
-		petugasResponse = UserModel(collection=self.CONNECTION.collection(database='pyDatabase', name='users'), service=None).select(filter={"actived": True, "_id": {"$ne":  self.get_cookies_user()['userid']}})
+		petugas = UserModel(collection=self.CONNECTION.collection(database='pyDatabase', name='users'), service=None).select(filter={"actived": True, "_id": {"$ne":  self.get_cookies_user()['userid']}})
 		yield gen.sleep(0.1)
+
+		for u in self.useractived['role']:
+			if u['key'] == 'REGOUT':
+				status_regout = True
 
 		for p in register['pemilik']:
 			if p['typepemilikid'] == 'P':
@@ -162,4 +171,33 @@ class InboxDetailController(BaseController):
 			node['recievedate'] = datetime.datetime.now()
 			inbox.update(filter={"_id": node['_id']}, schema=node)
 		
-		self.render("node/detailinbox.html", office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, node=node, petugas=petugasResponse, pemohon=pemohon)
+		self.render("node/detailinbox.html", office=self.get_office_actived(cookies=self.get_cookies_user()), register=register, node=node, petugas=petugas, pemohon=pemohon, status_regout=status_regout)
+
+
+class FinnishBerkasController(BaseController):
+
+	@tornado.web.authenticated
+	@tornado.gen.coroutine
+	def post(self):
+		try:
+			body = tornado.escape.json_decode(self.request.body)
+			inbox = RegisterModel(collection=self.CONNECTION.collection(database="pyDatabase", name="register"), service=None)
+			berkas = BerkasModel(collection=self.CONNECTION.collection(database='pyDatabase', name='berkas'), service=None)
+
+			schema_berkas = berkas.get(filter={'_id': body['berkasid']})
+			schema_node = inbox.get(filter={'_id': body['nodeid']})
+
+			schema_node['actived'] = False
+			inbox.update(filter={'_id': body['nodeid']}, schema=schema_node)
+
+			schema_berkas['status'] = 'FINNISH'
+			schema_berkas['finnishuserid'] = body['penerimaid']
+			schema_berkas['finnishname'] = body['namapenerima']
+			schema_berkas['finnishdate'] = datetime.datetime.now()
+			schema_berkas['actived'] = False
+			schema_berkas['keterangan'] = body['pesan']
+			berkas.update(filter={'_id': body['berkasid']}, schema=schema_berkas)
+
+			self.write({'status': True, 'msg': 'Berkas {}/{} berhasil diselesaikan.'.format(schema_berkas['nomorberkas'], schema_berkas['tahunberkas'])})
+		except Exception as e:
+			print(e)

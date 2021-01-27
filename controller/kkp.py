@@ -8,8 +8,10 @@ from controller.base import BaseController
 
 # Model
 from model.berkas import BerkasModel
+from model.user import UserModel
 
-class BerkasController(BaseController):
+
+class BerkasKKPController(BaseController):
 
 	@tornado.web.authenticated
 	@tornado.gen.coroutine
@@ -39,5 +41,19 @@ class BerkasController(BaseController):
 			title = '<strong>Info</strong> <br>'
 
 			self.write({'status': status, 'title': title, 'type': tipe, 'msg': msg})
+		except Exception as e:
+			print(e)
+
+class PegawaiKKPController(BaseController):
+
+	@tornado.web.authenticated
+	@tornado.gen.coroutine
+	def get(self, username=""):
+		try:
+			response_pegawai = UserModel(collection=None, service=options.service).kkp(officeid=self.get_cookies_user()['officeid'], username=username)
+			if response_pegawai.status_code == 200:
+				self.write({'status': True, 'data': response_pegawai.json()['result']})
+			else:
+				self.write({'status': False, 'data': None})
 		except Exception as e:
 			print(e)

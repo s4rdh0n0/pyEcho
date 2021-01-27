@@ -97,7 +97,7 @@ class PegawaiController(BaseController):
         collection = self.CONNECTION.collection(database="pyDatabase", name="users")
         user = UserModel(collection=collection, service=options.service)
         response_count = user.count(filter={"username": username})
-        response_pegawai = user.kkp(officeid=cookies['officeid'],username=username)
+        response_pegawai = user.kkp(officeid=cookies['officeid'], username=username)
         if response_pegawai.status_code == 200:
             self.render('node/detailuser.html', pegawai=response_pegawai.json()['result'], username=username, count=response_count)
         else:

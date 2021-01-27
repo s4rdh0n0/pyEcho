@@ -37,7 +37,7 @@
 
                 <div class="info-box-content">
                     <span class="info-box-text">Berkas Masuk</span>
-                    <span class="info-box-number">{{ berkas['masuk'] }} <small> Berkas</small></span>
+                    <span class="info-box-number"><small>{{ berkas['masuk_harini'] }} berkas hari ini </small><br> {{ berkas['masuk'] }} Berkas</span class="info-box-number">
                 </div>
                 <!-- /.info-box-content -->
             </div>
@@ -55,7 +55,7 @@
         </div>
         <div class="col-md-3 col-sm-6 col-xs-12">
             <div class="info-box">
-                <span class="info-box-icon bg-red"><i class="ion ion-android-remove-circle"></i></span>
+                <span class="info-box-icon bg-red"><i class="ion ion-ios-pause"></i></span>
         
                 <div class="info-box-content">
                     <span class="info-box-text">Berkas Tunda</span>
@@ -70,7 +70,7 @@
         
                 <div class="info-box-content">
                     <span class="info-box-text">Berkas Selesai</span>
-                    <span class="info-box-number">{{ berkas['selesai'] }} <small> Berkas</small></span>
+                    <span class="info-box-number"><small>{{ berkas['selesai_hariini'] }} berkas hari ini</small> <br> {{ berkas['selesai'] }} Berkas </span class="info-box-number">
                 </div>
                 <!-- /.info-box-content -->
             </div>
@@ -80,29 +80,25 @@
         <div class="box-body">
             <div class="row">
                 <div class="col-sm-12">
-                    <h5> <strong>Update Data:   {{ datetime.datetime.now().strftime('%d/%m/%Y, %H:%M:%S') }}</strong> </h5>
+                    <h4> <strong>Update Data Perjalanan Berkas:   {{ datetime.datetime.now().strftime('%d/%m/%Y, %H:%M:%S') }}</strong> </h4>
                 </div>
                 <div class="col-sm-12">
                     <div class="table-responsive">
-                        <table  class="table table-bordered table-hover" role="grid" >
+                        <table  class="table table-bordered table-striped" role="grid" >
                             <tbody>
-                                <tr>
-                                    <th class="text-center">Nama</th>
-                                    <th class="text-center">Berkas Masuk</th>
-                                    <th class="text-center">Tunggakan</th>
-                                    <th class="text-center">Terkirim</th>
-                                    <th class="text-center">Belum Diterima</th>
-                                    <th class="text-center">Sudah Diterima</th>
+                                <tr class="bg-gray">
+                                    <th class="text-center">NAMA PETUGAS</th>
+                                    <th class="text-center">BEBAN KERJA</th>
+                                    <th class="text-center">TUNGGAKAN</th>
+                                    <th class="text-center">SELESAI</th>
                                 </tr>
                                 {% if cal_berkas != None %}
                                     {% for c in cal_berkas %}
                                     <tr>
-                                        <td class="text-center">{{ c['nama'].upper() }}</td>
-                                        <td class="text-center">{{ c['berkas'] }}</td>
-                                        <td class="text-center">{{ c['tunggakan'] }}</td>
-                                        <td class="text-center">{{ c['selesai'] }}</td>
-                                        <td class="text-center">{{ c['selesai_blm_terima'] }}</td>
-                                        <td class="text-center">{{ c['selesai'] - c['selesai_blm_terima'] }}</td>
+                                        <td class="text-center" style="border-width: 1px;">{{ c['nama'].upper() }}</td>
+                                        <td class="text-center" style="border-width: 1px;">{{ c['tunggakan'] + c['selesai'] }}</td>
+                                        <td class="text-center" style="border-width: 1px;">{{ c['tunggakan'] }}</td>
+                                        <td class="text-center" style="border-width: 1px;">{{ c['selesai'] }}</td>
                                     </tr>
                                     {% end %}
                                 {% end %}

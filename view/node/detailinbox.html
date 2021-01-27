@@ -10,8 +10,13 @@
     <div class="box-header with-border text-center">
         <h3 class="box-title">
         {% if register['status'] == 'PROSES' %}
-            <a class="btn btn-app bg-green" id="btnSendBerkas" name="btnSendBerkas" data-toggle="modal" data-target="#modal-messange">
+            <a class="btn btn-app bg-yellow" data-toggle="modal" data-target="#modal-messange">
                 <i class="fa fa-paper-plane" aria-hidden="true"></i> Send Berkas
+            </a>
+        {% end %}
+        {% if status_regout == True %}
+            <a class="btn btn-app bg-red" data-toggle="modal" data-target="#modal-finnish">
+                <i class="fa fa-font-awesome" aria-hidden="true"></i> Finnish
             </a>
         {% end %}
             <a class="btn btn-app bg-green" id="btnKembali" name="btnKembali">
@@ -21,6 +26,8 @@
     </div>
 
     <div class="box-body">
+        <input type="hidden" name="berkasid" value="{{ register['_id'] }}">
+        <input type="hidden" name="nodeid" value="{{ node['_id'] }}">
         <div class="row">
             <div class="col-sm-4">
                 <strong>Kantor :</strong> <address>{{ office['nama'].upper() }}</address>
@@ -37,6 +44,8 @@
             <div class="col-sm-4">
                 <strong>Phone :</strong> <address>{{ register['phone'] }}</address>
                 <strong>Email :</strong> <address>{{ register['email'] }}</address>
+                <strong>Status :</strong><address>{{ register['status'] }}</address>
+                <strong>Keterangan :</strong><address>{% if 'keterangan' in register.keys() %}{{ register['keterangan'] }}{% end %}</address>
             </div>
         </div>
         <div class="row">
@@ -145,8 +154,6 @@
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" id="formSendMessange" method="PUT">
-                    <input type="hidden" name="berkasid" value="{{ register['_id'] }}">
-                    <input type="hidden" name="nodeid" value="{{ node['_id'] }}">
                     <div class="form-group">
                         <label class="control-label col-md-2 col-sm-2 col-xs-12" for="petugas">Petugas:</label>
                         <div class="col-md-9 col-sm-9 col-xs-12">
@@ -167,7 +174,63 @@
                     <div class="form-group">
                         <div class="col-md-8 col-sm-8 col-xs-12 col-md-offset-3">
                             <div class="pull-right">
-                                <button type="submit" id="btnSimpan" name="btnSimpan" class="btn btn-success btn-flat"><i class="fa fa-paper-plane" aria-hidden="true"></i> Kirim</button>
+                                <button type="submit" id="btnSimpan" name="btnSimpan" class="btn btn-warning btn-flat"><i class="fa fa-paper-plane" aria-hidden="true"></i> Kirim</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% end %}
+{% if status_regout == True %}
+<div class="modal fade" id="modal-finnish" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="text-align:left;">
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn close" data-dismiss="modal" aria-label="Close"><i class="fa fa-times"></i>
+                    </button>
+                </div>
+                <h4 class="modal-title"><i class="fa fa-font-awesome" aria-hidden="true"></i> Berkas Keluar</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="formFinnishMessange" method="POST">
+                    <input type="hidden" name="userid" id="userid" value="">
+                    <div class="form-group">
+                        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="username">Username:</label>
+                        <div class="col-md-9 col-sm-9 col-xs-12">
+                            <div class="input-group input-group-md">
+                                <input type="text" class="form-control" id="username" name="username">
+                                <span class="input-group-btn">
+                                    <button id="btnFindPegawai" type="button" class="btn btn-success btn-flat"> <i class="fa fa-filter" aria-hidden="true"></i> Cari Pegawai</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="pegawaiid">PegawaiID:</label>
+                        <div class="col-md-9 col-sm-9 col-xs-12">
+                            <input type="text" class="form-control" id="pegawaiid" name="pegawaiid" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="namapegawai">Nama:</label>
+                        <div class="col-md-9 col-sm-9 col-xs-12">
+                            <input type="text" class="form-control" id="namapegawai" name="namapegawai" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-2 col-sm-2 col-xs-12" for="pesanfinnish">Pesan:</label>
+                        <div class="col-md-9 col-sm-9 col-xs-12">
+                            <textarea name="pesanfinnish" id="pesanfinnish" class="form-control" cols="30" rows="5"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-8 col-sm-8 col-xs-12 col-md-offset-3">
+                            <div class="pull-right">
+                                <button type="submit" id="btnFinnish" name="btnFinnish" class="btn btn-danger btn-flat"><i class="fa fa-paper-plane" aria-hidden="true"></i> Simpan</button>
                             </div>
                         </div>
                     </div>
@@ -179,9 +242,30 @@
 {% end %}
 <script>
 
+    $("#btnFindPegawai").click(function () {
+        $.ajax({
+            type: 'GET',
+            url: '/kkp/pegawai/username=' + $('#username').val(),
+            async: true,
+            headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+            success: (function (result) {
+                console.log(result);
+                if(result.status){
+                    $('#userid').val(result.data.userid);
+                    $('#pegawaiid').val(result.data.pegawaiid);
+                    $('#namapegawai').val(result.data.nama);
+                }
+            }),
+            error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                alert("Error: " + errorThrown);
+            })
+        });
+
+    });
+
+
     $("#btnKembali").click(function () {
-        $('.nav-tabs a[href="#tabPencarian"]').tab('show');
-        $('#tableBerkas').DataTable().ajax.reload(null, false);
+        location.reload(true);
     });
 
     $('#petugas').on('change', function () {
@@ -192,6 +276,96 @@
         placeholder: "Pilih petugas",
         theme: "bootstrap",
         allowClear: true
+    });
+
+    $('#petugaspenerima').on('change', function () {
+        $(this).valid();
+    });
+    
+    $("#petugaspenerima").select2({
+        placeholder: "Pilih petugas",
+        theme: "bootstrap",
+        allowClear: true
+    });
+
+    $('#formFinnishMessange').validate({
+        rules: {
+            pegawaiid: {
+                required: true,
+            },
+            namapegawai: {
+                required: true,
+            },
+            userid:{
+                required: true,
+            }
+        },
+        messages: {
+            pegawaiid: {
+                required: 'Pegawaiid wajib diisi.',
+            },
+            namapegawai: {
+                required: 'Nama pegawai wajib diisi.',
+            },
+            userid: {
+                required: 'Userid wajib diisi.',
+            }
+        },
+        errorElement: "small",
+        highlight: function (element, errorClass, validClass) {
+            var elem = $(element);
+            elem.closest('.form-group').addClass('has-error');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            var elem = $(element);
+            elem.closest('.form-group').removeClass('has-error');
+        }, errorPlacement: function (error, element) {
+            if (element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            }
+            else if (element.prop('type') === 'radio' && element.parent('.radio-inline').length) {
+                error.insertAfter(element.parent().parent());
+            }
+            else if (element.prop('type') === 'checkbox' || element.prop('type') === 'radio') {
+                error.appendTo(element.parent().parent());
+            }
+            else if (element.hasClass('select2') && element.next('.select2-container').length) {
+                error.insertAfter(element.next('.select2-container'));
+            }
+            else {
+                error.insertAfter(element);
+            }
+        },
+        submitHandler: function (data) {
+            $('#modal-finnish').modal('hide');
+            $.ajax({
+                type: 'POST',
+                url: '/register/finnish/save',
+                data: JSON.stringify({
+                    berkasid: $('input:hidden[name=berkasid]').val(),
+                    nodeid: $('input:hidden[name=nodeid]').val(),
+                    penerimaid: $('input:hidden[name=userid]').val(),
+                    namapenerima: $('#namapegawai').val(),
+                    pesan: $('#pesanfinnish').val(),
+                }),
+                async: true,
+                headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
+                success: (function (result) {
+                    if(result.status){
+                        bootbox.alert({
+                            message: result.msg,
+                            size: 'medium',
+                            callback: function () {
+                                location.reload(true);
+                            }
+                        });
+                    }
+                }),
+                error: (function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("Error: " + errorThrown);
+                })
+            });
+        }
     });
 
     $('#formSendMessange').validate({
@@ -248,9 +422,7 @@
                         message: result.msg,
                         size: 'medium',
                         callback: function () {
-                            $('.nav-tabs a[href="#tabPencarian"]').tab('show');
-                            $('#tabDetail').empty();
-                            $('#tableBerkas').DataTable().ajax.reload(null, false);
+                            location.reload(true);
                         }
                     });
                 }),
