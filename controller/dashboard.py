@@ -36,7 +36,6 @@ class DashboardController(BaseController):
 			for p in petugas.select(filter={'officeid': self.useractived['officeid']}):
 				p['tunggakan'] = register.count({'recieve': p['_id'], 'actived': True})
 				p['selesai'] = register.count({'recieve': p['_id'], 'actived': False})
-				p['selesai_blm_terima'] = register.count({'recieve': p['_id'], 'actived': False, "recievedate": {"$ne": None}})
 				cal_berkas.append(p)
 
 			self.page_data['title'] = 'Dashboard'
