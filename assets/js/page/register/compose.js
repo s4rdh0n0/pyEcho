@@ -76,7 +76,6 @@
                                 exit: 'animated fadeOutRight'
                             }
                         });
-                        
                         $('#berkasView').empty()
                     }
 

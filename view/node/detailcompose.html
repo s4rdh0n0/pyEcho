@@ -2,26 +2,37 @@
     <div class="box-header with-border text-center">
         <h3 class="box-title">
             <button class="btn btn-app bg-green" id="btnNewRegister" name="btnNewRegister" data-toggle="modal" data-target="#modal-messange">
-                <i class="fa fa-paper-plane" aria-hidden="true"></i> New Register
+                <i class="fa fa-paper-plane" aria-hidden="true"></i> Register Baru
             </button>
         </h3>
     </div>
     <div class="box-body">
         <div class="row">
-            <div class="col-sm-4">
-                <strong>Kantor :</strong> <address>{{ office['nama'].upper() }}</address>
-                <strong>Nomor Berkas :</strong> <address>{{ info['nomor'] }} / {{ info['tahun'] }}</address>
-                <strong>Tanggal Pendaftaran :</strong> <address>{{ datetime.datetime.strptime(info['createdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}</address>
+            <div class="col-sm-12">
+                <h4>INFORMASI BERKAS KKP:</h4>
             </div>
-            <div class="col-sm-4">
-                <strong>Kegiatan :</strong> <address>{{ info['kegiatan'] }}</address>
-                <strong>Prosedur :</strong> <address>{{ info['prosedur'] }}</address>
-                <strong>Pemohon Berkas :</strong> <address>{{ info['pemohon'] }} </address>
-            </div>
-            <div class="col-sm-4">
-                <strong>Posisi Berkas :</strong> <address>{{ info['profile'] }}</address>
-                <strong>Petugas Terakhir :</strong> <address>{{ info['pegawai'] }}</address>
-                <strong>Status :</strong> <address>{% if info['status'] == '1' %}PROSES{% elif info['status'] == '0' %}SELESAI {% if info['finnishdate'] != '0001-01-01T00:00:00Z' %}  Tgl.{{ datetime.datetime.strptime(info['finnishdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}{% end %}{% end %}</address>
+            <div class="col-sm-12">
+                <div>
+                    <table class="table table-bordered table-striped">
+                        <tbody>
+                            <tr>
+                                <td style="width: 30%;"><strong>Kantor :</strong> <p>{{ office['nama'].upper() }}</p></td>
+                                <td style="width: 30%;"><strong>Kegiatan :</strong> <p>{{ info['kegiatan'] }}</p></td>
+                                <td style="width: 30%;"><strong>Tanggal Pendaftaran :</strong> <p>{{ datetime.datetime.strptime(info['createdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}</p></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Nomor Berkas :</strong> <p>{{ info['nomor'] }} / {{ info['tahun'] }}</p></td>
+                                <td><strong>Prosedur :</strong> <p>{{ info['prosedur'] }}</p></td>
+                                <td><strong>Pemohon Berkas :</strong> <p>{{ info['pemohon'] }} </p></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tanggal Pendaftaran :</strong> <p>{{ datetime.datetime.strptime(info['createdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}</p></td>
+                                <td><strong>Pemohon Berkas :</strong> <p>{{ info['pemohon'] }} </p></td>
+                                <td><strong>Status :</strong> <p>{% if info['status'] == '1' %}PROSES{% elif info['status'] == '0' %}SELESAI {% if info['finnishdate'] != '0001-01-01T00:00:00Z' %}  Tgl.{{ datetime.datetime.strptime(info['finnishdate'], '%Y-%m-%dT%H:%M:%S%z').strftime('%d/%m/%Y, %H:%M:%S')  }}{% end %}{% end %}</p></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <div class="row">
@@ -75,8 +86,7 @@
                                 <tr>
                                     <td class="text-center">{{ d['typediid'] }}</td>
                                     <td class="text-center">{{ d['description'].split("-")[1].split(" No.")[1] }}</td>
-                                    <td class="text-center">{{ d['description'].split("-")[1].split(", ")[0].split("Tgl. ")[1] }}
-                                    </td>
+                                    <td class="text-center">{{ d['description'].split("-")[1].split(", ")[0].split("Tgl. ")[1] }}</td>
                                 </tr>
                                 {% end %}
                             {% end %}
@@ -152,7 +162,7 @@
                 <div class="box-tools pull-right">
                     <button type="button" class="btn close" data-dismiss="modal" aria-label="Close"><i class="fa fa-times"></i></button>
                 </div>
-                <h4 class="modal-title"><i class="fa fa-envelope-o" aria-hidden="true"></i> New Register</h4>
+                <h4 class="modal-title"><i class="fa fa-envelope-o" aria-hidden="true"></i> Register Baru</h4>
             </div>
             <div class="modal-body">
                 <form class="form-horizontal" id="formSendMessange" method="PUT">
@@ -322,7 +332,7 @@
                         message: result.msg,
                         size: 'medium',
                         callback: function () {
-                            $('#berkasView').empty();
+                            location.reload(true);
                         }
                     });
                 }),
