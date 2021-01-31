@@ -60,7 +60,8 @@ class ComponseController(BaseController):
 				self.write({'status': False, 'title': 'Warning', 'msg': 'Berkas {}/{} sudah terregister sebelumnya.'.format(body['nomor'], body['tahun']), 'type': 'minimalist'})
 		else:
 			self.write({'status': False, 'title': 'Warning', 'msg': 'Berkas {}/{} tidak ada pada database https://kkp2.atrbpn.go.id/.'.format(body['nomor'], body['tahun']), 'type': 'minimalist'})
-	
+
+
 	@tornado.web.authenticated
 	@tornado.gen.coroutine
 	def put(self):
@@ -119,6 +120,7 @@ class ComponseController(BaseController):
 			schema_berkas['status'] = 'PROSES'
 			schema_berkas['actived'] = True
 			berkas.add(schema=schema_berkas)
+
 			yield gen.sleep(0.1)
 
 			schema_register = dict()
@@ -208,6 +210,7 @@ class ComposeListController(BaseController):
 		except Exception as e:
 			print(e)
 
+
 	@tornado.web.authenticated
 	@tornado.gen.coroutine
 	def post(self):
@@ -291,5 +294,3 @@ class DetailComposeListController(BaseController):
 			self.write({'status': True, 'msg': 'Berkas {}/{} berhasil dilanjutkan.'.format(schema_berkas['nomorberkas'], schema_berkas['tahunberkas'])})
 		else:
 			self.write({'status': False, 'msg': 'Berkas gagal dilanjutkan.'})
-
-	
