@@ -76,9 +76,13 @@
                                 exit: 'animated fadeOutRight'
                             }
                         });
+<<<<<<< HEAD
                         $('#berkasView').empty()
+=======
+>>>>>>> dbe310e401ebaddec8551c8331c994648c1f378b
                     }
-
+                    
+                    location.reload(true);
                 }),
                 error: (function (XMLHttpRequest, textStatus, errorThrown) {
                     alert("Error: " + errorThrown);
