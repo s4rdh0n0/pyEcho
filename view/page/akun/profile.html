@@ -1,0 +1,144 @@
+{% extends "../../index.html" %}
+
+<!-- ANCHOR: Module CSS daftarpegawai.html -->
+{% block css %}
+<link rel="stylesheet" href="{{ static_url('vendor/bootstrap/dist/css/bootstrap.css') }}">
+<link rel="stylesheet" href="{{ static_url('vendor/font-awesome/css/font-awesome.css') }}">
+<link rel="stylesheet" href="{{ static_url('vendor/select2/dist/css/select2.css') }}">
+<link rel="stylesheet" href="{{ static_url('vendor/select2/dist/css/select2-bootstrap.css') }}">
+<link rel="stylesheet" href="{{ static_url('vendor/waitme/waitMe.css') }}">
+<link rel="stylesheet" href="{{ static_url('vendor/animate-css/animate.css') }}">
+<link rel="stylesheet" href="{{ static_url('vendor/bootstrap-datepicker/dist/css/bootstrap-datepicker.css') }}">
+<link rel="stylesheet" href="{{ static_url('css/init.css') }}">
+<link rel="stylesheet" href="{{ static_url('css/skin-blue.css') }}">
+{% end %}
+
+{% block title %}
+{{ escape(handler.settings["title"]) }} | {{ page['title'] }}
+{% end %}
+
+
+<!-- ANCHOR: Module JS daftarpegawai.html -->
+{% block js %}
+<script src="{{ static_url('vendor/jquery/dist/jquery.js') }}"></script>
+<script src="{{ static_url('vendor/bootstrap/dist/js/bootstrap.js') }}"></script>
+<script src="{{ static_url('vendor/jquery-validation/dist/jquery.validate.js') }}"></script>
+<script src="{{ static_url('vendor/select2/dist/js/select2.full.js') }}"></script>
+<script src="{{ static_url('vendor/waitme/waitMe.js') }} }}"></script>
+<script src="{{ static_url('vendor/bootstrap-datepicker/dist/js/bootstrap-datepicker.js') }}"></script>
+<script src="{{ static_url('vendor/bootstrap-notify-master/bootstrap-notify.js') }} }}"></script>
+<script src="{{ static_url('vendor/bootbox/bootbox.js') }}"></script>
+<script src="{{ static_url('js/init.js') }}"></script>
+<script src="{{ static_url('js/page/register/compose.js') }}"></script>
+<style>
+    .error {
+        color: #dd4b39 !important;
+    }
+
+    .has-error .select2-selection {
+        border: 1px solid #a94442;
+        border-radius: 4px;
+    }
+
+    th.dt-center {
+        text-align: center;
+    }
+
+    .alert-info {
+        background-color: rgba(119, 131, 235, 0.945);
+        /* border-color: rgb(22, 22, 22); */
+        border-radius: 3px;
+        color: rgb(255, 255, 255);
+        padding: 10px;
+    }
+
+    .alert-info>[data-notify="icon"] {
+        height: 50px;
+        margin-right: 12px;
+    }
+
+    .alert-info>[data-notify="title"] {
+        color: rgb(255, 255, 255);
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 130%;
+    }
+
+    .alert-info>[data-notify="message"] {
+        font-size: 115%;
+    }
+
+    .alert-minimalist {
+        background-color: rgba(236, 171, 51, 0.945);
+        /* border-color: rgb(22, 22, 22); */
+        border-radius: 3px;
+        color: rgb(255, 255, 255);
+        padding: 10px;
+    }
+
+    .alert-minimalist>[data-notify="icon"] {
+        height: 50px;
+        margin-right: 12px;
+    }
+
+    .alert-minimalist>[data-notify="title"] {
+        color: rgb(255, 255, 255);
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 130%;
+    }
+
+    .alert-minimalist>[data-notify="message"] {
+        font-size: 115%;
+    }
+</style>
+{% end %}
+
+
+{% block content %}
+<section class="content-header">
+    <h1>
+        {{ page['title'] }}
+        <small>{{ page['description'] }}</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><i class="fa fa-sign-in" aria-hidden="true"></i> Register Masuk</li>
+        <li class="active"> {{ page['title'] }}</li>
+    </ol>
+</section>
+
+<section class="content">
+    <div class="box box-solid">
+        <div class="box-header with-border">
+            <h3 class="box-title">Pencarian Berkas</h3>
+        </div>
+
+        <div class="box-body">
+            <form id="formCariBerkas" class="form-horizontal" method="POST" role="form">
+                {% module xsrf_form_html() %}
+
+                <div class="form-group">
+                    <label class="control-label col-md-4 col-sm-4 col-xs-12" for="nomor">Nomor:</label>
+                    <div class="col-md-5 col-sm-5 col-xs-12">
+                        <input type="text" class="form-control" id="nomor" name="nomor">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4 col-sm-4 col-xs-12" for="tahun">Tahun:</label>
+                    <div class="col-md-5 col-sm-5 col-xs-12">
+                        <div class="input-group input-group-md">
+                            <input type="text" class="form-control" id="tahun" name="tahun">
+                            <span class="input-group-btn">
+                                <button id="btnCariBerkas" type="submit" class="btn btn-success btn-flat"> <i
+                                        class="fa fa-database" aria-hidden="true"></i> http://kkp.atrbpn.go.id </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% end %}
