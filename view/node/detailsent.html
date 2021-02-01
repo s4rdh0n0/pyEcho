@@ -9,34 +9,47 @@
 
     <div class="box-body">
         <div class="row">
-            <div class="col-sm-4">
-                <strong>Kantor :</strong><address>{{ office['nama'].upper() }}</address>
-                <strong>Nomor Berkas :</strong><address>{{ register['nomorberkas'] }} / {{ register['tahunberkas'] }}</address>
-                <strong>Region :</strong><address>KEC. {{ register['kecamatannama'] }}, DS/KEL.{{ register['desanama'] }}</address>
-                <strong>Kegiatan :</strong><address>{{ register['kegiatan'] }}, {{ register['prosedur'] }}</address>
+            <div class="col-sm-12">
+                <h4>INFORMASI REGISTER BERKAS:</h4>
             </div>
-            <div class="col-sm-4">
-                <strong>Pemohon Berkas :</strong><address>{{ pemohon['nama'] }} </address>
-                <strong>Register Masuk :</strong><address>{{ register['userregisterinname'] }}</address>
-                <strong>Tanggal Register</strong><address>{{ register['userregisterindate'].strftime('%d/%m/%Y') }}</address>
-                <strong>Tanggal Diterima :</strong><address>{% if node['recievedate'] != None %}{{ node['recievedate'].strftime('%d/%m/%Y, %H:%M:%S') }}{% end %}</address>
-            </div>
-            <div class="col-sm-4">
-                <strong>Phone :</strong><address>{{ register['phone'] }}</address>
-                <strong>Email :</strong><address>{{ register['email'] }}</address>
-                <strong>Status :</strong><address>{{ register['status'] }}</address>
-                <strong>Keterangan :</strong><address>{% if 'keterangan' in register.keys() %}{{ register['keterangan'] }}{% end %}</address>
+            <div class="col-sm-12">
+                <div>
+                    <table class="table table-bordered table-striped">
+                        <tbody>
+                            <tr>
+                                <td style="width: 30%;"><strong>Kantor :</strong><p>{{ office['nama'].upper() }}</p></td>
+                                <td style="width: 30%;"><strong>Pemohon Berkas :</strong><p>{{ pemohon['nama'] }} </p></td>
+                                <td style="width: 30%;"><strong>Email :</strong><p>{{ register['email'] }}</p></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Nomor Berkas :</strong><p>{{ register['nomorberkas'] }} / {{ register['tahunberkas'] }}</p></td>
+                                <td><strong>Petugas Register Masuk :</strong><p>{{ register['userregisterinname'] }}</p></td>
+                                <td><strong>Status :</strong><p>{{ register['status'] }}</p></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Kegiatan :</strong><p>{{ register['kegiatan'] }}, {{ register['prosedur'] }}</p></td>
+                                <td><strong>Tanggal Register</strong><p>Tgl. {{ register['userregisterindate'].strftime('%d/%m/%Y') }}</p></td>
+                                <td><strong>Keterangan :</strong><p>{% if 'keterangan' in register.keys() %}{{ register['keterangan'] }}{% end %}</p></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Region :</strong><p>KEC. {{ register['kecamatannama'] }}, DS/KEL.{{ register['desanama'] }}</p></td>
+                                <td><strong>Phone :</strong><p>{{ register['phone'] }}</p></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <div class="row">
             <div class="col-sm-12">
-                <h5> <strong>DAFTAR ISIAN:</strong> </h5>
+                <h4> DAFTAR ISIAN: </h4>
             </div>
             <div class="col-sm-12">
                 <div class="table-responsive">
-                    <table class="table table-bordered">
+                    <table class="table table-bordered table-striped">
                         <tbody>
-                            <tr>
+                            <tr class="bg-gray">
                                 <th class="text-center">Daftar Isian</th>
                                 <th class="text-center">Nomor</th>
                                 <th class="text-center">Tanggal</th>
@@ -58,13 +71,13 @@
         </div>
         <div class="row">
             <div class="col-sm-12">
-                <h5> <strong>PRODUK:</strong> </h5>
+                <h4> PRODUK: </h4>
             </div>
             <div class="col-sm-12">
                 <div class="table-responsive">
-                    <table class="table table-bordered">
+                    <table class="table table-bordered table-striped" role="grid">
                         <tbody>
-                            <tr>
+                            <tr class="bg-gray">
                                 <th style="display:none"></th>
                                 <th style="display:none"></th>
                                 <th class="text-center">Produk</th>
@@ -80,35 +93,30 @@
                                     <td class="text-center">SURAT TUGAS PENGUKURAN</td>
                                     <td class="text-center">{{ p['nomor'] }}</td>
                                     <td class="text-center">{{ p['wilayah'] }}</td>
-                                    </td>
                                     {% elif p['type'] == 'PERSIL' %}
                                     <td style="display:none">{{ p['documentid'] }}</td>
                                     <td style="display:none">{{ p['type'] }}</td>
                                     <td class="text-center">NIB</td>
                                     <td class="text-center">{{ p['nomor'] }}</td>
                                     <td class="text-center">{{ p['wilayah'] }}</td>
-                                    </td>
                                     {% elif p['type'] == 'GU' %}
                                     <td style="display:none">{{ p['documentid'] }}</td>
                                     <td style="display:none">{{ p['type'] }}</td>
                                     <td class="text-center">GAMBAR UKUR</td>
                                     <td class="text-center">{{ p['nomor'] }}</td>
                                     <td class="text-center">{{ p['wilayah'] }}</td>
-                                    </td>
                                     {% elif p['type'] == 'SU' %}
                                     <td style="display:none">{{ p['documentid'] }}</td>
                                     <td style="display:none">{{ p['type'] }}</td>
                                     <td class="text-center">SURAT UKUR</td>
                                     <td class="text-center">{{ p['nomor'] }}</td>
                                     <td class="text-center">{{ p['wilayah'] }}</td>
-                                    </td>
                                     {% elif p['type'] == 'HAK' %}
                                     <td style="display:none">{{ p['documentid'] }}</td>
                                     <td style="display:none">{{ p['type'] }}</td>
                                     <td class="text-center">BUKU TANAH</td>
                                     <td class="text-center">{{ p['nomor'] }}</td>
                                     <td class="text-center">{{ p['wilayah'] }}</td>
-                                    </td>
                                     {% end %}
                                 </tr>
                                 {% end %}

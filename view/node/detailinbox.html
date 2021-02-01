@@ -29,32 +29,45 @@
         <input type="hidden" name="berkasid" value="{{ register['_id'] }}">
         <input type="hidden" name="nodeid" value="{{ node['_id'] }}">
         <div class="row">
-            <div class="col-sm-4">
-                <strong>Kantor :</strong> <address>{{ office['nama'].upper() }}</address>
-                <strong>Nomor Berkas :</strong> <address>{{ register['nomorberkas'] }} / {{ register['tahunberkas'] }}</address>
-                <strong>Region :</strong> <address>KEC. {{ register['kecamatannama'] }}, DS/KEL.{{ register['desanama'] }}</address>
-                <strong>Kegiatan :</strong> <address>{{ register['kegiatan'] }}, {{ register['prosedur'] }}</address>
+            <div class="col-sm-12">
+                <h4>INFORMASI REGISTER BERKAS:</h4>
             </div>
-            <div class="col-sm-4">
-                <strong>Pemohon Berkas :</strong> <address>{{ pemohon['nama'] }} </address>
-                <strong>Register Masuk :</strong><address>{{ register['userregisterinname'] }}</address>
-                <strong>Tanggal Register</strong><address>Tgl.{{ register['userregisterindate'].strftime('%d/%m/%Y') }}</address>
-                <strong>Tanggal Diterima :</strong> <address>{{ node['recievedate'].strftime('%d/%m/%Y, %H:%M:%S') }}</address>
-            </div>
-            <div class="col-sm-4">
-                <strong>Phone :</strong> <address>{{ register['phone'] }}</address>
-                <strong>Email :</strong> <address>{{ register['email'] }}</address>
-                <strong>Status :</strong><address>{{ register['status'] }}</address>
-                <strong>Keterangan :</strong><address>{% if 'keterangan' in register.keys() %}{{ register['keterangan'] }}{% end %}</address>
+            <div class="col-sm-12">
+                <div>
+                    <table class="table table-bordered table-striped">
+                        <tbody>
+                            <tr>
+                                <td style="width: 30%;"><strong>Kantor :</strong><p>{{ office['nama'].upper() }}</p></td>
+                                <td style="width: 30%;"><strong>Pemohon Berkas :</strong><p>{{ pemohon['nama'] }} </p></td>
+                                <td style="width: 30%;"><strong>Email :</strong><p>{{ register['email'] }}</p></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Nomor Berkas :</strong><p>{{ register['nomorberkas'] }} / {{ register['tahunberkas'] }}</p></td>
+                                <td><strong>Petugas Register Masuk :</strong><p>{{ register['userregisterinname'] }}</p></td>
+                                <td><strong>Status :</strong><p>{{ register['status'] }}</p></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Kegiatan :</strong><p>{{ register['kegiatan'] }}, {{ register['prosedur'] }}</p></td>
+                                <td><strong>Tanggal Register</strong><p>Tgl. {{ register['userregisterindate'].strftime('%d/%m/%Y') }}</p></td>
+                                <td><strong>Keterangan :</strong><p>{% if 'keterangan' in register.keys() %}{{ register['keterangan'] }}{% end %}</p></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Region :</strong><p>KEC. {{ register['kecamatannama'] }}, DS/KEL.{{ register['desanama'] }}</p></td>
+                                <td><strong>Phone :</strong><p>{{ register['phone'] }}</p></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <div class="row">
             <div class="col-sm-12">
-                <h5> <strong>DAFTAR ISIAN:</strong> </h5>
+                <h4> DAFTAR ISIAN: </h4>
             </div>
             <div class="col-sm-12">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped" role="grid">
+                    <table class="table table-bordered table-striped">
                         <tbody>
                             <tr class="bg-gray">
                                 <th class="text-center">Daftar Isian</th>
@@ -66,7 +79,8 @@
                                 <tr>
                                     <td class="text-center">{{ d['typediid'] }}</td>
                                     <td class="text-center">{{ d['description'].split("-")[1].split(" No.")[1] }}</td>
-                                    <td class="text-center">{{ d['description'].split("-")[1].split(", ")[0].split("Tgl. ")[1] }}</td>
+                                    <td class="text-center">{{ d['description'].split("-")[1].split(", ")[0].split("Tgl.")[1] }}
+                                    </td>
                                 </tr>
                                 {% end %}
                             {% end %}
@@ -77,7 +91,7 @@
         </div>
         <div class="row">
             <div class="col-sm-12">
-                <h5> <strong>PRODUK:</strong> </h5>
+                <h4> PRODUK: </h4>
             </div>
             <div class="col-sm-12">
                 <div class="table-responsive">
