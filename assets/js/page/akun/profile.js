@@ -1,43 +1,21 @@
 + function ($) {
     'use strict';
 
-    $("#tmplpasswordlama").on("change", function () {
-        $(this).is(":checked") ? $("#passwordlama").attr("type", "text") : $("#passwordlama").attr("type", "password");
-    });
-
-    $("#tmplpasswordbaru").on("change", function () {
-        $(this).is(":checked") ? $("#passwordbaru").attr("type", "text") : $("#passwordbaru").attr("type", "password");
-    });
-
-    $("#tmplulangpasswordbaru").on("change", function () {
-        $(this).is(":checked") ? $("#ulangpasswordbaru").attr("type", "text") : $("#ulangpasswordbaru").attr("type", "password");
-    });
-
-    $('#formGantiPassword').validate({
+    $('#formProfile').validate({
         rules: {
-            passwordlama: {
+            phone: {
                 required: true,
             },
-            passwordbaru: {
+            email: {
                 required: true,
-                minlength: 8,
-            },
-            ulangpasswordbaru: {
-                required: true,
-                equalTo: '[name="passwordbaru"]'
             }
         },
         messages: {
-            passwordlama: {
-                required: "Password lama tidak boleh kosong.",
+            phone: {
+                required: "Phone tidak boleh kosong.",
             },
-            passwordbaru: {
-                required: "Password baru tidak boleh kosong.",
-                minlength: "Password baru min. 8 karakter.",
-            },
-            ulangpasswordbaru: {
-                required: "Ulang password baru tidak boleh kosong.",
-                equalTo: "Password baru dan ulangi password tidak sama."
+            email: {
+                required: "Email tidak boleh kosong.",
             }
         },
         errorElement: "small",
@@ -65,10 +43,10 @@
         submitHandler: function () {
             $.ajax({
                 type: 'POST',
-                url: '/akun/gantipassword',
+                url: '/akun/profile',
                 data: JSON.stringify({
-                    passwordlama: $('#passwordlama').val(),
-                    passwordbaru: $('#passwordbaru').val(),
+                    email: $('#email').val(),
+                    phone: $('#phone').val(),
                 }),
                 async: true,
                 headers: { 'X-XSRFToken': $('input[name="_xsrf"]').val() },
@@ -87,12 +65,6 @@
                             exit: 'animated fadeOutRight'
                         }
                     });
-
-                    if (result.status){
-                        $('#passwordlama').val('');
-                        $('#passwordbaru').val('');
-                        $('#ulangpasswordbaru').val('');
-                    }
                 }),
                 error: (function (XMLHttpRequest, textStatus, errorThrown) {
                     alert("Error: " + errorThrown);
