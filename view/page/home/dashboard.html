@@ -87,18 +87,23 @@
                         <table  class="table table-bordered table-striped" role="grid" >
                             <tbody>
                                 <tr class="bg-gray">
-                                    <th class="text-center">NAMA PETUGAS</th>
-                                    <th class="text-center">BEBAN KERJA</th>
-                                    <th class="text-center">TUNGGAKAN</th>
-                                    <th class="text-center">SELESAI</th>
+                                    <th style="vertical-align: middle; text-align: center; font-size: 115%" rowspan="2">NAMA PETUGAS</th>
+                                    <th style="vertical-align: middle; text-align: center; font-size: 115%" rowspan="2">BEBAN KERJA</th>
+                                    <th style="vertical-align: middle; text-align: center; font-size: 115%" colspan="2">TUNGGAKAN</th>
+                                    <th style="vertical-align: middle; text-align: center; font-size: 115%" rowspan="2">SELESAI</th>
+                                </tr>
+                                <tr class="bg-gray">
+                                    <td style="vertical-align: middle; text-align: center; font-size: 115%"> <strong>BELUM DITERIMA</strong> </td>
+                                    <td style="vertical-align: middle; text-align: center; font-size: 115%"><strong>SUDAH DITERIMA</strong></td>
                                 </tr>
                                 {% if cal_berkas != None %}
                                     {% for c in cal_berkas %}
                                     <tr>
-                                        <td class="text-center" style="border-width: 1px;">{{ c['nama'].upper() }}</td>
-                                        <td class="text-center" style="border-width: 1px;">{{ c['tunggakan'] + c['selesai'] }}</td>
-                                        <td class="text-center" style="border-width: 1px;">{{ c['tunggakan'] }}</td>
-                                        <td class="text-center" style="border-width: 1px;">{{ c['selesai'] }}</td>
+                                        <td class="text-center" style="border-width: 1px; font-size: 110%;">{{ c['nama'].upper() }}</td>
+                                        <td class="text-center" style="border-width: 1px; font-size: 110%;">{{ c['tunggakan'] + c['selesai'] }}</td>
+                                        <td class="text-center bg-maroon" style="border-width: 1px; font-size: 110%;"> {{ c['tunggakan'] - c['tunggakan_sdh_diterima'] }}</td>
+                                        <td class="text-center" style="border-width: 1px; font-size: 110%;">{{ c['tunggakan_sdh_diterima'] }}</td>
+                                        <td class="text-center" style="border-width: 1px; font-size: 110%;">{{ c['selesai'] }}</td>
                                     </tr>
                                     {% end %}
                                 {% end %}

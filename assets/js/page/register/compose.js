@@ -78,8 +78,6 @@
                         });
                         $('#berkasView').empty()
                     }
-                    
-                    location.reload(true);
                 }),
                 error: (function (XMLHttpRequest, textStatus, errorThrown) {
                     alert("Error: " + errorThrown);
