@@ -130,7 +130,6 @@
 </section>
 <script>
     $("#btnKembali").click(function () {
-        $('.nav-tabs a[href="#tabPencarian"]').tab('show');
-        $('#tableBerkas').DataTable().ajax.reload(null, false);
+        location.reload(true);
     });
 </script>
