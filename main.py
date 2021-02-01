@@ -11,6 +11,7 @@ from tornado.log import app_log, gen_log, access_log, LogFormatter
 
 # Controller
 from controller.auth import SignInController, SignOutController, NotFoundController
+from controller.akun import AkunSayaController, GantiPasswordController
 from controller.error import NodeNotFoundController
 from controller.dashboard import DashboardController
 from controller.compose import ComponseController, DetailComposeController, ComposeListController, DetailComposeListController
@@ -31,6 +32,9 @@ class Application(tornado.web.Application):
 
                 (r"/kkp/berkas", BerkasKKPController),
                 (r"/kkp/pegawai/username=([A-Za-z0-9\ -@.]+)", PegawaiKKPController),
+
+                (r"/akun/profile", AkunSayaController),
+                (r"/akun/gantipassword", GantiPasswordController),
 
                 (r"/register/compose", ComponseController),
                 (r"/register/compose/save", ComponseController),
