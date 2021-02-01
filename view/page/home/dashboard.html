@@ -87,6 +87,7 @@
                         <table  class="table table-bordered table-striped" role="grid" >
                             <tbody>
                                 <tr class="bg-gray">
+                                    <th style="vertical-align: middle; text-align: center; font-size: 115%" rowspan="2">NO</th>
                                     <th style="vertical-align: middle; text-align: center; font-size: 115%" rowspan="2">NAMA PETUGAS</th>
                                     <th style="vertical-align: middle; text-align: center; font-size: 115%" rowspan="2">BEBAN KERJA</th>
                                     <th style="vertical-align: middle; text-align: center; font-size: 115%" colspan="2">TUNGGAKAN</th>
@@ -99,6 +100,7 @@
                                 {% if cal_berkas != None %}
                                     {% for c in cal_berkas %}
                                     <tr>
+                                        <td class="text-center" style="border-width: 1px; font-size: 110%;">{{ c['index'] }}</td>
                                         <td class="text-center" style="border-width: 1px; font-size: 110%;">{{ c['nama'].upper() }}</td>
                                         <td class="text-center" style="border-width: 1px; font-size: 110%;">{{ c['tunggakan'] + c['selesai'] }}</td>
                                         <td class="text-center bg-maroon" style="border-width: 1px; font-size: 110%;"> {{ c['tunggakan'] - c['tunggakan_sdh_diterima'] }}</td>

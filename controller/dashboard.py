@@ -42,10 +42,13 @@ class DashboardController(BaseController):
                 'selesai_hariini': berkas.count(filter={"officeid": self.get_cookies_user()['officeid'], 'status': 'FINNISH', 'actived': False, 'finnishdate': {'$gte': start, '$lt': end}})
 			}
 			cal_berkas = []
+			index = 1
 			for p in petugas.select(filter={'officeid': self.useractived['officeid']}):
+				p['index'] = index
 				p['tunggakan'] = register.count({'recieve': p['_id'], 'actived': True})
 				p['tunggakan_sdh_diterima'] = register.count({'recieve': p['_id'], 'recievedate':{'$ne': None }, 'actived': True})
 				p['selesai'] = register.count({'recieve': p['_id'], 'actived': False})
+				index = index + 1
 				cal_berkas.append(p)
 
 			self.page_data['title'] = 'Dashboard'
