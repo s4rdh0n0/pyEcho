@@ -74,15 +74,10 @@
                                 </span>
                                 <span class="description">Tanggal Diterima - {% if r['recievedate'] != None %}{{r['recievedate'].strftime('%d/%m/%Y, %H:%M:%S') }} {% end %}</span>
                             </div>
+                            <small>{{ r['sendername'].upper() }} - {% if r['senderdate'] != None %}{{r['senderdate'].strftime('%d/%m/%Y, %H:%M:%S') }} {% end %}</small>
                             <h5>
                                 {{ r['messange'] }}
                             </h5>
-                            <ul class="list-inline">
-                                <li class="link-black text-sm">
-                                    <small>{{ r['sendername'].upper() }}<br>
-                                    Tgl.{% if r['senderdate'] != None %}{{r['senderdate'].strftime('%d/%m/%Y, %H:%M:%S') }} {% end %}</small>
-                                </li>
-                            </ul>
                         </form>
                     </div>
                     {% end %}

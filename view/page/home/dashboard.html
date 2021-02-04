@@ -16,6 +16,7 @@
 <script src="{{ static_url('vendor/jquery/dist/jquery.js') }}"></script>
 <script src="{{ static_url('vendor/bootstrap/dist/js/bootstrap.js') }}"></script>
 <script src="{{ static_url('js/init.js') }}"></script>
+<script src="{{ static_url('js/page/home/dashboard.js') }}"></script>
 {% end %}
 
 {% block content %}
@@ -89,22 +90,38 @@
                                 <tr class="bg-gray">
                                     <th style="vertical-align: middle; text-align: center; font-size: 115%" rowspan="2">NO</th>
                                     <th style="vertical-align: middle; text-align: center; font-size: 115%" rowspan="2">NAMA PETUGAS</th>
-                                    <th style="vertical-align: middle; text-align: center; font-size: 115%" rowspan="2">BEBAN KERJA</th>
+                                    <th style="vertical-align: middle; text-align: center; font-size: 115%" colspan="3">BEBAN KERJA</th>
                                     <th style="vertical-align: middle; text-align: center; font-size: 115%" colspan="2">TUNGGAKAN</th>
-                                    <th style="vertical-align: middle; text-align: center; font-size: 115%" rowspan="2">SELESAI</th>
+                                    <th style="vertical-align: middle; text-align: center; font-size: 115%" colspan="2">SELESAI</th>
                                 </tr>
                                 <tr class="bg-gray">
+                                    <td style="vertical-align: middle; text-align: center; font-size: 115%"><strong>MINGGU INI</strong> <br> <small>{{ call_berkas[0]['start_week'].strftime('%d/%m/%Y') }} - {{ call_berkas[0]['end_week'].strftime('%d/%m/%Y') }}</small> </td>
+                                    <td style="vertical-align: middle; text-align: center; font-size: 115%"> <strong>JATUH TEMPO</strong> <br> <small>(> 1 MINGGU)</small></td>
+                                    <td style="vertical-align: middle; text-align: center; font-size: 115%"> <strong>TOTAL</strong> </td>
                                     <td style="vertical-align: middle; text-align: center; font-size: 115%"> <strong>BELUM DITERIMA</strong> </td>
                                     <td style="vertical-align: middle; text-align: center; font-size: 115%"><strong>SUDAH DITERIMA</strong></td>
+                                    <td style="vertical-align: middle; text-align: center; font-size: 115%"><strong>MINGGU INI</strong>  <br> <small>{{ call_berkas[0]['start_week'].strftime('%d/%m/%Y') }} - {{ call_berkas[0]['end_week'].strftime('%d/%m/%Y') }}</small> </td>
+                                    <td style="vertical-align: middle; text-align: center; font-size: 115%"> <strong>TOTAL</strong> </td>
                                 </tr>
-                                {% if cal_berkas != None %}
-                                    {% for c in cal_berkas %}
+                                {% if call_berkas != None %}
+                                    {% for c in call_berkas %}
                                     <tr>
                                         <td class="text-center" style="border-width: 1px; font-size: 110%;">{{ c['index'] }}</td>
                                         <td class="text-center" style="border-width: 1px; font-size: 110%;">{{ c['nama'].upper() }}</td>
+
+                                        <td class="text-center" style="border-width: 1px; font-size: 110%;">{{ c['tunggakan_minggu_ini'] }}</td>
+                                        {% if c['tunggakan_lebih_seminggu'] == 0%}
+                                        <td class="text-center" style="border-width: 1px; font-size: 110%;">{{ c['tunggakan_lebih_seminggu'] }}</td>
+                                        {% else %}
+                                        <td class="text-center bg-red" style="border-width: 1px; font-size: 110%;">{{ c['tunggakan_lebih_seminggu'] }}</td>
+                                        {% end %}
+
                                         <td class="text-center" style="border-width: 1px; font-size: 110%;">{{ c['tunggakan'] + c['selesai'] }}</td>
-                                        <td class="text-center bg-maroon" style="border-width: 1px; font-size: 110%;"> {{ c['tunggakan'] - c['tunggakan_sdh_diterima'] }}</td>
+                                        
+                                        
+                                        <td class="text-center" style="border-width: 1px; font-size: 110%;"> {{ c['tunggakan'] - c['tunggakan_sdh_diterima'] }}</td>
                                         <td class="text-center" style="border-width: 1px; font-size: 110%;">{{ c['tunggakan_sdh_diterima'] }}</td>
+                                        <td class="text-center" style="border-width: 1px; font-size: 110%;">{{ c['selesai_minggu_ini'] }}</td>
                                         <td class="text-center" style="border-width: 1px; font-size: 110%;">{{ c['selesai'] }}</td>
                                     </tr>
                                     {% end %}

@@ -1,20 +1,18 @@
 
 db:
-  server: localhost
-  username: 1228_Trenggalek
-  password: 1228trenggalek
+  server: 123.231.152.210
+  username: 1211_mojokerto
+  password: 1211mojokerto
   port: 27017
 
 office:
-  - code: '1228'
-    kantah: Trenggalek
   - code: '1211'
     kantah: Mojokerto
 
 user:
   - officeid: d8af2d0372b84f6fb33a97847b94cacd
-    username: '3503112605860003'
-    email: s4rdh0n0@gmail.com
+    username: 'wahyuekoc'
+    email: ''
 
 master:
   - code: 1
