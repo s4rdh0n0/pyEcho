@@ -17,7 +17,7 @@ from model.office import OfficeModel
 # Database
 define("db_host", default="localhost", help="Mongo DB")
 define("db_port", default="27017", help="Mongo DB")
-define("db_user", default="1228_Trenggalek", help="Mongo DB")
+define("db_user", default="1228_adminregister", help="Mongo DB")
 define("db_password", default="1228trenggalek", help="Mongo DB")
 
 # Service
