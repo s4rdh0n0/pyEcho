@@ -2,6 +2,7 @@
 import os
 import logging
 
+# Tornado Framework
 import tornado
 import tornado.gen
 import tornado.ioloop
@@ -13,7 +14,7 @@ from tornado.log import app_log, gen_log, access_log, LogFormatter
 from controller.auth import SignInController, SignOutController, NotFoundController
 from controller.akun import AkunSayaController, GantiPasswordController
 from controller.error import NodeNotFoundController
-from controller.dashboard import DashboardController
+from controller.dashboard import DashboardController, NDLPersilController
 from controller.compose import ComponseController, DetailComposeController, ComposeListController, DetailComposeListController
 from controller.kkp import BerkasKKPController, PegawaiKKPController
 from controller.inbox import InboxController, InboxDetailController, FinnishBerkasController
@@ -28,7 +29,10 @@ class Application(tornado.web.Application):
 
     handlers = [(r"/logout", SignOutController),
                 (r"/login", SignInController),
+                
+                
                 (r"/", DashboardController),
+                (r"/ndlpersil", NDLPersilController),
 
                 (r"/kkp/berkas", BerkasKKPController),
                 (r"/kkp/pegawai/username=([A-Za-z0-9\ -@.]+)", PegawaiKKPController),
