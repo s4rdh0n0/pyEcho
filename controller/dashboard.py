@@ -49,14 +49,14 @@ class DashboardController(BaseController):
 				'selesai': berkas.count(filter={"officeid": self.get_cookies_user()['officeid'], 'status': 'FINNISH', 'actived': False}),
                 'selesai_hariini': berkas.count(filter={"officeid": self.get_cookies_user()['officeid'], 'status': 'FINNISH', 'actived': False, 'finnishdate': {'$gte': start, '$lt': end}})
 			}
-			call_berkas = []
 			index = 1
+			call_berkas = []
 			for p in petugas.select(filter={'officeid': self.useractived['officeid']}):
 				p['index'] = index
 				p['start_week'] = datetime(year=start_of_week.year,month=start_of_week.month,day=start_of_week.day)
 				p['end_week'] = datetime(year=end_of_week.year,month=end_of_week.month,day=end_of_week.day)
 				p['tunggakan'] = register.count({'recieve': p['_id'], 'actived': True})
-				p['tunggakan_minggu_ini'] = register.count({'recieve': p['_id'], 'senderdate': {'$gte': datetime(year=start_of_week.year,month=start_of_week.month,day=start_of_week.day), '$lt': datetime(year=end_of_week.year,month=end_of_week.month,day=end_of_week.day)}, 'actived': True})
+				p['tunggakan_minggu_ini'] = register.count({'recieve': p['_id'], 'senderdate': {'$gte': datetime(year=start_of_week.year, month=start_of_week.month,day=start_of_week.day), '$lt': datetime(year=end_of_week.year,month=end_of_week.month,day=end_of_week.day)}, 'actived': True})
 				p['tunggakan_lebih_seminggu'] = p['tunggakan'] - p['tunggakan_minggu_ini']
 				p['tunggakan_sdh_diterima'] = register.count({'recieve': p['_id'], 'recievedate':{'$ne': None }, 'actived': True})
 				p['selesai'] = register.count({'recieve': p['_id'], 'actived': False})
