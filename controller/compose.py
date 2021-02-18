@@ -226,8 +226,14 @@ class ComposeListController(BaseController):
 
 			count_reponse = inbox.count(filter=filter)
 			list_response = inbox.pagination(filter=filter, page_size = body['limit'], page_num = body['page'] + 1)
+
+			list_data = []
+			for l in list_response:
+				register = RegisterModel(collection=self.CONNECTION.collection(database="pyDatabase", name="register"), service=None)
+				l['node'] = register.get(filter={'berkasid': l['_id'], 'actived': True})
+				list_data.append(l)
 			
-			self.write({'status': True, 'draw': body['draw'], 'data': json.dumps(list_response, default=json_util.default), 'recordsTotal': count_reponse, 'recordsFiltered': count_reponse})
+			self.write({'status': True, 'draw': body['draw'], 'data': json.dumps(list_data, default=json_util.default), 'recordsTotal': count_reponse, 'recordsFiltered': count_reponse})
 		except Exception as e:
 			print(e)
 

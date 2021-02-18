@@ -131,43 +131,75 @@ var tableBerkas = $('#tableBerkas').DataTable({
             "width": "10%",
             "data": 'userregisterinname',
             "className": "dt-center text-center"
-        }, {
+        },{
             "targets": [4],
+            "width": "15%",
+            "data": 'node',
+            "className": "dt-center text-left",
+            "render": function (data) {
+                console.log(data.sendername)
+                return 'Dari: ' + data.sendername + '<br>Kepada: ' + data.recievename
+            }
+        },{
+            "targets": [5],
             "width": "5%",
             "data": 'nomorberkas',
             "className": "dt-center text-center"
         }, {
-            "targets": [5],
+            "targets": [6],
             "width": "5%",
             "data": 'tahunberkas',
             "className": "dt-center text-center"
         },{
-            "targets": [6],
-            "width": "10%",
+            "targets": [7],
+            "width": "5%",
             "data": 'kecamatannama',
             "className": "dt-center text-center"
         },{
-            "targets": [7],
-            "width": "10%",
-            "data": 'desanama',
-            "className": "dt-center text-center"
-        },{
             "targets": [8],
-            "width": "10%",
+            "width": "5%",
+            "data": 'desanama',
+            "className": "dt-center text-center",
+            "render": function(data) {
+                return data.toUpperCase();
+            }
+        },{
+            "targets": [9],
+            "width": "5%",
             "data": 'kegiatan',
             "className": "dt-center text-center"
-        }, {
-            "targets": [8],
-            "width": "10%",
+        },{
+            "targets": [10],
+            "width": "15%",
             "data": 'prosedur',
             "className": "dt-center text-center"
-        }, {
-            "targets": [9],
+        },{
+            "targets": [11],
+            "width": "10%",
+            "data": 'pemilik',
+            "className": "dt-center text-center",
+            "render": function (data) {
+                if (data.length == 1){
+                    for (const key in data) {
+                        return data[key].nama
+                    }
+                }else{
+                    for (const key in data) {
+                        if (data[key].typepemilikid == 'P') {
+                            return data[key].nama
+                        }else if (data[key].typepemilikid == 'M'){
+                            return ' An. ' + data[key].nama
+                        }
+                    }
+                }
+            }
+        },{
+            "targets": [12],
             "width": "10%",
             "data": 'status',
             "className": "dt-center text-center"
         },{
-            "targets": [10],
+            "targets": [13],
             "width": "3%",
             "className": "dt-center text-center",
             "render": function (data) {

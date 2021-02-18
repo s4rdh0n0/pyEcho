@@ -109,7 +109,7 @@ def main():
     tornado.options.parse_command_line()
 
     server = Application()
-    server.listen('4231')
+    server.listen('1234')
 
     # In this demo the server will simply run until interrupted
     # with Ctrl-C, but if you want to shut down more gracefully,
